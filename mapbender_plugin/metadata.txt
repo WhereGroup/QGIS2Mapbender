@@ -1,0 +1,17 @@
+[general]
+name=Mapbender QGIS-Plugin
+author=Carmen Viesca
+email=carmen.viesca@wheregroup.com
+description=kurze Beschreibung
+about=lange Beschreibung
+homepage=https://wheregroup.com/
+tags=mapbender
+
+version=0.0.1
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+
+icon=mapbender_logo.png
+experimental=False
+deprecated=False
+
