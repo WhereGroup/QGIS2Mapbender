@@ -6,7 +6,7 @@ from qgis.core import (
     QgsProject,
 )
 
-from .main_dialog import MainDialog
+from mapbender_plugin.main_dialog import MainDialog
 
 class Mapbenderplugin:
     def __init__(self,iface):
