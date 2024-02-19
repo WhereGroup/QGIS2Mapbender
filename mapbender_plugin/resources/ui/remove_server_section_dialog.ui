@@ -31,7 +31,7 @@
     <widget class="QComboBox" name="removeSectionComboBox"/>
    </item>
    <item>
-    <widget class="QPushButton" name="removeSectionButton">
+    <widget class="QPushButton" name="removeSelectedSectionButton">
      <property name="text">
       <string>Remove selected section</string>
      </property>
