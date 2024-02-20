@@ -72,13 +72,17 @@ class EditServerSectionDialog(BASE, WIDGET):
             successBox.setText("Section successfully updated")
             successBox.setStandardButtons(QMessageBox.Ok)
             result = successBox.exec_()
-            if result == 1024:
+            if result == QMessageBox.Ok:
                 self.close()
-        except configparser.DuplicateSectionError as error:
-            print(error)
-            raise
-            sys.exit(1)
-
+        except configparser.Error:
+            failBox = QMessageBox()
+            failBox.setIcon(QMessageBox.Warning)
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Section could not be edited")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+            if result == QMessageBox.Ok:
+                self.close()
 
 
 

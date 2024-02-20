@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
         <string>Import service configuration file</string>
        </property>
       </widget>
-      <widget class="QLabel" name="addServerConfLabel">
+      <widget class="QLabel" name="addServerConfigLabel">
        <property name="geometry">
         <rect>
          <x>50</x>
@@ -184,7 +184,7 @@ p, li { white-space: pre-wrap; }
          <normaloff>../icons/mActionSharingImport.svg</normaloff>../icons/mActionSharingImport.svg</iconset>
        </property>
       </widget>
-      <widget class="QLabel" name="editServiceConfigFileLabel">
+      <widget class="QLabel" name="editServiceConfigLabel">
        <property name="geometry">
         <rect>
          <x>50</x>
@@ -214,7 +214,7 @@ p, li { white-space: pre-wrap; }
          <normaloff>../icons/mActionSharingExport.svg</normaloff>../icons/mActionSharingExport.svg</iconset>
        </property>
       </widget>
-      <widget class="QLabel" name="removeServiceConfigFileLabel">
+      <widget class="QLabel" name="removeServiceConfigLabel">
        <property name="geometry">
         <rect>
          <x>50</x>

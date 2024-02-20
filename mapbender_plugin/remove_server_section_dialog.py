@@ -35,12 +35,12 @@ class RemoveServerSectionDialog(BASE, WIDGET):
         selected_section = self.removeSectionComboBox.currentText()
         self.config.remove_section(selected_section)
 
-        successBox = QMessageBox()
-        successBox.setIcon(QMessageBox.Question)
+        questionBox = QMessageBox()
+        questionBox.setIcon(QMessageBox.Question)
         #successBox.setWindowTitle("..")
-        successBox.setText("Are you sure you want to delete the section '" + selected_section + "' ?")
-        successBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        result = successBox.exec_()
+        questionBox.setText("Are you sure you want to delete the section '" + selected_section + "' ?")
+        questionBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        result = questionBox.exec_()
         if result == QMessageBox.Yes:
             try:
                 with open(self.config_path, 'w') as config_file:
@@ -52,12 +52,17 @@ class RemoveServerSectionDialog(BASE, WIDGET):
                 successBox.setText("Section successfully removed")
                 successBox.setStandardButtons(QMessageBox.Ok)
                 result = successBox.exec_()
-                if result == 1024:
+                if result == QMessageBox.Ok:
                     self.close()
-            except configparser.DuplicateSectionError as error:
-                print(error)
-                raise
-                sys.exit(1)
+            except configparser.Error:
+                failBox = QMessageBox()
+                failBox.setIcon(QMessageBox.Warning)
+                failBox.setWindowTitle("Failed")
+                failBox.setText("Section could not be deleted")
+                failBox.setStandardButtons(QMessageBox.Ok)
+                result = failBox.exec_()
+                if result == QMessageBox.Ok:
+                    self.close()
 
 
 

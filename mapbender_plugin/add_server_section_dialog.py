@@ -33,28 +33,38 @@ class AddServerSectionDialog(BASE, WIDGET):
         new_user_name = self.newUserNameLineEdit.text()
         new_password = self.newPasswordLineEdit.text()
 
-        self.config.add_section(new_section_name)
-        self.config.set(new_section_name, 'url', new_server_address)
-        self.config.set(new_section_name, 'username', new_user_name)
-        self.config.set(new_section_name, 'password', new_password)
         try:
+            self.config.add_section(new_section_name)
+            self.config.set(new_section_name, 'url', new_server_address)
+            self.config.set(new_section_name, 'username', new_user_name)
+            self.config.set(new_section_name, 'password', new_password)
             with open(self.config_path,'w') as config_file:
                 self.config.write(config_file)
             config_file.close()
-            print('saved')
-
             successBox = QMessageBox()
             successBox.setIcon(QMessageBox.Information)
             successBox.setWindowTitle("Success")
             successBox.setText("New section successfully added")
             successBox.setStandardButtons(QMessageBox.Ok)
             result = successBox.exec_()
-            if result == 1024:
+            if result == QMessageBox.Ok:
                 self.close()
-
-
-        except configparser.DuplicateSectionError as error:
-            print(error)
-            raise
-            sys.exit(1)
+        except configparser.DuplicateSectionError:
+            failBox = QMessageBox()
+            failBox.setIcon(QMessageBox.Warning)
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Section could not be added: section name already exists!")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+            if result == QMessageBox.Ok:
+                self.close()
+        except configparser.Error:
+            failBox = QMessageBox()
+            failBox.setIcon(QMessageBox.Warning)
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Section could not be added")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+            if result == QMessageBox.Ok:
+                self.close()
 

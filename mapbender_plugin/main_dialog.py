@@ -1,11 +1,13 @@
 import os
+import shutil
 import sys
 
 from PyQt5 import uic
 #from configparser import ConfigParser
 import configparser
 
-from qgis._core import Qgis
+from PyQt5.QtWidgets import QMessageBox
+from qgis._core import Qgis, QgsProject
 
 from mapbender_plugin.add_server_section_dialog import AddServerSectionDialog
 from mapbender_plugin.edit_server_section_dialog import EditServerSectionDialog
@@ -20,11 +22,15 @@ class MainDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.updateSectionComboBox()
-
+        # tabs
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget.currentChanged.connect(self.updateSectionComboBox)
 
+        # tab1
+        self.updateSectionComboBox()
+        self.uploadButton.clicked.connect(self.validateConfigParams)
+
+        # tab2
         self.addServerConfigButton.clicked.connect(self.openDialogAddNewConfigSection)
         self.editServerConfigButton.clicked.connect(self.openDialogEditConfigSection)
         self.removeServerConfigButton.clicked.connect(self.openDialogRemoveConfigSection)
@@ -32,7 +38,7 @@ class MainDialog(BASE, WIDGET):
         self.buttonBoxTab2.rejected.connect(self.reject)
 
     def updateSectionComboBox(self):
-        # get config file path
+        # create an empty config file in plugin directory if not already existing
         self.plugin_dir = os.path.dirname(__file__)
         self.config_path = self.plugin_dir + '/server_config.cfg'
 
@@ -46,22 +52,24 @@ class MainDialog(BASE, WIDGET):
 
         # parse config file
         try:
+            # As the documentation makes clear, any number of filenames can be passed to the read method,
+            # and it will silently ignore the ones that cannot be opened.
             self.config = configparser.ConfigParser()
             self.config.read(self.config_path)
-        except configparser.ParsingError as error:
-            self.iface.messageBar().pushMessage("Error: Could not parse", error, level=Qgis.Critical)
+        except configparser.Error as error:
+            self.iface.messageBar().pushMessage("Error: Could not parse config file ", error, level=Qgis.Critical)
 
-        # read config sections and validate config params
+        # read config sections
         config_sections = self.config.sections()
         if len(config_sections) == 0:
             self.warningAddServiceText.show()
             self.sectionComboBoxLabel.hide()
             self.sectionComboBox.hide()
             self.uploadButton.hide()
-            self.editSelectedServerConfigButton.hide()
-            self.editSelectedServiceConfigFileLabel.hide()
-            self.removeSelectedServerConfigButton.hide()
-            self.removeSelectedServiceConfigFileLabel.hide()
+            self.editServerConfigButton.hide()
+            self.editServiceConfigLabel.hide()
+            self.removeServerConfigButton.hide()
+            self.removeServiceConfigLabel.hide()
             self.exportServiceConfigFileButton.hide()
             self.exportServiceConfigFileLabel.hide()
         else:
@@ -70,8 +78,6 @@ class MainDialog(BASE, WIDGET):
             self.sectionComboBox.addItems(config_sections)
             self.sectionComboBoxLabel.show()
             self.sectionComboBox.show()
-            #self.validateConfigParams()
-            #self.sectionComboBox.currentIndexChanged.connect(self.validateConfigParams)
             # config management
             self.warningAddServiceText.hide()
 
@@ -83,6 +89,38 @@ class MainDialog(BASE, WIDGET):
         if server_url == '' or len(server_url)<5:
             print('Please provide a value for URL')
         print(server_url, server_username, server_password)
+        self.uploadProject()
+
+    def uploadProject(self):
+        self.source_project_dir_path = QgsProject.instance().readPath("./")
+        self.source_project_file_path = QgsProject.instance().fileName()
+
+        self.server_dir_path = '/home/cviesca/Projekte/Plugin_QGIS-QGIS-Server_Mapbender/'
+        self.server_project_dir_name = 'project_ordner_COPY'
+        self.server_project_dir_path = self.server_dir_path + self.server_project_dir_name
+        # The destination directory, must not already exist; it will be created
+        # as well as missing parent directories. Permissions and times of directories are copied
+        # with copystat(), individual files are copied using shutil.copy2().
+        try:
+            shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
+            successBox = QMessageBox()
+            successBox.setIcon(QMessageBox.Information)
+            successBox.setWindowTitle("Success")
+            successBox.setText("Project directory successfully uploaded")
+            successBox.setStandardButtons(QMessageBox.Ok)
+            result = successBox.exec_()
+            if result == QMessageBox.Ok:
+                self.close()
+        except FileExistsError:
+            failBox = QMessageBox()
+            failBox.setIcon(QMessageBox.Warning)
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Project directory could not be uploaded: Project directory already exists")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+            if result == QMessageBox.Ok:
+                self.close()
+
 
     def openDialogAddNewConfigSection(self):
         new_server_section_dialog = AddServerSectionDialog()
