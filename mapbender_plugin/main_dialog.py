@@ -1,21 +1,20 @@
 import os
 import shutil
-import sys
 
 from PyQt5 import uic
-#from configparser import ConfigParser
 import configparser
 
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis._core import Qgis, QgsProject
 
-from mapbender_plugin.add_server_section_dialog import AddServerSectionDialog
-from mapbender_plugin.edit_server_section_dialog import EditServerSectionDialog
-from mapbender_plugin.remove_server_section_dialog import RemoveServerSectionDialog
+from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
+from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerSectionDialog
+from mapbender_plugin.dialogs.remove_server_section_dialog import RemoveServerSectionDialog
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'resources/ui/main_dialog.ui'))
+    os.path.dirname(__file__), 'dialogs/ui/main_dialog.ui'))
 
 class MainDialog(BASE, WIDGET):
     def __init__(self, parent=None):
@@ -74,12 +73,19 @@ class MainDialog(BASE, WIDGET):
             self.exportServiceConfigFileLabel.hide()
         else:
             # sections-combobox
+            self.warningAddServiceText.hide()
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
             self.sectionComboBoxLabel.show()
             self.sectionComboBox.show()
+            self.uploadButton.show()
             # config management
-            self.warningAddServiceText.hide()
+            self.editServerConfigButton.show()
+            self.editServiceConfigLabel.show()
+            self.removeServerConfigButton.show()
+            self.removeServiceConfigLabel.show()
+            self.exportServiceConfigFileButton.show()
+            self.exportServiceConfigFileLabel.show()
 
     def validateConfigParams(self):
         selected_section = self.sectionComboBox.currentText()
@@ -87,9 +93,16 @@ class MainDialog(BASE, WIDGET):
         server_username = self.config.get(selected_section, 'username')
         server_password = self.config.get(selected_section, 'password')
         if server_url == '' or len(server_url)<5:
-            print('Please provide a value for URL')
-        print(server_url, server_username, server_password)
-        self.uploadProject()
+            failBox = QMessageBox()
+            # failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Server URL is not valid. Please select a valid section or edit the selected section under"
+                            " 'Server configuration management'")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+        else:
+            self.uploadProject()
 
     def uploadProject(self):
         self.source_project_dir_path = QgsProject.instance().readPath("./")
@@ -104,7 +117,8 @@ class MainDialog(BASE, WIDGET):
         try:
             shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
             successBox = QMessageBox()
-            successBox.setIcon(QMessageBox.Information)
+            #successBox.setIcon(QMessageBox.Information)
+            successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("Project directory successfully uploaded")
             successBox.setStandardButtons(QMessageBox.Ok)
@@ -112,14 +126,52 @@ class MainDialog(BASE, WIDGET):
             if result == QMessageBox.Ok:
                 self.close()
         except FileExistsError:
+            #res = QMessageBox.critical(self, "Failed", "Project directory could not be uploaded: Project directory already exists",QMessageBox.Ok)
             failBox = QMessageBox()
-            failBox.setIcon(QMessageBox.Warning)
+            #failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
-            failBox.setText("Project directory could not be uploaded: Project directory already exists")
-            failBox.setStandardButtons(QMessageBox.Ok)
+            failBox.setText("Project directory could not be uploaded: Project directory already exists. Do you want to "
+                            "overwrite the existing project directory '" + self.server_project_dir_name + "'?")
+            failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             result = failBox.exec_()
-            if result == QMessageBox.Ok:
+            if result == QMessageBox.Yes:
                 self.close()
+                self.overwriteProject()
+        except shutil.Error:
+            #res = QMessageBox.critical(self, "Failed", "Project directory could not be uploaded: Project directory already exists",QMessageBox.Ok)
+            failBox = QMessageBox()
+            #failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText("Project directory could not be uploaded: Project directory already exists. Do you want to "
+                            "overwrite the existing project directory '" + self.server_project_dir_name + "'?")
+            failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            result = failBox.exec_()
+            if result == QMessageBox.Yes:
+                self.close()
+                self.overwriteProject()
+
+    def overwriteProject(self):
+        try:
+            shutil.rmtree(self.server_project_dir_path)
+            shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
+            successBox = QMessageBox()
+            # successBox.setIcon(QMessageBox.Information)
+            successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+            successBox.setWindowTitle("Success")
+            successBox.setText("Project directory successfully overwritten")
+            successBox.setStandardButtons(QMessageBox.Ok)
+            result = successBox.exec_()
+        except shutil.Error:
+            failBox = QMessageBox()
+            # failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText("An error occurred")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            failBox.exec_()
+
 
 
     def openDialogAddNewConfigSection(self):

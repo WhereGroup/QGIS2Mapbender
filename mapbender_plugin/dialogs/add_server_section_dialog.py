@@ -1,12 +1,13 @@
 import configparser
 import os
 from PyQt5 import uic
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.uic.properties import QtGui
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'resources/ui/add_server_section_dialog.ui'))
+    os.path.dirname(__file__), 'ui/add_server_section_dialog.ui'))
 
 class AddServerSectionDialog(BASE, WIDGET):
     def __init__(self, parent=None):
@@ -17,14 +18,11 @@ class AddServerSectionDialog(BASE, WIDGET):
         self.addSectionDialogButtonBox.rejected.connect(self.reject)
 
         # get config file path
-        self.plugin_dir = os.path.dirname(__file__)
+        self.file = os.path.dirname(__file__)
+        self.plugin_dir = os.path.dirname(self.file)
         self.config_path = self.plugin_dir + '/server_config.cfg'
 
     def saveNewConfigSection(self):
-        # get config file path
-        self.plugin_dir = os.path.dirname(__file__)
-        self.config_path = self.plugin_dir + '/server_config.cfg'
-
         self.config = configparser.ConfigParser()
         self.config.read(self.config_path)
 
@@ -42,7 +40,8 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.config.write(config_file)
             config_file.close()
             successBox = QMessageBox()
-            successBox.setIcon(QMessageBox.Information)
+            #successBox.setIcon(QMessageBox.Information)
+            successBox.setIconPixmap(QPixmap(self.plugin_dir +  '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("New section successfully added")
             successBox.setStandardButtons(QMessageBox.Ok)
@@ -51,7 +50,8 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.DuplicateSectionError:
             failBox = QMessageBox()
-            failBox.setIcon(QMessageBox.Warning)
+            #failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be added: section name already exists!")
             failBox.setStandardButtons(QMessageBox.Ok)
@@ -60,7 +60,8 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.Error:
             failBox = QMessageBox()
-            failBox.setIcon(QMessageBox.Warning)
+            #failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be added")
             failBox.setStandardButtons(QMessageBox.Ok)

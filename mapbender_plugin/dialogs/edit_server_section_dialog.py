@@ -1,11 +1,12 @@
 import configparser
 import os
 from PyQt5 import uic
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'resources/ui/edit_server_section_dialog.ui'))
+    os.path.dirname(__file__), 'ui/edit_server_section_dialog.ui'))
 
 class EditServerSectionDialog(BASE, WIDGET):
     def __init__(self, parent=None):
@@ -16,14 +17,15 @@ class EditServerSectionDialog(BASE, WIDGET):
         self.removeDialogButtonBox.rejected.connect(self.reject)
 
         # get config file path
-        self.plugin_dir = os.path.dirname(__file__)
+        self.file = os.path.dirname(__file__)
+        self.plugin_dir = os.path.dirname(self.file)
         self.config_path = self.plugin_dir + '/server_config.cfg'
 
         # parse config file
         try:
             self.config = configparser.ConfigParser()
             self.config.read(self.config_path)
-        except configparser.ParsingError as error:
+        except configparser.Error as error:
             self.iface.messageBar().pushMessage("Error: Could not parse", error, level=Qgis.Critical)
 
         # read config sections
@@ -67,7 +69,8 @@ class EditServerSectionDialog(BASE, WIDGET):
                 self.config.write(config_file)
             config_file.close()
             successBox = QMessageBox()
-            successBox.setIcon(QMessageBox.Information)
+            #successBox.setIcon(QMessageBox.Information)
+            successBox.setIconPixmap(QPixmap(self.plugin_dir +  '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("Section successfully updated")
             successBox.setStandardButtons(QMessageBox.Ok)
@@ -76,7 +79,8 @@ class EditServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.Error:
             failBox = QMessageBox()
-            failBox.setIcon(QMessageBox.Warning)
+            #failBox.setIcon(QMessageBox.Warning)
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be edited")
             failBox.setStandardButtons(QMessageBox.Ok)

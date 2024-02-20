@@ -20,14 +20,14 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="serverConnectionTab">
+     <widget class="QWidget" name="serverUploadTab">
       <property name="accessibleName">
        <string/>
       </property>
       <attribute name="title">
-       <string>Server connection</string>
+       <string>Upload .qgz project</string>
       </attribute>
       <widget class="QLabel" name="sectionComboBoxLabel">
        <property name="geometry">
@@ -164,7 +164,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../icons/mActionAllEdits.svg</normaloff>../icons/mActionAllEdits.svg</iconset>
+         <normaloff>../../resources/icons/mActionAllEdits.svg</normaloff>../../resources/icons/mActionAllEdits.svg</iconset>
        </property>
       </widget>
       <widget class="QToolButton" name="importServiceConfigFileButton">
@@ -181,7 +181,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../icons/mActionSharingImport.svg</normaloff>../icons/mActionSharingImport.svg</iconset>
+         <normaloff>../../resources/icons/mActionSharingImport.svg</normaloff>../../resources/icons/mActionSharingImport.svg</iconset>
        </property>
       </widget>
       <widget class="QLabel" name="editServiceConfigLabel">
@@ -211,7 +211,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../icons/mActionSharingExport.svg</normaloff>../icons/mActionSharingExport.svg</iconset>
+         <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
        </property>
       </widget>
       <widget class="QLabel" name="removeServiceConfigLabel">
@@ -241,7 +241,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../icons/mIconDelete.svg</normaloff>../icons/mIconDelete.svg</iconset>
+         <normaloff>../../resources/icons/mIconDelete.svg</normaloff>../../resources/icons/mIconDelete.svg</iconset>
        </property>
       </widget>
       <widget class="QLabel" name="exportServiceConfigFileLabel">
@@ -271,7 +271,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>../icons/mActionAdd.svg</normaloff>../icons/mActionAdd.svg</iconset>
+         <normaloff>../../resources/icons/mActionAdd.svg</normaloff>../../resources/icons/mActionAdd.svg</iconset>
        </property>
       </widget>
       <widget class="QDialogButtonBox" name="buttonBoxTab2">
