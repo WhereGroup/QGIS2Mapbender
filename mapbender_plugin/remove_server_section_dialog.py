@@ -58,7 +58,6 @@ class RemoveServerSectionDialog(BASE, WIDGET):
                 print(error)
                 raise
                 sys.exit(1)
-        #else:
-            #self.close()
+
 
 
