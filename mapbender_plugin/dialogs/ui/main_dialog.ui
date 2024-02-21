@@ -70,6 +70,10 @@
        <property name="text">
         <string>Upload .qgz and data sources to QGIS-Server</string>
        </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
+       </property>
       </widget>
       <widget class="QDialogButtonBox" name="buttonBoxTab1">
        <property name="geometry">
