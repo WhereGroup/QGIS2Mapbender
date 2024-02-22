@@ -40,6 +40,8 @@ class MainDialog(BASE, WIDGET):
         self.buttonBoxTab1.rejected.connect(self.reject)
         self.buttonBoxTab2.rejected.connect(self.reject)
 
+        self.server_qgis_projects_folder_rel_path = '/data/qgis-projects/'
+
     def updateSectionComboBox(self):
         # create an empty config file in plugin directory if not already existing
         self.plugin_dir = os.path.dirname(__file__)
@@ -94,9 +96,8 @@ class MainDialog(BASE, WIDGET):
     def validateConfigParams(self):
         selected_section = self.sectionComboBox.currentText()
         self.host = self.config.get(selected_section, 'url')
-        self.port = 24
-        server_username = self.config.get(selected_section, 'username')
-        server_password = self.config.get(selected_section, 'password')
+        self.username = self.config.get(selected_section, 'username')
+        self.password = self.config.get(selected_section, 'password')
         if self.host == '' or len(self.host)<5:
             failBox = QMessageBox()
             # failBox.setIcon(QMessageBox.Warning)
@@ -115,9 +116,7 @@ class MainDialog(BASE, WIDGET):
         self.source_project_dir_path = QgsProject.instance().readPath("./")
         self.source_project_file_path = QgsProject.instance().fileName()
         if self.source_project_dir_path == "./" or self.source_project_file_path == "":
-            # res = QMessageBox.critical(self, "Failed", "Project directory could not be uploaded: Project directory already exists",QMessageBox.Ok)
             failBox = QMessageBox()
-            # failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
@@ -129,68 +128,70 @@ class MainDialog(BASE, WIDGET):
             #print(source_project_layers)
 
             # QGIS Server folder
-            self.host = 'mapbender-qgis.wheregroup.lan'
-            self.qgis_server_dir_path = self.host + '/usr/lib/cgi-bin/'
-            #self.server_dir_path = '/home/cviesca/Projekte/Plugin_QGIS-QGIS-Server_Mapbender/destination_ober_ordner/' #only for local tests
+            self.server_qgis_projects_folder_abs_path = self.host + self.server_qgis_projects_folder_rel_path
 
-            # project folder (with .qgz and data)
-            self.server_project_folder_name = self.source_project_dir_path.split("/")[-1]
-            self.server_project_dir_path = self.qgis_server_dir_path + self.server_project_folder_name
+            # project folder name (with .qgz and data) as in local
+            self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
+            self.server_project_dir_path = self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
 
             try:
-                # local test:
-                # The destination directory, must not already exist; it will be created
-                # as well as missing parent directories. Permissions and times of directories are copied
-                # with copystat(), individual files are copied using shutil.copy2().
-                #shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
+                # server connection and upload - WORKS, with VPN
+                #sftpConnection = Connection(host=self.host, user=self.username) # does not work!  Der Name oder der Dienst ist nicht bekannt
+                sftpPassword = ''
+                sftpConnection = Connection(host='mapbender-qgis.wheregroup.lan', user='root', port='', connect_kwargs={"password": sftpPassword})
+                with sftpConnection as c:
+                     sftpClient = c.sftp()
+                     # create qgis-project folder:
+                     try:
+                         sftpClient.mkdir(self.server_project_dir_path) # does not create parent directories if not exist!
+                         # upload files:
+                         for filename in os.listdir(self.source_project_dir_path):
+                             # if filename is a file:
+                             if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
+                                 c.put(local=self.source_project_dir_path + "/" + filename,
+                                       remote=self.server_project_dir_path)
+                     except Exception as e:
+                        print(f"Could not mkdir!. Reason: {e}")
 
-                #server connection and upload
-                # try SSH - WORKS
-                #client = SSHClient()
-                #client.load_system_host_keys()
-                #client.connect('mapbender-qgis.wheregroup.lan', username='root', password='')
-                #client.exec_command('mkdir -p ' + 'mapbender-qgis.wheregroup.lan/usr/lib/cgi-bin/test5') # WOKRS
-
-                # try sftp- WORKS
-                sftpConnection = Connection(host='mapbender-qgis.wheregroup.lan', user='root')
+                                     # check upload:
+                files_uploaded = []
+                files_not_uploaded = []
                 with sftpConnection as c:
                     sftpClient = c.sftp()
-                    print(sftpClient.listdir('/usr/lib/cgi-bin/'))
-                    print(self.source_project_dir_path)
                     for filename in os.listdir(self.source_project_dir_path):
-                        print(filename)
-                        #if filename is a file:
-                        c.put(local=f'/home/cviesca/Projekte/Plugin_QGIS-QGIS-Server_Mapbender/source_ordner/{filename}',
-                              remote='/usr/lib/cgi-bin/')
-                        #if file name is a folder...
-
+                         if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir(self.server_project_dir_path):
+                             files_uploaded.append(filename)
+                         elif filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(self.server_project_dir_path):
+                            files_not_uploaded.append(filename)
                 # succes:
                 successBox = QMessageBox()
-                #successBox.setIcon(QMessageBox.Information)
                 successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
                 successBox.setWindowTitle("Success")
-                successBox.setText("Project directory successfully uploaded")
+                if len(files_not_uploaded) == 0:
+                    successBox.setText("Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(files_uploaded))
+                else:
+                    successBox.setText(
+                        "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(files_uploaded)
+                        + ".\nFiles not uploaded: " + ', '.join(files_not_uploaded))
+
                 successBox.setStandardButtons(QMessageBox.Ok)
                 result = successBox.exec_()
                 if result == QMessageBox.Ok:
                     self.close()
+
             except FileExistsError:
-                #res = QMessageBox.critical(self, "Failed", "Project directory could not be uploaded: Project directory already exists",QMessageBox.Ok)
                 failBox = QMessageBox()
-                #failBox.setIcon(QMessageBox.Warning)
                 failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
                 failBox.setWindowTitle("Failed")
                 failBox.setText("Project directory could not be uploaded: Project directory already exists. Do you want to "
-                                "overwrite the existing project directory '" + self.server_project_folder_name + "'?")
+                                "overwrite the existing project directory '" + self.qgis_project_folder_name + "'?")
                 failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                 result = failBox.exec_()
                 if result == QMessageBox.Yes:
                     self.close()
                     self.overwriteProject()
-            except shutil.Error:
-                #res = QMessageBox.critical(self, "Failed", "Project directory could not be uploaded: Project directory already exists",QMessageBox.Ok)
+            except shutil.Error: #convert to error
                 failBox = QMessageBox()
-                #failBox.setIcon(QMessageBox.Warning)
                 failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
                 failBox.setWindowTitle("Failed")
                 failBox.setText("Project directory could not be uploaded")
@@ -208,12 +209,11 @@ class MainDialog(BASE, WIDGET):
             layers_names.append(layer.name())
         return layers_names
 
-    def overwriteProject(self):
+    def overwriteProject(self): # local, for tests
         try:
             shutil.rmtree(self.server_project_dir_path)
             shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
             successBox = QMessageBox()
-            # successBox.setIcon(QMessageBox.Information)
             successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("Project directory successfully overwritten")
@@ -221,7 +221,6 @@ class MainDialog(BASE, WIDGET):
             result = successBox.exec_()
         except shutil.Error:
             failBox = QMessageBox()
-            # failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("An error occurred")

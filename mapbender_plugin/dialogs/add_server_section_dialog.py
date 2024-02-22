@@ -40,7 +40,6 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.config.write(config_file)
             config_file.close()
             successBox = QMessageBox()
-            #successBox.setIcon(QMessageBox.Information)
             successBox.setIconPixmap(QPixmap(self.plugin_dir +  '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("New section successfully added")
@@ -50,7 +49,6 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.DuplicateSectionError:
             failBox = QMessageBox()
-            #failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be added: section name already exists!")
@@ -60,7 +58,6 @@ class AddServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.Error:
             failBox = QMessageBox()
-            #failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be added")

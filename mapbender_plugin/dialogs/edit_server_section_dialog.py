@@ -69,7 +69,6 @@ class EditServerSectionDialog(BASE, WIDGET):
                 self.config.write(config_file)
             config_file.close()
             successBox = QMessageBox()
-            #successBox.setIcon(QMessageBox.Information)
             successBox.setIconPixmap(QPixmap(self.plugin_dir +  '/resources/icons/mIconSuccess.svg'))
             successBox.setWindowTitle("Success")
             successBox.setText("Section successfully updated")
@@ -79,7 +78,6 @@ class EditServerSectionDialog(BASE, WIDGET):
                 self.close()
         except configparser.Error:
             failBox = QMessageBox()
-            #failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Section could not be edited")
