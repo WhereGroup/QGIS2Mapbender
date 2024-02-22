@@ -100,13 +100,12 @@ class MainDialog(BASE, WIDGET):
         self.password = self.config.get(selected_section, 'password')
         if self.host == '' or len(self.host)<5:
             failBox = QMessageBox()
-            # failBox.setIcon(QMessageBox.Warning)
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
             failBox.setText("Server URL is not valid. Please select a valid section or edit the selected section under"
                             " 'Server configuration management'")
             failBox.setStandardButtons(QMessageBox.Ok)
-            result = failBox.exec_()
+            failBox.exec_()
         else:
             self.uploadProject()
 
@@ -127,18 +126,14 @@ class MainDialog(BASE, WIDGET):
             source_project_layers = self.getProjectLayers()
             #print(source_project_layers)
 
-            # QGIS Server folder
-            self.server_qgis_projects_folder_abs_path = self.host + self.server_qgis_projects_folder_rel_path
-
             # project folder name (with .qgz and data) as in local
             self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
             self.server_project_dir_path = self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
 
             try:
                 # server connection and upload - WORKS, with VPN
-                #sftpConnection = Connection(host=self.host, user=self.username) # does not work!  Der Name oder der Dienst ist nicht bekannt
                 sftpPassword = ''
-                sftpConnection = Connection(host='mapbender-qgis.wheregroup.lan', user='root', port='', connect_kwargs={"password": sftpPassword})
+                sftpConnection = Connection(host=self.host, user=self.username, port='', connect_kwargs={"password": sftpPassword}) # does not work!  Der Name oder der Dienst ist nicht bekannt
                 with sftpConnection as c:
                      sftpClient = c.sftp()
                      # create qgis-project folder:
@@ -147,13 +142,17 @@ class MainDialog(BASE, WIDGET):
                          # upload files:
                          for filename in os.listdir(self.source_project_dir_path):
                              # if filename is a file:
+                             #QGIS-Projekt
+                             if filename.split(".")[-1] in ('qgs', 'qgz'):
+                                 self.qgis_project_name = filename
+                             # data
                              if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
                                  c.put(local=self.source_project_dir_path + "/" + filename,
                                        remote=self.server_project_dir_path)
                      except Exception as e:
                         print(f"Could not mkdir!. Reason: {e}")
 
-                                     # check upload:
+                # check upload:
                 files_uploaded = []
                 files_not_uploaded = []
                 with sftpConnection as c:
@@ -178,6 +177,9 @@ class MainDialog(BASE, WIDGET):
                 result = successBox.exec_()
                 if result == QMessageBox.Ok:
                     self.close()
+                # wms getCapabilities
+                wms_getcapabilities = "http://"+ self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="+ self.server_project_dir_path + "/" + self.qgis_project_name
+                print(wms_getcapabilities)
 
             except FileExistsError:
                 failBox = QMessageBox()
