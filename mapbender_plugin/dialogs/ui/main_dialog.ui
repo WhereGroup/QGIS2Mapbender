@@ -123,6 +123,19 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#c01c28;&quot;&gt;No server configuration(s) available. Please add a new valid server configuration section or import a server configuration file.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="tmpMapbenderConsoleButton">
+       <property name="geometry">
+        <rect>
+         <x>170</x>
+         <y>140</y>
+         <width>161</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Mapbender console</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="serverConfigTab">
       <attribute name="title">

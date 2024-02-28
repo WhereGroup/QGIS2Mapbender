@@ -28,12 +28,14 @@ class AddServerSectionDialog(BASE, WIDGET):
 
         new_section_name = self.newServiceNameLineEdit.text()
         new_server_address = self.newServerAddressLineEdit.text()
+        new_server_port =self.newServerPortLineEdit.text()
         new_user_name = self.newUserNameLineEdit.text()
         new_password = self.newPasswordLineEdit.text()
 
         try:
             self.config.add_section(new_section_name)
             self.config.set(new_section_name, 'url', new_server_address)
+            self.config.set(new_section_name, 'port', new_server_port)
             self.config.set(new_section_name, 'username', new_user_name)
             self.config.set(new_section_name, 'password', new_password)
             with open(self.config_path,'w') as config_file:

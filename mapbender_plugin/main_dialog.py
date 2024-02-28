@@ -1,15 +1,15 @@
 import os
 import shutil
 
+from fabric2 import Connection
+import paramiko
+
 from PyQt5 import uic
 import configparser
 
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from paramiko import sftp
-from paramiko.client import SSHClient
-from paramiko.sftp_client import SFTPClient
-from fabric2 import Connection
+
 from qgis._core import Qgis, QgsProject
 
 from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
@@ -32,6 +32,7 @@ class MainDialog(BASE, WIDGET):
         # tab1
         self.updateSectionComboBox()
         self.uploadButton.clicked.connect(self.validateConfigParams)
+        self.tmpMapbenderConsoleButton.clicked.connect(self.tempTestMapbenderConsole)
 
         # tab2
         self.addServerConfigButton.clicked.connect(self.openDialogAddNewConfigSection)
@@ -96,6 +97,7 @@ class MainDialog(BASE, WIDGET):
     def validateConfigParams(self):
         selected_section = self.sectionComboBox.currentText()
         self.host = self.config.get(selected_section, 'url')
+        self.port = self.config.get(selected_section, 'port')
         self.username = self.config.get(selected_section, 'username')
         self.password = self.config.get(selected_section, 'password')
         if self.host == '' or len(self.host)<5:
@@ -132,9 +134,10 @@ class MainDialog(BASE, WIDGET):
 
             try:
                 # server connection and upload - WORKS, with VPN
-                sftpPassword = ''
-                sftpConnection = Connection(host=self.host, user=self.username, port='', connect_kwargs={"password": sftpPassword}) # does not work!  Der Name oder der Dienst ist nicht bekannt
-                with sftpConnection as c:
+                #self.validateConfigParams()''
+                sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={"password": self.password}) # does not work!  Der Name oder der Dienst ist nicht bekannt
+                try:
+                    with sftpConnection as c:
                      sftpClient = c.sftp()
                      # create qgis-project folder:
                      try:
@@ -147,61 +150,37 @@ class MainDialog(BASE, WIDGET):
                                  self.qgis_project_name = filename
                              # data
                              if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
-                                 c.put(local=self.source_project_dir_path + "/" + filename,
-                                       remote=self.server_project_dir_path)
+                                 try:
+                                    c.put(local=self.source_project_dir_path + "/" + filename,
+                                        remote=self.server_project_dir_path)
+                                 except:
+                                     failBox = QMessageBox()
+                                     failBox.setIconPixmap(
+                                         QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                                     failBox.setWindowTitle("Failed")
+                                     failBox.setText("Project directory could not be uploaded")
+                                     failBox.setStandardButtons(QMessageBox.Ok)
+                                     failBox.exec_()
+
+                         self.checkUpload()
                      except Exception as e:
-                        print(f"Could not mkdir!. Reason: {e}")
+                        print(f"Could not mkdir!. Reason: {e}") # i.e. if dir already exists
+                        failBox = QMessageBox()
+                        failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                        failBox.setWindowTitle("Failed")
+                        failBox.setText(
+                            "Project directory could not be uploaded: Project directory already exists. Do you want to "
+                            "overwrite the existing project directory '" + self.qgis_project_folder_name + "'?")
+                        failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+                        result = failBox.exec_()
+                        if result == QMessageBox.Yes:
+                            self.close()
+                            self.overwriteProject()
+                except Exception as e:
+                    print(f"Could not connect to server!. Reason: {e}")
 
-                # check upload:
-                files_uploaded = []
-                files_not_uploaded = []
-                with sftpConnection as c:
-                    sftpClient = c.sftp()
-                    for filename in os.listdir(self.source_project_dir_path):
-                         if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir(self.server_project_dir_path):
-                             files_uploaded.append(filename)
-                         elif filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(self.server_project_dir_path):
-                            files_not_uploaded.append(filename)
-                # succes:
-                successBox = QMessageBox()
-                successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
-                successBox.setWindowTitle("Success")
-                if len(files_not_uploaded) == 0:
-                    successBox.setText("Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(files_uploaded))
-                else:
-                    successBox.setText(
-                        "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(files_uploaded)
-                        + ".\nFiles not uploaded: " + ', '.join(files_not_uploaded))
-
-                successBox.setStandardButtons(QMessageBox.Ok)
-                result = successBox.exec_()
-                if result == QMessageBox.Ok:
-                    self.close()
-                # wms getCapabilities
-                wms_getcapabilities = "http://"+ self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="+ self.server_project_dir_path + "/" + self.qgis_project_name
-                print(wms_getcapabilities)
-
-            except FileExistsError:
-                failBox = QMessageBox()
-                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                failBox.setWindowTitle("Failed")
-                failBox.setText("Project directory could not be uploaded: Project directory already exists. Do you want to "
-                                "overwrite the existing project directory '" + self.qgis_project_folder_name + "'?")
-                failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                result = failBox.exec_()
-                if result == QMessageBox.Yes:
-                    self.close()
-                    self.overwriteProject()
-            except shutil.Error: #convert to error
-                failBox = QMessageBox()
-                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                failBox.setWindowTitle("Failed")
-                failBox.setText("Project directory could not be uploaded")
-                failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-                result = failBox.exec_()
-                if result == QMessageBox.Yes:
-                    self.close()
-                    self.overwriteProject()
+            except Exception: #convert to error
+                print(f"Could not connect to server!. Reason: {e}")
 
     def getProjectLayers(self):
         project = QgsProject.instance()
@@ -229,6 +208,63 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
 
+    def checkUpload(self):
+        sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={
+            "password": self.password})  # does not work!  Der Name oder der Dienst ist nicht bekannt
+        # check upload:
+        files_uploaded = []
+        files_not_uploaded = []
+        try:
+            with sftpConnection as c:
+                try:
+                    sftpClient = c.sftp()
+                    for filename in os.listdir(self.source_project_dir_path):
+                        if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir(
+                                self.server_project_dir_path):
+                            files_uploaded.append(filename)
+                        elif filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(
+                                self.server_project_dir_path):
+                            files_not_uploaded.append(filename)
+                    # succes:
+                    successBox = QMessageBox()
+                    successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+                    successBox.setWindowTitle("Success")
+                    if len(files_not_uploaded) == 0:
+                        successBox.setText(
+                            "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(
+                                files_uploaded))
+                    else:
+                        successBox.setText(
+                            "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(
+                                files_uploaded)
+                            + ".\nFiles not uploaded: " + ', '.join(files_not_uploaded))
+
+                    successBox.setStandardButtons(QMessageBox.Ok)
+                    result = successBox.exec_()
+                    if result == QMessageBox.Ok:
+                        self.close()
+                    # wms getCapabilities
+                    wms_getcapabilities = ("http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                                           + self.server_project_dir_path + "/" + self.qgis_project_name)
+                    print(wms_getcapabilities)
+                except Exception as e:
+                    print(f"Could not.... Reason: {e}")
+        except Exception as e:
+                print(f"Could not.... Reason: {e}")
+
+
+    def tempTestMapbenderConsole(self):
+        print("connecting to mapbender console")
+
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        #client.connect(hostname=self.host, username=self.username, password=self.password) # use when function is correctly exceuted after upload
+        client.connect('mapbender-qgis.wheregroup.lan', username='root', password='')
+        # paramiko creates an instance of shell and all the commands have to be given in that instance of shell only
+        stdin, stdout, stderr = client.exec_command('cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show 1;')
+        for line in stdout:
+            print(line.strip('\n'))
+        client.close()
 
 
     def openDialogAddNewConfigSection(self):
