@@ -1,5 +1,7 @@
 import os
 import shutil
+import zipfile
+from pathlib import Path as pathlibPath
 
 from fabric2 import Connection
 import paramiko
@@ -109,10 +111,64 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
         else:
-            self.uploadProject()
+            self.checkQgisProjectAndGetPaths()
 
+    def getProjectLayers(self):
+        project = QgsProject.instance()
+        project.read()
+        layers_names = []
+        for layer in project.mapLayers().values():
+            layers_names.append(layer.name())
+        return layers_names
 
-    def uploadProject(self):
+    def overwriteProject(self): # local, for tests
+        print('overwrite project')
+        try:
+            # login
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
+            try:
+                # remove folder from server
+                stdin, stdout, stderr = ssh_client.exec_command(
+                    f'cd ..; cd {self.server_qgis_projects_folder_rel_path}; rm -r {self.qgis_project_folder_name};')
+                #check
+                out = stdout.readlines()
+                if os.path.isdir(f'{self.server_qgis_projects_folder_rel_path}{self.qgis_project_folder_name}'):
+                    failBox = QMessageBox()
+                    failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                    failBox.setWindowTitle("Failed")
+                    failBox.setText(f"Could not remove existing project folder from server.")
+                    failBox.setStandardButtons(QMessageBox.Ok)
+                    failBox.exec_()
+                else:
+                    try:
+                        self.uploadProjectZipFile()
+                    except Exception as e:
+                        failBox = QMessageBox()
+                        failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                        failBox.setWindowTitle("Failed")
+                        failBox.setText(f"Could not overwrite project folder. Reason: {e}")
+                        failBox.setStandardButtons(QMessageBox.Ok)
+                        failBox.exec_()
+
+            except Exception as e:
+                failBox = QMessageBox()
+                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                failBox.setWindowTitle("Failed")
+                failBox.setText(f"Could not remove existing project folder from server. Reason: {e}")
+                failBox.setStandardButtons(QMessageBox.Ok)
+                failBox.exec_()
+
+        except Exception as e:
+            failBox = QMessageBox()
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText(f"Could not overwrite project folder. Reason: {e}")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            failBox.exec_()
+
+    def checkQgisProjectAndGetPaths(self):
         # get and check .qgz project path
         self.source_project_dir_path = QgsProject.instance().readPath("./")
         self.source_project_file_path = QgsProject.instance().fileName()
@@ -126,45 +182,82 @@ class MainDialog(BASE, WIDGET):
         else:
             # get project layers
             source_project_layers = self.getProjectLayers()
-            #print(source_project_layers)
+            # print(source_project_layers)
 
             # project folder name (with .qgz and data) as in local
+            self.source_project_zip_dir_path = self.source_project_dir_path + '.zip'
             self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
+            self.qgis_project_folder_parent = os.path.abspath(os.path.join(self.source_project_dir_path, os.pardir))
             self.server_project_dir_path = self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
 
+            self.zipProjectFolder()
+    def zipProjectFolder(self): # does not zip two folders in the same level
             try:
-                # server connection and upload - WORKS, with VPN
-                #self.validateConfigParams()''
-                sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={"password": self.password}) # does not work!  Der Name oder der Dienst ist nicht bekannt
-                try:
-                    with sftpConnection as c:
-                     sftpClient = c.sftp()
-                     # create qgis-project folder:
-                     try:
-                         sftpClient.mkdir(self.server_project_dir_path) # does not create parent directories if not exist!
-                         # upload files:
-                         for filename in os.listdir(self.source_project_dir_path):
-                             # if filename is a file:
-                             #QGIS-Projekt
-                             if filename.split(".")[-1] in ('qgs', 'qgz'):
-                                 self.qgis_project_name = filename
-                             # data
-                             if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
-                                 try:
-                                    c.put(local=self.source_project_dir_path + "/" + filename,
-                                        remote=self.server_project_dir_path)
-                                 except:
-                                     failBox = QMessageBox()
-                                     failBox.setIconPixmap(
-                                         QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                                     failBox.setWindowTitle("Failed")
-                                     failBox.setText("Project directory could not be uploaded")
-                                     failBox.setStandardButtons(QMessageBox.Ok)
-                                     failBox.exec_()
+                with zipfile.ZipFile(self.source_project_zip_dir_path, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
+                    for folder_name, subfolders, filenames in os.walk(self.source_project_dir_path):
+                        for filename in filenames:
+                            if filename.split(".")[-1] in ('qgs', 'qgz'):
+                                self.qgis_project_name = filename
+                            if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
+                                file_path = os.path.join(folder_name, filename)
+                                zip_ref.write(file_path, arcname=os.path.relpath(file_path, self.qgis_project_folder_parent))
+                zip_ref.close()
+                print('Zip-project folder successfully created')
+                self.uploadProjectZipFile()
+            except Exception as e:
+                print(f"Could not zip project folder. Reason: {e}")
 
-                         self.checkUpload()
-                     except Exception as e:
-                        print(f"Could not mkdir!. Reason: {e}") # i.e. if dir already exists
+
+    def uploadProjectZipFile(self):
+        # Alternative 1 - OSError: Failure
+        # login
+        #ssh_client = paramiko.SSHClient()
+        #ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        #ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
+
+        # upload
+        #ftp_client = ssh_client.open_sftp()
+        #ftp_client.put('/home/cviesca/Projekte/Plugin_QGIS-QGIS-Server_Mapbender/source_ordner.zip', '/data/qgis-projects')
+        #ftp_client.close()
+
+        # unzip
+        #stdin, stdout, stderr = ssh_client.exec_command('unzip source_ordner.zip')
+        #print(stdout.read().decode())
+
+        # access files
+        #stdin, stdout, stderr = ssh_client.exec_command('ls')
+        #print(stdout.read().decode())
+
+        # Alternative 2
+        sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={
+            "password": self.password})
+        try:
+            with sftpConnection as c:
+                try:
+                    # check if project folder already exists
+                    if c.run('test -d {}'.format(self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name), warn=True).failed: # without .zip
+                        # (if exists, is unzipped), -d option to test if the file exist and is a directory
+                        # Folder doesn't exist yet in server: upload project folder
+                        c.put(local=self.source_project_zip_dir_path,
+                              remote= self.server_qgis_projects_folder_rel_path)
+                        # check upload success
+                        if c.run('test {}'.format(self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name + ".zip"),
+                                 warn=True).failed:  # with .zip (if exists, is zipped), wihout -d option (to test if
+                            # the file exist, not a directory)
+                            # Upload not successful:: Folder does not exist in server
+                            failBox = QMessageBox()
+                            failBox.setIconPixmap(
+                                QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                            failBox.setWindowTitle("Failed")
+                            failBox.setText("Project directory could not be uploaded")
+                            failBox.setStandardButtons(QMessageBox.Ok)
+                            failBox.exec_()
+                        else:
+                            # Upload was successful: Folder exists now in server
+                            print('zip folder succesfully uploaded')
+                            self.unzipProjectFolderInServer()
+                    else:
+                        # Folder already exists in server
                         failBox = QMessageBox()
                         failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
                         failBox.setWindowTitle("Failed")
@@ -176,37 +269,52 @@ class MainDialog(BASE, WIDGET):
                         if result == QMessageBox.Yes:
                             self.close()
                             self.overwriteProject()
-                except Exception as e:
-                    print(f"Could not connect to server!. Reason: {e}")
-
-            except Exception: #convert to error
-                print(f"Could not connect to server!. Reason: {e}")
-
-    def getProjectLayers(self):
-        project = QgsProject.instance()
-        project.read()
-        layers_names = []
-        for layer in project.mapLayers().values():
-            layers_names.append(layer.name())
-        return layers_names
-
-    def overwriteProject(self): # local, for tests
-        try:
-            shutil.rmtree(self.server_project_dir_path)
-            shutil.copytree(self.source_project_dir_path, self.server_project_dir_path)
-            successBox = QMessageBox()
-            successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
-            successBox.setWindowTitle("Success")
-            successBox.setText("Project directory successfully overwritten")
-            successBox.setStandardButtons(QMessageBox.Ok)
-            result = successBox.exec_()
-        except shutil.Error:
+                except:
+                    failBox = QMessageBox()
+                    failBox.setIconPixmap(
+                        QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                    failBox.setWindowTitle("Failed")
+                    failBox.setText("Project directory could not be uploaded.")
+                    failBox.setStandardButtons(QMessageBox.Ok)
+                    failBox.exec_()
+        except Exception as e:
             failBox = QMessageBox()
-            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setIconPixmap(
+                QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
             failBox.setWindowTitle("Failed")
-            failBox.setText("An error occurred")
+            failBox.setText(f"Could not create connection. Reason: {e}")
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
+
+    def unzipProjectFolderInServer(self):
+        try:
+            # login
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
+            try:
+                # unzip
+                stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; cd {self.server_qgis_projects_folder_rel_path}/; unzip {self.qgis_project_folder_name}.zip;')
+                print(stdout.read().decode())
+
+                # access files
+                stdin, stdout, stderr = ssh_client.exec_command(f'cd {self.server_qgis_projects_folder_rel_path}/{self.qgis_project_folder_name}/; ls')
+                print(stdout.read().decode())
+
+                try:
+                    # remove zip file from server
+                    stdin, stdout, stderr = ssh_client.exec_command(
+                        f'cd ..; cd /data/qgis-projects/; rm {self.qgis_project_folder_name}.zip;')
+                except Exception as e:
+                    print(f"Could not remove zip file from server. Reason: {e}")
+
+            except Exception as e:
+                print(f"Could not unzip file. Reason: {e}")
+
+            self.checkUpload()
+        except Exception as e:
+            print(f"Could not create connection. Reason: {e}")
+
 
     def checkUpload(self):
         sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={
@@ -231,7 +339,7 @@ class MainDialog(BASE, WIDGET):
                     successBox.setWindowTitle("Success")
                     if len(files_not_uploaded) == 0:
                         successBox.setText(
-                            "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(
+                            "Project directory '" + self.qgis_project_folder_name + "' successfully uploaded. \nFiles uploaded: " + ', '.join(
                                 files_uploaded))
                     else:
                         successBox.setText(
