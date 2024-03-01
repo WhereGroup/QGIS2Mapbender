@@ -345,12 +345,13 @@ class MainDialog(BASE, WIDGET):
             except Exception as e:
                 print(f"Could not unzip file. Reason: {e}")
 
-            self.checkUpload()
+            #self.checkUploadedFiles()
+            self.getGetCapabilitiesUrl()
         except Exception as e:
             print(f"Could not create connection. Reason: {e}")
 
 
-    def checkUpload(self):
+    def checkUploadedFiles(self):
         sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={
             "password": self.password}) 
         # check upload:
@@ -360,13 +361,32 @@ class MainDialog(BASE, WIDGET):
             with sftpConnection as c:
                 try:
                     sftpClient = c.sftp()
-                    for filename in os.listdir(self.source_project_dir_path):
-                        if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir(
-                                self.server_project_dir_path):
-                            files_uploaded.append(filename)
-                        elif filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(
-                                self.server_project_dir_path):
-                            files_not_uploaded.append(filename)
+                    # this only checks ls in self.source_project_dir_path
+                    # for filename in os.listdir(self.source_project_dir_path):
+                    #     if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir(
+                    #             self.server_project_dir_path):
+                    #         files_uploaded.append(filename)
+                    #     elif filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(
+                    #             self.server_project_dir_path):
+                    #         files_not_uploaded.append(filename)
+
+                    # use os.walk instead for listing all files in source file
+                    source_tree = []
+                    for root, _, files in os.walk(self.source_project_dir_path):
+                        source_tree.append(root)
+                        for f in files:
+                            source_tree.append(os.path.join(root, f))
+                    for path in source_tree:
+                        filename = path.split("/")[-1]
+                        file_extension = filename.split(".")[-1]
+                        if os.path.isfile(path):
+                            if file_extension not in ('gpkg-wal', 'gpkg-shm') and filename in sftpClient.listdir_attr(
+                                        self.server_project_dir_path):
+                                files_uploaded.append(filename)
+                            elif file_extension not in ('gpkg-wal', 'gpkg-shm') and filename not in sftpClient.listdir(
+                                        self.server_project_dir_path):
+                                files_not_uploaded.append(filename)
+
                     # succes:
                     successBox = QMessageBox()
                     successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
@@ -377,7 +397,7 @@ class MainDialog(BASE, WIDGET):
                                 files_uploaded))
                     else:
                         successBox.setText(
-                            "Project directory" + self.qgis_project_folder_name + "successfully uploaded. \nFiles uploaded: " + ', '.join(
+                            "Project directory " + self.qgis_project_folder_name + " successfully uploaded. \nFiles uploaded: " + ', '.join(
                                 files_uploaded)
                             + ".\nFiles not uploaded: " + ', '.join(files_not_uploaded))
 
@@ -394,6 +414,19 @@ class MainDialog(BASE, WIDGET):
         except Exception as e:
                 print(f"Could not.... Reason: {e}")
 
+    def getGetCapabilitiesUrl(self):
+        self.wms_getcapabilities_url = (
+                    "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                    + self.server_project_dir_path + "/" + self.qgis_project_name)
+        # 1) test in mapbender console
+        # if succes:
+        successBox = QMessageBox()
+        successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+        successBox.setWindowTitle("Success")
+        successBox.setText("WMS succesfully created:\n" +  self.wms_getcapabilities_url)
+        successBox.setStandardButtons(QMessageBox.Ok)
+        successBox.exec_()
+        print(self.wms_getcapabilities_url)
 
     def tempTestMapbenderConsole(self):
         print("connecting to mapbender console")
