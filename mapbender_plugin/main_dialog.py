@@ -411,21 +411,22 @@ class MainDialog(BASE, WIDGET):
             out_wms_show = []
             for line in stdout:
                 print(line.strip('\n'))
-                out_wms_show.append(line)
+                out_wms_show.append(line.strip('\n'))
             print(out_wms_show)
-            if len(out_wms_show) == 0:
-                print('WMS not available yet as Mapbender source')
+            if len(out_wms_show) == 0: # == 0 (test with > 0)
+                print(f'WMS not available yet as Mapbender source')
+                #print(f'WMS {self.wms_getcapabilities_url} not available yet as Mapbender source') # use when function is correctly executed after upload
                 try:
-                    # 2) If WMS not available as mapbender source yet: add WMS to Mapbender sources
+                    # 2) If WMS not available as mapbender source yet: Adds a new WMS Source to your Mapbender Service rep
                     stdin, stdout, stderr = client.exec_command(
                         #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
                         f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
                     out_wms_add = []
                     for line in stdout:
                         print(line.strip('\n'))
-                        out_wms_add.append(line)
+                        out_wms_add.append(line.strip('\n'))
                     print(out_wms_add)
-                    print('wms successfully added to Mapbender sources')
+                    print(f'wms successfully added to Mapbender sources ({out_wms_add[-1]})')
                 except Exception as e:
                     print(f'Error: Could not add WMS to Mapbender sources. Reason {e}')
             else:
@@ -438,7 +439,7 @@ class MainDialog(BASE, WIDGET):
                     out_wms_reaload_url = []
                     for line in stdout:
                         print(line.strip('\n'))
-                        out_wms_reaload_url.append(line)
+                        out_wms_reaload_url.append(line.strip('\n'))
                     print(out_wms_reaload_url)
                     if len(out_wms_reaload_url) == 0:
                         print('WMS could not be updated WMS as Mapbender source')
@@ -454,7 +455,7 @@ class MainDialog(BASE, WIDGET):
                 out_application_clone = []
                 for line in stdout:
                     print(line.strip('\n'))
-                    out_application_clone.append(line)
+                    out_application_clone.append(line.strip('\n'))
                 print(out_application_clone)
                 if len(out_application_clone) == 0:
                     print('WMS could not be updated WMS as Mapbender source')
