@@ -44,6 +44,7 @@ class MainDialog(BASE, WIDGET):
         self.buttonBoxTab2.rejected.connect(self.reject)
 
         self.server_qgis_projects_folder_rel_path = '/data/qgis-projects/'
+        self.applicationName = 'mapbender_user_basic'
 
     def updateSectionComboBox(self):
         # create an empty config file in plugin directory if not already existing
@@ -385,9 +386,9 @@ class MainDialog(BASE, WIDGET):
                     if result == QMessageBox.Ok:
                         self.close()
                     # wms getCapabilities
-                    wms_getcapabilities = ("http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-                                           + self.server_project_dir_path + "/" + self.qgis_project_name)
-                    print(wms_getcapabilities)
+                    self.wms_getcapabilities_url = ("http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                                                    + self.server_project_dir_path + "/" + self.qgis_project_name)
+                    print(self.wms_getcapabilities_url)
                 except Exception as e:
                     print(f"Could not.... Reason: {e}")
         except Exception as e:
@@ -396,15 +397,77 @@ class MainDialog(BASE, WIDGET):
 
     def tempTestMapbenderConsole(self):
         print("connecting to mapbender console")
-
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        #client.connect(hostname=self.host, username=self.username, password=self.password) # use when function is correctly exceuted after upload
+        #client.connect(hostname=self.host, username=self.username, password=self.password) # use when function is correctly executed after upload
         client.connect('mapbender-qgis.wheregroup.lan', username='root', password='')
         # paramiko creates an instance of shell and all the commands have to be given in that instance of shell only
-        stdin, stdout, stderr = client.exec_command('cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show 1;')
-        for line in stdout:
-            print(line.strip('\n'))
+        # 0) Nice to have: bin/console mapbender:wms:validate:url
+        # 1) Check if WMS is already available as source in Mapbender (pending: based on url and not on id)
+        try:
+            stdin, stdout, stderr = client.exec_command(
+                f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show 4;') # with id
+                #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show {self.wms_getcapabilities_url} ;')
+            out_wms_show = []
+            for line in stdout:
+                print(line.strip('\n'))
+                out_wms_show.append(line)
+            print(out_wms_show)
+            if len(out_wms_show) == 0:
+                print('WMS not available yet as Mapbender source')
+                try:
+                    # 2) If WMS not available as mapbender source yet: add WMS to Mapbender sources
+                    stdin, stdout, stderr = client.exec_command(
+                        #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
+                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
+                    out_wms_add = []
+                    for line in stdout:
+                        print(line.strip('\n'))
+                        out_wms_add.append(line)
+                    print(out_wms_add)
+                    print('wms successfully added to Mapbender sources')
+                except Exception as e:
+                    print(f'Error: Could not add WMS to Mapbender sources. Reason {e}')
+            else:
+                print('WMS already available as Mapbender source')
+                try:
+                    # 3) If WMS already available as Mapbender source: update (bin/console mapbender:wms:reload:url (arguments: id, serviceUrl))
+                    stdin, stdout, stderr = client.exec_command(
+                        #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url {id} {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
+                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url 4 http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
+                    out_wms_reaload_url = []
+                    for line in stdout:
+                        print(line.strip('\n'))
+                        out_wms_reaload_url.append(line)
+                    print(out_wms_reaload_url)
+                    if len(out_wms_reaload_url) == 0:
+                        print('WMS could not be updated WMS as Mapbender source')
+                    else:
+                        print('WMS was successfully updated WMS as Mapbender source')
+                except Exception as e:
+                    print(f'Error: Could not update WMS as Mapbender source. Reason {e}')
+
+            # 4) Clone template application: This will create a new application with a _imp suffix as application name.
+            try:
+                stdin, stdout, stderr = client.exec_command(
+                    f'cd ..; cd /data/mapbender/application/; bin/console mapbender:application:clone {self.applicationName};')
+                out_application_clone = []
+                for line in stdout:
+                    print(line.strip('\n'))
+                    out_application_clone.append(line)
+                print(out_application_clone)
+                if len(out_application_clone) == 0:
+                    print('WMS could not be updated WMS as Mapbender source')
+                else:
+                    print(f'Application {self.applicationName} was successfully cloned ({out_application_clone[0]})')
+            except Exception as e:
+                print(f'Error: Could not clone application. Reason {e}')
+
+            # 5) Add source to application
+            # bin/console command pending
+
+        except Exception as e:
+            print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
         client.close()
 
 
