@@ -1,7 +1,7 @@
 import os
 import shutil
 import zipfile
-from pathlib import Path as pathlibPath
+
 
 from fabric2 import Connection
 import paramiko
@@ -172,6 +172,7 @@ class MainDialog(BASE, WIDGET):
         # get and check .qgz project path
         self.source_project_dir_path = QgsProject.instance().readPath("./")
         self.source_project_file_path = QgsProject.instance().fileName()
+        self.qgis_project_name = self.source_project_file_path.split("/")[-1]
         if self.source_project_dir_path == "./" or self.source_project_file_path == "":
             failBox = QMessageBox()
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
@@ -191,22 +192,52 @@ class MainDialog(BASE, WIDGET):
             self.server_project_dir_path = self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
 
             self.zipProjectFolder()
-    def zipProjectFolder(self): # does not zip two folders in the same level
+    def zipProjectFolder(self):
+        try:
+            # copy directory and remove unwanted files
+            if os.path.isdir(f'{self.source_project_dir_path}_copy_tmp'):
+                print("copy already exists... removing it")
+                shutil.rmtree(f'{self.source_project_dir_path}_copy_tmp')
+            os.mkdir(f'{self.source_project_dir_path}_copy_tmp')
+            shutil.copytree(self.source_project_dir_path, f'{self.source_project_dir_path}_copy_tmp/'
+                                                          f'{self.qgis_project_folder_name}')
             try:
-                with zipfile.ZipFile(self.source_project_zip_dir_path, 'w', zipfile.ZIP_DEFLATED) as zip_ref:
-                    for folder_name, subfolders, filenames in os.walk(self.source_project_dir_path):
-                        for filename in filenames:
-                            if filename.split(".")[-1] in ('qgs', 'qgz'):
-                                self.qgis_project_name = filename
-                            if filename.split(".")[-1] not in ('gpkg-wal', 'gpkg-shm'):
-                                file_path = os.path.join(folder_name, filename)
-                                zip_ref.write(file_path, arcname=os.path.relpath(file_path, self.qgis_project_folder_parent))
-                zip_ref.close()
-                print('Zip-project folder successfully created')
-                self.uploadProjectZipFile()
-            except Exception as e:
-                print(f"Could not zip project folder. Reason: {e}")
+                for folder_name, subfolders, filenames in os.walk(f'{self.source_project_dir_path}_copy_tmp'):
+                    for filename in filenames:
+                        file_path = os.path.join(folder_name, filename)
+                        if filename.split(".")[-1] in ('gpkg-wal', 'gpkg-shm'):
+                            os.remove(file_path)
+                try:
+                    # compress tmp copy of project folder
+                    shutil.make_archive(self.source_project_dir_path, 'zip', f'{self.source_project_dir_path}_copy_tmp')
+                    # check
+                    if os.path.isfile(self.source_project_zip_dir_path):
+                        print('Zip-project folder successfully created')
+                    # remove tmp copy of project folder
+                    shutil.rmtree(f'{self.source_project_dir_path}_copy_tmp')
+                    self.uploadProjectZipFile()
 
+                except Exception as e:
+                    failBox = QMessageBox()
+                    failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                    failBox.setWindowTitle("Failed")
+                    failBox.setText(f"Could not compress copy of project folder. Reason: {e}")
+                    failBox.setStandardButtons(QMessageBox.Ok)
+                    failBox.exec_()
+            except Exception as e:
+                failBox = QMessageBox()
+                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                failBox.setWindowTitle("Failed")
+                failBox.setText(f"Could not remove unwanted files. Reason: {e}")
+                failBox.setStandardButtons(QMessageBox.Ok)
+                failBox.exec_()
+        except Exception as e:
+            failBox = QMessageBox()
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText(f"Could not copy project folder. Reason: {e}")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            failBox.exec_()
 
     def uploadProjectZipFile(self):
         # Alternative 1 - OSError: Failure
@@ -269,12 +300,12 @@ class MainDialog(BASE, WIDGET):
                         if result == QMessageBox.Yes:
                             self.close()
                             self.overwriteProject()
-                except:
+                except Exception as e:
                     failBox = QMessageBox()
                     failBox.setIconPixmap(
                         QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
                     failBox.setWindowTitle("Failed")
-                    failBox.setText("Project directory could not be uploaded.")
+                    failBox.setText(f"Project directory could not be uploaded. Reason: {e}")
                     failBox.setStandardButtons(QMessageBox.Ok)
                     failBox.exec_()
         except Exception as e:
@@ -294,7 +325,9 @@ class MainDialog(BASE, WIDGET):
             ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
             try:
                 # unzip
-                stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; cd {self.server_qgis_projects_folder_rel_path}/; unzip {self.qgis_project_folder_name}.zip;')
+                stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; '
+                                                                f'cd {self.server_qgis_projects_folder_rel_path}/;'
+                                                                f'unzip {self.qgis_project_folder_name}.zip;')
                 print(stdout.read().decode())
 
                 # access files
@@ -318,7 +351,7 @@ class MainDialog(BASE, WIDGET):
 
     def checkUpload(self):
         sftpConnection = Connection(host=self.host, user=self.username, port=self.port, connect_kwargs={
-            "password": self.password})  # does not work!  Der Name oder der Dienst ist nicht bekannt
+            "password": self.password}) 
         # check upload:
         files_uploaded = []
         files_not_uploaded = []
