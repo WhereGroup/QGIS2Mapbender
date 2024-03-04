@@ -533,9 +533,7 @@ class MainDialog(BASE, WIDGET):
                     #else:
                     #    print(f'Mapbender source was successfully assigned')
                 except Exception as e:
-                    print(f'Error: Could not clone application. Reason {e}')
-
-                # bin/console command pending
+                    print(f'Error: Could not assign Mapbender source to application {self.applicationName}_imp. Reason {e}')
 
             except Exception as e:
                 print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
