@@ -1,7 +1,5 @@
 import os
 import shutil
-import zipfile
-
 
 from fabric2 import Connection
 import paramiko
@@ -17,6 +15,13 @@ from qgis._core import Qgis, QgsProject
 from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
 from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerSectionDialog
 from mapbender_plugin.dialogs.remove_server_section_dialog import RemoveServerSectionDialog
+from mapbender_plugin.helpers import checkIfConfigFileExists, getPluginDir, getProjectLayers, \
+    checkQgisProjectAndGetPaths
+
+from mapbender_plugin.settings import (
+    SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
+    TEMPLATE_APPLICATION_NAME, CONFIG_FILE_NAME,
+)
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -26,6 +31,16 @@ class MainDialog(BASE, WIDGET):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+
+        self.server_qgis_projects_folder_rel_path = SERVER_QGIS_PROJECTS_FOLDER_REL_PATH
+        templateApplicationName = TEMPLATE_APPLICATION_NAME
+
+        self.plugin_dir = getPluginDir()
+        self.config_path = self.plugin_dir + "/" + CONFIG_FILE_NAME
+        # check if config file exists
+        if not checkIfConfigFileExists(self.config_path):
+            self.iface.messageBar().pushMessage("No config file is available. Failed creating a new"
+                                                "config file", "Please contact", level=Qgis.Critical)
 
         # tabs
         self.tabWidget.setCurrentIndex(0)
@@ -43,22 +58,9 @@ class MainDialog(BASE, WIDGET):
         self.buttonBoxTab1.rejected.connect(self.reject)
         self.buttonBoxTab2.rejected.connect(self.reject)
 
-        self.server_qgis_projects_folder_rel_path = '/data/qgis-projects/'
-        self.applicationName = 'mapbender_user_basic_db'
 
-    def updateSectionComboBox(self):
-        # create an empty config file in plugin directory if not already existing
-        self.plugin_dir = os.path.dirname(__file__)
-        self.config_path = self.plugin_dir + '/server_config.cfg'
-
-        # check if config file exists
-        if not os.path.isfile(self.config_path):
-            try:
-                # create the config file if not existing
-                open(self.config_path, 'a').close()
-            except OSError:
-                self.iface.messageBar().pushMessage("Failed creating the file", "Please contact", level=Qgis.Critical)
-
+    def updateSectionComboBox(self) -> None:
+        """ Updates the server configuration sections dropdown menu """
         # parse config file
         try:
             # As the documentation makes clear, any number of filenames can be passed to the read method,
@@ -112,88 +114,38 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
         else:
-            self.checkQgisProjectAndGetPaths()
+            source_project_zip_dir_paths = checkQgisProjectAndGetPaths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
+                                                                      self.plugin_dir)
+            source_project_dir_path = source_project_zip_dir_paths.get('source_project_dir_path')
 
-    def getProjectLayers(self):
-        project = QgsProject.instance()
-        project.read()
-        layers_names = []
-        for layer in project.mapLayers().values():
-            layers_names.append(layer.name())
-        return layers_names
+            # getProjectLayers
+            # zipProjectFolder
 
-    def overwriteProject(self): # local, for tests
-        print('overwrite project')
-        try:
-            # login
-            ssh_client = paramiko.SSHClient()
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
-            try:
-                # remove folder from server
-                stdin, stdout, stderr = ssh_client.exec_command(
-                    f'cd ..; cd {self.server_qgis_projects_folder_rel_path}; rm -r {self.qgis_project_folder_name};')
-                #check
-                out = stdout.readlines()
-                if os.path.isdir(f'{self.server_qgis_projects_folder_rel_path}{self.qgis_project_folder_name}'):
-                    failBox = QMessageBox()
-                    failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                    failBox.setWindowTitle("Failed")
-                    failBox.setText(f"Could not remove existing project folder from server.")
-                    failBox.setStandardButtons(QMessageBox.Ok)
-                    failBox.exec_()
-                else:
-                    try:
-                        self.uploadProjectZipFile()
-                    except Exception as e:
-                        failBox = QMessageBox()
-                        failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                        failBox.setWindowTitle("Failed")
-                        failBox.setText(f"Could not overwrite project folder. Reason: {e}")
-                        failBox.setStandardButtons(QMessageBox.Ok)
-                        failBox.exec_()
-
-            except Exception as e:
-                failBox = QMessageBox()
-                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-                failBox.setWindowTitle("Failed")
-                failBox.setText(f"Could not remove existing project folder from server. Reason: {e}")
-                failBox.setStandardButtons(QMessageBox.Ok)
-                failBox.exec_()
-
-        except Exception as e:
-            failBox = QMessageBox()
-            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-            failBox.setWindowTitle("Failed")
-            failBox.setText(f"Could not overwrite project folder. Reason: {e}")
-            failBox.setStandardButtons(QMessageBox.Ok)
-            failBox.exec_()
-
-    def checkQgisProjectAndGetPaths(self):
-        # get and check .qgz project path
-        self.source_project_dir_path = QgsProject.instance().readPath("./")
-        self.source_project_file_path = QgsProject.instance().fileName()
-        self.qgis_project_name = self.source_project_file_path.split("/")[-1]
-        if self.source_project_dir_path == "./" or self.source_project_file_path == "":
-            failBox = QMessageBox()
-            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-            failBox.setWindowTitle("Failed")
-            failBox.setText("Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
-            failBox.setStandardButtons(QMessageBox.Ok)
-            failBox.exec_()
-        else:
-            # get project layers
-            source_project_layers = self.getProjectLayers()
-            # print(source_project_layers)
-
-            # project folder name (with .qgz and data) as in local
-            self.source_project_zip_dir_path = self.source_project_dir_path + '.zip'
-            self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
-            self.qgis_project_folder_parent = os.path.abspath(os.path.join(self.source_project_dir_path, os.pardir))
-            self.server_project_dir_path = self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
-
-            self.zipProjectFolder()
-    def zipProjectFolder(self):
+    # def checkQgisProjectAndGetPaths(self, server_qgis_projects_folder_rel_path):
+    #     # get and check .qgz project path
+    #     self.source_project_dir_path = QgsProject.instance().readPath("./")
+    #     self.source_project_file_path = QgsProject.instance().fileName()
+    #     self.qgis_project_name = self.source_project_file_path.split("/")[-1]
+    #     if self.source_project_dir_path == "./" or self.source_project_file_path == "":
+    #         failBox = QMessageBox()
+    #         failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+    #         failBox.setWindowTitle("Failed")
+    #         failBox.setText("Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
+    #         failBox.setStandardButtons(QMessageBox.Ok)
+    #         failBox.exec_()
+    #     else:
+    #         # get project layers
+    #         #source_project_layers = getProjectLayers()
+    #         #print(source_project_layers)
+    #
+    #         # project folder name (with .qgz and data) as in local
+    #         self.source_project_zip_dir_path = self.source_project_dir_path + '.zip'
+    #         self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
+    #         self.qgis_project_folder_parent = os.path.abspath(os.path.join(self.source_project_dir_path, os.pardir))
+    #         self.server_project_dir_path = server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
+    #
+    #         self.zipProjectFolder(server_qgis_projects_folder_rel_path)
+    def zipProjectFolder(self, server_qgis_projects_folder_rel_path):
         try:
             # copy directory and remove unwanted files
             if os.path.isdir(f'{self.source_project_dir_path}_copy_tmp'):
@@ -216,7 +168,7 @@ class MainDialog(BASE, WIDGET):
                         print('Zip-project folder successfully created')
                     # remove tmp copy of project folder
                     shutil.rmtree(f'{self.source_project_dir_path}_copy_tmp')
-                    self.uploadProjectZipFile()
+                    self.uploadProjectZipFile(server_qgis_projects_folder_rel_path)
 
                 except Exception as e:
                     failBox = QMessageBox()
@@ -240,7 +192,7 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
 
-    def uploadProjectZipFile(self):
+    def uploadProjectZipFile(self, server_qgis_projects_folder_rel_path):
         # Alternative 1 - OSError: Failure
         # login
         #ssh_client = paramiko.SSHClient()
@@ -267,13 +219,13 @@ class MainDialog(BASE, WIDGET):
             with sftpConnection as c:
                 try:
                     # check if project folder already exists
-                    if c.run('test -d {}'.format(self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name), warn=True).failed: # without .zip
+                    if c.run('test -d {}'.format(server_qgis_projects_folder_rel_path + self.qgis_project_folder_name), warn=True).failed: # without .zip
                         # (if exists, is unzipped), -d option to test if the file exist and is a directory
                         # Folder doesn't exist yet in server: upload project folder
                         c.put(local=self.source_project_zip_dir_path,
-                              remote= self.server_qgis_projects_folder_rel_path)
+                              remote= server_qgis_projects_folder_rel_path)
                         # check upload success
-                        if c.run('test {}'.format(self.server_qgis_projects_folder_rel_path + self.qgis_project_folder_name + ".zip"),
+                        if c.run('test {}'.format(server_qgis_projects_folder_rel_path + self.qgis_project_folder_name + ".zip"),
                                  warn=True).failed:  # with .zip (if exists, is zipped), wihout -d option (to test if
                             # the file exist, not a directory)
                             # Upload not successful:: Folder does not exist in server
@@ -286,8 +238,8 @@ class MainDialog(BASE, WIDGET):
                             failBox.exec_()
                         else:
                             # Upload was successful: Folder exists now in server
-                            print('zip folder succesfully uploaded')
-                            self.unzipProjectFolderInServer()
+                            print('zip folder successfully uploaded')
+                            self.unzipProjectFolderInServer(server_qgis_projects_folder_rel_path)
                     else:
                         # Folder already exists in server
                         failBox = QMessageBox()
@@ -300,7 +252,7 @@ class MainDialog(BASE, WIDGET):
                         result = failBox.exec_()
                         if result == QMessageBox.Yes:
                             self.close()
-                            self.overwriteProject()
+                            self.overwriteProject(server_qgis_projects_folder_rel_path)
                 except Exception as e:
                     failBox = QMessageBox()
                     failBox.setIconPixmap(
@@ -318,7 +270,54 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
 
-    def unzipProjectFolderInServer(self):
+    def overwriteProject(self, server_qgis_projects_folder_rel_path):
+        print('overwrite project')
+        try:
+            # login
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname=self.host, username=self.username, password=self.password)
+            try:
+                # remove folder from server
+                stdin, stdout, stderr = ssh_client.exec_command(
+                    f'cd ..; cd {server_qgis_projects_folder_rel_path}; rm -r {self.qgis_project_folder_name};')
+                #check
+                out = stdout.readlines()
+                if os.path.isdir(f'{server_qgis_projects_folder_rel_path}{self.qgis_project_folder_name}'):
+                    failBox = QMessageBox()
+                    failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                    failBox.setWindowTitle("Failed")
+                    failBox.setText(f"Could not remove existing project folder from server.")
+                    failBox.setStandardButtons(QMessageBox.Ok)
+                    failBox.exec_()
+                else:
+                    try:
+                        self.uploadProjectZipFile(server_qgis_projects_folder_rel_path)
+                    except Exception as e:
+                        failBox = QMessageBox()
+                        failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                        failBox.setWindowTitle("Failed")
+                        failBox.setText(f"Could not overwrite project folder. Reason: {e}")
+                        failBox.setStandardButtons(QMessageBox.Ok)
+                        failBox.exec_()
+
+            except Exception as e:
+                failBox = QMessageBox()
+                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                failBox.setWindowTitle("Failed")
+                failBox.setText(f"Could not remove existing project folder from server. Reason: {e}")
+                failBox.setStandardButtons(QMessageBox.Ok)
+                failBox.exec_()
+
+        except Exception as e:
+            failBox = QMessageBox()
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Failed")
+            failBox.setText(f"Could not overwrite project folder. Reason: {e}")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            failBox.exec_()
+
+    def unzipProjectFolderInServer(self, server_qgis_projects_folder_rel_path):
         try:
             # login
             ssh_client = paramiko.SSHClient()
@@ -327,12 +326,12 @@ class MainDialog(BASE, WIDGET):
             try:
                 # unzip
                 stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; '
-                                                                f'cd {self.server_qgis_projects_folder_rel_path}/;'
+                                                                f'cd {server_qgis_projects_folder_rel_path}/;'
                                                                 f'unzip {self.qgis_project_folder_name}.zip;')
                 print(stdout.read().decode())
 
                 # access files
-                stdin, stdout, stderr = ssh_client.exec_command(f'cd {self.server_qgis_projects_folder_rel_path}/{self.qgis_project_folder_name}/; ls')
+                stdin, stdout, stderr = ssh_client.exec_command(f'cd {server_qgis_projects_folder_rel_path}/{self.qgis_project_folder_name}/; ls')
                 print(stdout.read().decode())
 
                 try:
@@ -502,7 +501,7 @@ class MainDialog(BASE, WIDGET):
                 # 4) Clone template application: This will create a new application with a _imp suffix as application name.
                 try:
                     stdin, stdout, stderr = client.exec_command(
-                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:application:clone {self.applicationName};')
+                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:application:clone {self.templateApplicationName};')
                     out_application_clone = []
                     for line in stdout:
                         print(line.strip('\n'))
@@ -511,7 +510,7 @@ class MainDialog(BASE, WIDGET):
                     if len(out_application_clone) == 0:
                         print('WMS could not be updated WMS as Mapbender source')
                     else:
-                        print(f'Application {self.applicationName} was successfully cloned ({out_application_clone[0]})')
+                        print(f'Application {self.templateApplicationName} was successfully cloned ({out_application_clone[0]})')
                 except Exception as e:
                     print(f'Error: Could not clone application. Reason {e}')
 
@@ -522,7 +521,7 @@ class MainDialog(BASE, WIDGET):
                 self.mapbenderSourceId = 15
                 try:
                     stdin, stdout, stderr = client.exec_command(
-                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:assign {self.applicationName}_imp {self.mapbenderSourceId};')
+                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:assign {self.templateApplicationName}_imp {self.mapbenderSourceId};')
                     out_wms_assign = []
                     for line in stdout:
                         print(line.strip('\n'))
@@ -533,7 +532,7 @@ class MainDialog(BASE, WIDGET):
                     #else:
                     #    print(f'Mapbender source was successfully assigned')
                 except Exception as e:
-                    print(f'Error: Could not assign Mapbender source to application {self.applicationName}_imp. Reason {e}')
+                    print(f'Error: Could not assign Mapbender source to application {self.templateApplicationName}_imp. Reason {e}')
 
             except Exception as e:
                 print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
