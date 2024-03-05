@@ -1,3 +1,4 @@
+# Only no editable configurations
 
 # General
 SERVER_QGIS_PROJECTS_FOLDER_REL_PATH = '/data/qgis-projects/'
