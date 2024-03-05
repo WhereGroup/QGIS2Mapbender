@@ -16,7 +16,7 @@ from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionD
 from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerSectionDialog
 from mapbender_plugin.dialogs.remove_server_section_dialog import RemoveServerSectionDialog
 from mapbender_plugin.helpers import checkIfConfigFileExists, getPluginDir, getProjectLayers, \
-    checkQgisProjectAndGetPaths
+    checkIfQgisProject, getPaths
 
 from mapbender_plugin.settings import (
     SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
@@ -114,37 +114,13 @@ class MainDialog(BASE, WIDGET):
             failBox.setStandardButtons(QMessageBox.Ok)
             failBox.exec_()
         else:
-            source_project_zip_dir_paths = checkQgisProjectAndGetPaths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
-                                                                      self.plugin_dir)
-            source_project_dir_path = source_project_zip_dir_paths.get('source_project_dir_path')
+            if checkIfQgisProject(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,self.plugin_dir):
+                source_project_dir_path = getPaths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH).get('source_project_dir_path')
+                print(source_project_dir_path)
 
             # getProjectLayers
             # zipProjectFolder
 
-    # def checkQgisProjectAndGetPaths(self, server_qgis_projects_folder_rel_path):
-    #     # get and check .qgz project path
-    #     self.source_project_dir_path = QgsProject.instance().readPath("./")
-    #     self.source_project_file_path = QgsProject.instance().fileName()
-    #     self.qgis_project_name = self.source_project_file_path.split("/")[-1]
-    #     if self.source_project_dir_path == "./" or self.source_project_file_path == "":
-    #         failBox = QMessageBox()
-    #         failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-    #         failBox.setWindowTitle("Failed")
-    #         failBox.setText("Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
-    #         failBox.setStandardButtons(QMessageBox.Ok)
-    #         failBox.exec_()
-    #     else:
-    #         # get project layers
-    #         #source_project_layers = getProjectLayers()
-    #         #print(source_project_layers)
-    #
-    #         # project folder name (with .qgz and data) as in local
-    #         self.source_project_zip_dir_path = self.source_project_dir_path + '.zip'
-    #         self.qgis_project_folder_name = self.source_project_dir_path.split("/")[-1]
-    #         self.qgis_project_folder_parent = os.path.abspath(os.path.join(self.source_project_dir_path, os.pardir))
-    #         self.server_project_dir_path = server_qgis_projects_folder_rel_path + self.qgis_project_folder_name
-    #
-    #         self.zipProjectFolder(server_qgis_projects_folder_rel_path)
     def zipProjectFolder(self, server_qgis_projects_folder_rel_path):
         try:
             # copy directory and remove unwanted files

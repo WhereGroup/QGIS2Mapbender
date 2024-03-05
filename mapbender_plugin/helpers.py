@@ -39,7 +39,13 @@ def getProjectLayers() -> list:
         layers_names.append(layer.name())
     return layers_names
 
-def checkQgisProjectAndGetPaths(server_qgis_projects_folder_rel_path, plugin_dir):
+def checkIfQgisProject(server_qgis_projects_folder_rel_path, plugin_dir) -> bool:
+    """
+        Check if plugin is used within a QGIS-Project
+        :param server_qgis_projects_folder_rel_path:
+        :param plugin_dir:
+        :return:
+        """
     # get and check .qgz project path
     source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
@@ -51,8 +57,21 @@ def checkQgisProjectAndGetPaths(server_qgis_projects_folder_rel_path, plugin_dir
         failBox.setText("Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
         failBox.setStandardButtons(QMessageBox.Ok)
         failBox.exec_()
+        return False
     else:
-        paths = {'source_project_dir_path': QgsProject.instance().readPath("./"),
+        return True
+
+def getPaths(server_qgis_projects_folder_rel_path) -> dict:
+    """
+    Check if plugin is used within a QGIS-Project and get the paths if true
+    :param server_qgis_projects_folder_rel_path:
+    :param plugin_dir:
+    :return:
+    """
+    source_project_dir_path = QgsProject.instance().readPath("./")
+    source_project_file_path = QgsProject.instance().fileName()
+    qgis_project_name = source_project_file_path.split("/")[-1]
+    paths = {'source_project_dir_path': QgsProject.instance().readPath("./"),
                  'source_project_file_path': QgsProject.instance().fileName(),
                  'qgis_project_name': source_project_file_path.split("/")[-1],
                  'source_project_zip_dir_path': source_project_dir_path + '.zip',
@@ -60,4 +79,4 @@ def checkQgisProjectAndGetPaths(server_qgis_projects_folder_rel_path, plugin_dir
                  'qgis_project_folder_parent': os.path.abspath(os.path.join(source_project_dir_path, os.pardir)),
                  'server_project_dir_path': server_qgis_projects_folder_rel_path + source_project_dir_path.split("/")[-1]
                  }
-        return (paths)
+    return (paths)
