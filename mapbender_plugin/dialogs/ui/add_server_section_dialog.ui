@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>720</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,76 +28,56 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="newServiceNameLabel">
-         <property name="text">
-          <string>Service name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="newServiceNameLineEdit"/>
-       </item>
-      </layout>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="newServiceNameLabel">
+       <property name="text">
+        <string>Service name</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QLabel" name="newServerAddressLabel">
-         <property name="text">
-          <string>Server address</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="newServerAddressLineEdit"/>
-       </item>
-      </layout>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="newServiceNameLineEdit"/>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="newServerPortLabel">
-         <property name="text">
-          <string>Port</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="newServerPortLineEdit"/>
-       </item>
-      </layout>
+     <item row="1" column="0">
+      <widget class="QLabel" name="newServerAddressLabel">
+       <property name="text">
+        <string>Server address</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="newUserNameLabel">
-         <property name="text">
-          <string>User name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="newUserNameLineEdit"/>
-       </item>
-      </layout>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="newServerAddressLineEdit"/>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="newPasswordLabel">
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="newPasswordLineEdit"/>
-       </item>
-      </layout>
+     <item row="2" column="0">
+      <widget class="QLabel" name="newServerPortLabel">
+       <property name="text">
+        <string>Port</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="newServerPortLineEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="newUserNameLabel">
+       <property name="text">
+        <string>User name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="newUserNameLineEdit"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="newPasswordLabel">
+       <property name="text">
+        <string>Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="newPasswordLineEdit"/>
      </item>
     </layout>
    </item>

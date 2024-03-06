@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>530</width>
     <height>304</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
        <string/>
       </property>
       <attribute name="title">
-       <string>Upload .qgz project</string>
+       <string>Add WMS to Mapbender app </string>
       </attribute>
       <widget class="QLabel" name="sectionComboBoxLabel">
        <property name="geometry">
@@ -141,156 +141,6 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Server configuration management</string>
       </attribute>
-      <widget class="QLabel" name="importServiceConfigFileLabel">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>180</y>
-         <width>351</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Import service configuration file</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="addServerConfigLabel">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>20</y>
-         <width>431</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Add a new server configuration section</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="editServerConfigButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>29</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../resources/icons/mActionAllEdits.svg</normaloff>../../resources/icons/mActionAllEdits.svg</iconset>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="importServiceConfigFileButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>180</y>
-         <width>29</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../resources/icons/mActionSharingImport.svg</normaloff>../../resources/icons/mActionSharingImport.svg</iconset>
-       </property>
-      </widget>
-      <widget class="QLabel" name="editServiceConfigLabel">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>60</y>
-         <width>361</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Edit an existing server configuration section</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="exportServiceConfigFileButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>29</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
-       </property>
-      </widget>
-      <widget class="QLabel" name="removeServiceConfigLabel">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>100</y>
-         <width>371</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Remove an existing server configuration section</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="removeServerConfigButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>29</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../resources/icons/mIconDelete.svg</normaloff>../../resources/icons/mIconDelete.svg</iconset>
-       </property>
-      </widget>
-      <widget class="QLabel" name="exportServiceConfigFileLabel">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>140</y>
-         <width>371</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Export service configuration file</string>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="addServerConfigButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>29</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../../resources/icons/mActionAdd.svg</normaloff>../../resources/icons/mActionAdd.svg</iconset>
-       </property>
-      </widget>
       <widget class="QDialogButtonBox" name="buttonBoxTab2">
        <property name="geometry">
         <rect>
@@ -303,6 +153,108 @@ p, li { white-space: pre-wrap; }
        <property name="standardButtons">
         <set>QDialogButtonBox::Cancel</set>
        </property>
+      </widget>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>501</width>
+         <height>241</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QLabel" name="addServerConfigLabel">
+          <property name="text">
+           <string>Add a new server configuration section</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QToolButton" name="addServerConfigButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../resources/icons/mActionAdd.svg</normaloff>../../resources/icons/mActionAdd.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="removeServiceConfigLabel">
+          <property name="text">
+           <string>Remove an existing server configuration section</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QToolButton" name="editServerConfigButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../resources/icons/mActionAllEdits.svg</normaloff>../../resources/icons/mActionAllEdits.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="editServiceConfigLabel">
+          <property name="text">
+           <string>Edit an existing server configuration section</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QToolButton" name="exportServiceConfigFileButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="exportServiceConfigFileLabel">
+          <property name="text">
+           <string>Export service configuration file</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QToolButton" name="removeServerConfigButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../resources/icons/mIconDelete.svg</normaloff>../../resources/icons/mIconDelete.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QToolButton" name="importServiceConfigFileButton">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>../../resources/icons/mActionSharingImport.svg</normaloff>../../resources/icons/mActionSharingImport.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="importServiceConfigFileLabel">
+          <property name="text">
+           <string>Import service configuration file</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

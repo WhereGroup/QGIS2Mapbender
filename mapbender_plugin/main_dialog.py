@@ -10,14 +10,15 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
 from qgis._core import Qgis, QgsProject
+from qgis.utils import iface
 
 from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
 from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerSectionDialog
 from mapbender_plugin.dialogs.remove_server_section_dialog import RemoveServerSectionDialog
 from mapbender_plugin.helpers import checkIfConfigFileExists, getPluginDir, getProjectLayers, \
     checkIfQgisProject, getPaths, zipLocalProjectFolder, uploadProjectZipFile, removeProjectFolderFromServer, \
-    checkIfProjectFolderExistsOnServer, unzipProjectFolderOnServer, checkUploadedFiles, getGetCapabilitiesUrl, \
-    mapbenderValidateUrl, mapbenderWmsShow
+    checkIfProjectFolderExistsOnServer, unzipProjectFolderOnServer, checkUploadedFiles, getGetCapabilitiesUrl
+from mapbender_plugin.mapbender import mapbenderUpload
 
 from mapbender_plugin.settings import (
     SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
@@ -163,10 +164,10 @@ class MainDialog(BASE, WIDGET):
                                     #                    source_project_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
                                     wms_getcapabilities_url = getGetCapabilitiesUrl(self.host, self.plugin_dir,
                                                                                     server_project_dir_path, qgis_project_name)
-                                    mapbenderValidateUrl(self.host, self.username, self.port, self.password,
-                                                         wms_getcapabilities_url)
-                                    mapbenderWmsShow(self.host, self.username, self.port, self.password,
-                                                     wms_getcapabilities_url)
+                                    # mapbenderValidateUrl(self.host, self.username, self.port, self.password,
+                                    #                      wms_getcapabilities_url)
+                                    # mapbenderWmsShow(self.host, self.username, self.port, self.password,
+                                    #                  wms_getcapabilities_url)
                 else:
                     # if return = False (folder does not exist yet on the server)
                     if uploadProjectZipFile(self.host, self.username, self.port, self.password, self.plugin_dir,
@@ -177,26 +178,32 @@ class MainDialog(BASE, WIDGET):
                             # checkUploadedFiles(self.host, self.username, self.port, self.password,source_project_dir_path,
                             #                            SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
                             wms_getcapabilities_url = getGetCapabilitiesUrl(self.host, self.plugin_dir,server_project_dir_path, qgis_project_name)
-                            mapbenderValidateUrl(self.host, self.username, self.port, self.password,
-                                                 wms_getcapabilities_url)
-                            if mapbenderWmsShow(self.host, self.username, self.port, self.password,
-                                                 wms_getcapabilities_url):
-                                # reload source
-                                print('reload source')
-
-                            else:
-                                #add new source
-                                print('add new source')
+                            # mapbenderValidateUrl(self.host, self.username, self.port, self.password,
+                            #                      wms_getcapabilities_url)
+                            # if mapbenderWmsShow(self.host, self.username, self.port, self.password,
+                            #                      wms_getcapabilities_url):
+                            #     # reload source
+                            #     print('reload source')
+                            #
+                            # else:
+                            #     #add new source
+                            #     print('add new source')
 
     def tempTestMapbenderConsole(self):
-        print("Validating URL")
+        iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
+        # variable hard coded only for tests
+        wms_getCapabiltities_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
+
+        mapbenderUpload.wms_parse_url_validate(wms_getCapabiltities_url)
+        mapbenderUpload.wms_show(wms_getCapabiltities_url)
+
+        return
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         #client.connect(hostname=self.host, username=self.username, password=self.password) # use when function is correctly executed after upload
         client.connect('mapbender-qgis.wheregroup.lan', username='root', password='')
         # paramiko creates an instance of shell and all the commands have to be given in that instance of shell only
         # 0) Validate url: bin/console mapbender:wms:validate:url
-        return
         # Command to check the accessibility of the WMS data source. The available layers are listed, if the service is accessible.
         try:
             stdin, stdout, stderr = client.exec_command(

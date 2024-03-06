@@ -6,7 +6,11 @@ import paramiko
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsProject
+from qgis._core import QgsProject, Qgis, QgsMessageLog
+from qgis.utils import iface
+
+from mapbender_plugin.settings import SERVER_MB_CD_APPLICATION_PATH
+from mapbender_plugin.mapbender import TAG
 
 
 def getPluginDir() -> str:
@@ -435,93 +439,98 @@ def getGetCapabilitiesUrl(host: str, plugin_dir, server_project_dir_path, qgis_p
     print(wms_getcapabilities_url)
     return wms_getcapabilities_url
 
-def mapbenderValidateUrl(host: str,  username: str, port: str, password: str, wms_getcapabilities_url):
-    """
-    Validates URL with Mapbender's bin/console command mapbender:wms:validate:url
-    :return: True if URL is valid
-    """
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname=host, username=username, password=password)
+# def mapbenderValidateUrl(host: str,  username: str, port: str, password: str, wms_getcapabilities_url):
+#     f"""
+#     Validates URL with Mapbender's bin/console command to check the accessibility of the WMS data source.
+#     The available layers are listed, if the service is accessible.
+#     :return: True if URL is valid
+#     """
+#     client = paramiko.SSHClient()
+#     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#     client.connect(hostname=host, username=username, password=password)
+#
+#     iface.messageBar().pushMessage("", "Validating WMS URL", level=Qgis.Info, duration=1)
+#
+#     try:
+#         stdin, stdout, stderr = client.exec_command(
+#             f'{SERVER_MB_CD_APPLICATION_PATH}{mapbenderCommands.MB_VALIDATE_URL_COMMAND.value} "{wms_getcapabilities_url}";')
+#         out_wms_validate_url = []
+#         for line in stdout:
+#             out_wms_validate_url.append(line.strip('\n'))
+#         msg = f"Output {mapbenderCommands.MB_VALIDATE_URL_COMMAND.value}: {out_wms_validate_url}"
+#         QgsMessageLog.logMessage(msg, TAG, level=Qgis.Info)
+#         if len(out_wms_validate_url) == 0:
+#             msg = f'WMS "{wms_getcapabilities_url}" could not be validated'
+#             QgsMessageLog.logMessage(msg, TAG, level=Qgis.Warning)
+#         else:
+#             msg = f'WMS "{wms_getcapabilities_url}" was successfully validated ({out_wms_validate_url})'
+#             QgsMessageLog.logMessage(msg, TAG, level=Qgis.Success)
+#         return True
+#     except Exception as e:
+#         msg = f'Error: Could not validate application. Reason {e}'
+#         QgsMessageLog.logMessage(msg, TAG, level=Qgis.Critical)
+#     client.close()
 
-    # 0) Validate url: bin/console mapbender:wms:validate:url
-    # Command to check the accessibility of the WMS data source. The available layers are listed, if the service is accessible.
-    try:
-        stdin, stdout, stderr = client.exec_command(
-            f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:validate:url '
-            f'"{wms_getcapabilities_url}";')
-        out_wms_validate_url = []
-        for line in stdout:
-            print(line.strip('\n'))
-            out_wms_validate_url.append(line.strip('\n'))
-        print('out_wms_validate_url')
-        print(out_wms_validate_url)
-        if len(out_wms_validate_url) == 0:
-            print(f'WMS "{wms_getcapabilities_url}" could not be validated')
-        else:
-            print(f'WMS "{wms_getcapabilities_url}" was successfully validated ({out_wms_validate_url})')
-        return True
-    except Exception as e:
-        print(f'Error: Could not validate application. Reason {e}')
-    client.close()
-
-def mapbenderWmsShow(host: str,  username: str, port: str, password: str, wms_getcapabilities_url: str) -> bool:
-    """
-    Checks if WMS is already available as source in Mapbender
-    :return: id_source if getCapabilitites URL is already available as Mapbender source
-    """
-    print('start...mapbenderWmsShow')
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname=host, username=username, password=password)
-    try:
-        stdin, stdout, stderr = client.exec_command(
-        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show "{wms_getcapabilities_url}" ;')
-        out_wms_show = []
-        for line in stdout:
-            print(line.strip('\n'))
-            out_wms_show.append(line.strip('\n'))
-        print(out_wms_show)
-        if len(out_wms_show) == 0:
-            print(f'WMS "{wms_getcapabilities_url}" not available yet as Mapbender source. WMS will be added as Mapbender source...') # use when function is correctly executed after upload
-            return
-            try:
-                # 2) If WMS not available as mapbender source yet: Adds a new WMS Source to your Mapbender Service rep
-                stdin, stdout, stderr = client.exec_command(
-                    # f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
-                    f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
-                out_wms_add = []
-                for line in stdout:
-                    print(line.strip('\n'))
-                    out_wms_add.append(line.strip('\n'))
-                print(out_wms_add)
-                print(f'wms successfully added to Mapbender sources ({out_wms_add[-1]})')
-            except Exception as e:
-                print(f'Error: Could not add WMS to Mapbender sources. Reason {e}')
-        else:
-            print(f'WMS "{wms_getcapabilities_url}" already available as Mapbender source')
-            id_source = out_wms_show[0][0:10]
-            print(id_source)
-            return id_source
-            try:
-                # 3) If WMS already available as Mapbender source: update (bin/console mapbender:wms:reload:url (arguments: source id, serviceUrl))
-                stdin, stdout, stderr = client.exec_command(
-                    # f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url {id} {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
-                    f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url 4 "http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz"')
-                out_wms_reaload_url = []
-                for line in stdout:
-                    print(line.strip('\n'))
-                    out_wms_reaload_url.append(line.strip('\n'))
-                print(out_wms_reaload_url)
-                if len(out_wms_reaload_url) == 0:
-                    print('WMS could not be updated WMS as Mapbender source')
-                else:
-                    print('WMS was successfully updated WMS as Mapbender source')
-            except Exception as e:
-                print(f'Error: Could not update WMS as Mapbender source. Reason {e}')
-    except Exception as e:
-        print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
-    client.close()
+# def mapbenderWmsShow(host: str,  username: str, port: str, password: str, wms_getcapabilities_url: str) -> bool:
+#     """
+#     Checks if WMS is already available as source in Mapbender
+#     :return: id_source if getCapabilitites URL is already available as Mapbender source
+#     """
+#     iface.messageBar().pushMessage("", "Checking if WMS URL is already set as Mapbender source", level=Qgis.Info, duration=1)
+#     client = paramiko.SSHClient()
+#     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#     client.connect(hostname=host, username=username, password=password)
+#     print(f'{SERVER_MB_CD_APPLICATION_PATH} {mapbenderCommands.MB_WMS_SHOW.value} "{wms_getcapabilities_url}" ;')
+#     try:
+#         stdin, stdout, stderr = client.exec_command(
+#         f'{SERVER_MB_CD_APPLICATION_PATH} {mapbenderCommands.MB_WMS_SHOW.value} "{wms_getcapabilities_url}" ;')
+#         out_wms_show = []
+#         for line in stdout:
+#             out_wms_show.append(line.strip('\n'))
+#             print(line)
+#         msg = f"Output {mapbenderCommands.MB_WMS_SHOW.value}: {out_wms_show}"
+#         QgsMessageLog.logMessage(msg, TAG, level=Qgis.Info)
+#
+#         if len(out_wms_show) == 0: # update to
+#             msg = f'WMS "{wms_getcapabilities_url}" not available yet as Mapbender source. WMS will be added as Mapbender source...'
+#             QgsMessageLog.logMessage(msg, TAG, level=Qgis.Info)
+#             try:
+#                 # 2) If WMS not available as mapbender source yet: Adds a new WMS Source to your Mapbender Service rep
+#                 stdin, stdout, stderr = client.exec_command(
+#                     # f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
+#                     f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
+#                 out_wms_add = []
+#                 for line in stdout:
+#                     print(line.strip('\n'))
+#                     out_wms_add.append(line.strip('\n'))
+#                 print(out_wms_add)
+#                 print(f'wms successfully added to Mapbender sources ({out_wms_add[-1]})')
+#             except Exception as e:
+#                 print(f'Error: Could not add WMS to Mapbender sources. Reason {e}')
+#         else:
+#             print(f'WMS "{wms_getcapabilities_url}" already available as Mapbender source')
+#             id_source = out_wms_show[0][0:10]
+#             print(id_source)
+#             return id_source
+#             try:
+#                 # 3) If WMS already available as Mapbender source: update (bin/console mapbender:wms:reload:url (arguments: source id, serviceUrl))
+#                 stdin, stdout, stderr = client.exec_command(
+#                     # f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url {id} {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
+#                     f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url 4 "http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz"')
+#                 out_wms_reaload_url = []
+#                 for line in stdout:
+#                     print(line.strip('\n'))
+#                     out_wms_reaload_url.append(line.strip('\n'))
+#                 print(out_wms_reaload_url)
+#                 if len(out_wms_reaload_url) == 0:
+#                     print('WMS could not be updated WMS as Mapbender source')
+#                 else:
+#                     print('WMS was successfully updated WMS as Mapbender source')
+#             except Exception as e:
+#                 print(f'Error: Could not update WMS as Mapbender source. Reason {e}')
+#     except Exception as e:
+#         print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
+#     client.close()
 
 
 def mapbenderAddSource(host: str,  username: str, port: str, password: str, wms_getcapabilities_url: str) -> bool:
