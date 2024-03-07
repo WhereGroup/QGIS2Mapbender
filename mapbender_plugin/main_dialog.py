@@ -18,7 +18,7 @@ from mapbender_plugin.dialogs.remove_server_section_dialog import RemoveServerSe
 from mapbender_plugin.helpers import checkIfConfigFileExists, getPluginDir, getProjectLayers, \
     checkIfQgisProject, getPaths, zipLocalProjectFolder, uploadProjectZipFile, removeProjectFolderFromServer, \
     checkIfProjectFolderExistsOnServer, unzipProjectFolderOnServer, checkUploadedFiles, getGetCapabilitiesUrl
-from mapbender_plugin.mapbender import mapbenderUpload
+from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
     SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
@@ -160,14 +160,7 @@ class MainDialog(BASE, WIDGET):
                                                  qgis_project_folder_name):
                                 if unzipProjectFolderOnServer(self.host, self.username, self.port, self.password,
                                                               qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
-                                    # checkUploadedFiles(self.host, self.username, self.port, self.password,
-                                    #                    source_project_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
-                                    wms_getcapabilities_url = getGetCapabilitiesUrl(self.host, self.plugin_dir,
-                                                                                    server_project_dir_path, qgis_project_name)
-                                    # mapbenderValidateUrl(self.host, self.username, self.port, self.password,
-                                    #                      wms_getcapabilities_url)
-                                    # mapbenderWmsShow(self.host, self.username, self.port, self.password,
-                                    #                  wms_getcapabilities_url)
+                                    self.tempTestMapbenderConsole()
                 else:
                     # if return = False (folder does not exist yet on the server)
                     if uploadProjectZipFile(self.host, self.username, self.port, self.password, self.plugin_dir,
@@ -175,139 +168,41 @@ class MainDialog(BASE, WIDGET):
                                          qgis_project_folder_name):
                         if unzipProjectFolderOnServer(self.host, self.username, self.port, self.password,
                                                               qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
-                            # checkUploadedFiles(self.host, self.username, self.port, self.password,source_project_dir_path,
-                            #                            SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
-                            wms_getcapabilities_url = getGetCapabilitiesUrl(self.host, self.plugin_dir,server_project_dir_path, qgis_project_name)
-                            # mapbenderValidateUrl(self.host, self.username, self.port, self.password,
-                            #                      wms_getcapabilities_url)
-                            # if mapbenderWmsShow(self.host, self.username, self.port, self.password,
-                            #                      wms_getcapabilities_url):
-                            #     # reload source
-                            #     print('reload source')
-                            #
-                            # else:
-                            #     #add new source
-                            #     print('add new source')
+                            self.tempTestMapbenderConsole()
 
     def tempTestMapbenderConsole(self):
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
         # variable hard coded only for tests
-        wms_getCapabiltities_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
+        wms_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
+        slug_template = 'template_plugin' # replace with user input
 
-        mapbenderUpload.wms_parse_url_validate(wms_getCapabiltities_url)
-        mapbenderUpload.wms_show(wms_getCapabiltities_url)
+        mapbender_uploader = MapbenderUpload('mapbender-qgis.wheregroup.lan', 'root')
 
-        return
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        #client.connect(hostname=self.host, username=self.username, password=self.password) # use when function is correctly executed after upload
-        client.connect('mapbender-qgis.wheregroup.lan', username='root', password='')
-        # paramiko creates an instance of shell and all the commands have to be given in that instance of shell only
-        # 0) Validate url: bin/console mapbender:wms:validate:url
-        # Command to check the accessibility of the WMS data source. The available layers are listed, if the service is accessible.
-        try:
-            stdin, stdout, stderr = client.exec_command(
-                #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:validate:url "{self.wms_getcapabilities_url}";')
-                f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:validate:url '
-                f'"http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0'
-                f'&map=/data/qgis-projects/source_ordner/test_project.qgz";')
-            out_wms_validate_url = []
-            for line in stdout:
-                print(line.strip('\n'))
-                out_wms_validate_url.append(line.strip('\n'))
-            print('out_wms_validate_url')
-            print(out_wms_validate_url)
-            # if len(out_application_clone) == 0:
-            #    print('WMS {self.wms_getcapabilities_url} could not be validated')
-            # else:
-            #    print(f' {self.wms_getcapabilities_url} was successfully validated ({out_wms_validate_url})')
+        # Optional
+        # wms_is_valid = mapbender_uploader.wms_parse_url_validate(wms_url)
+        # if wms_is_valid:
+        #...
 
-            # 1) Check if WMS is already available as source in Mapbender (pending: based on url and not on id)
-            try:
-                stdin, stdout, stderr = client.exec_command(
-                    f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show 4;') # with id: test with existing and not existing ids
-                    #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:show {self.wms_getcapabilities_url} ;')
-                out_wms_show = []
-                for line in stdout:
-                    print(line.strip('\n'))
-                    out_wms_show.append(line.strip('\n'))
-                print(out_wms_show)
-                if len(out_wms_show) == 0:
-                    print(f'WMS not available yet as Mapbender source. WMS will be added as Mapbender source...')
-                    #print(f'WMS {self.wms_getcapabilities_url} not available yet as Mapbender source. WMS will be added as Mapbender source...') # use when function is correctly executed after upload
-                    try:
-                        # 2) If WMS not available as mapbender source yet: Adds a new WMS Source to your Mapbender Service rep
-                        stdin, stdout, stderr = client.exec_command(
-                            #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
-                            f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:add http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz')
-                        out_wms_add = []
-                        for line in stdout:
-                            print(line.strip('\n'))
-                            out_wms_add.append(line.strip('\n'))
-                        print(out_wms_add)
-                        print(f'wms successfully added to Mapbender sources ({out_wms_add[-1]})')
-                    except Exception as e:
-                        print(f'Error: Could not add WMS to Mapbender sources. Reason {e}')
-                else:
-                    print('WMS already available as Mapbender source')
-                    try:
-                        # 3) If WMS already available as Mapbender source: update (bin/console mapbender:wms:reload:url (arguments: source id, serviceUrl))
-                        stdin, stdout, stderr = client.exec_command(
-                            #f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url {id} {self.wms_getcapabilities_url} ;') # use when function is correctly executed after upload
-                            f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:reload:url 4 "http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz"')
-                        out_wms_reaload_url = []
-                        for line in stdout:
-                            print(line.strip('\n'))
-                            out_wms_reaload_url.append(line.strip('\n'))
-                        print(out_wms_reaload_url)
-                        if len(out_wms_reaload_url) == 0:
-                            print('WMS could not be updated WMS as Mapbender source')
-                        else:
-                            print('WMS was successfully updated WMS as Mapbender source')
-                    except Exception as e:
-                        print(f'Error: Could not update WMS as Mapbender source. Reason {e}')
+        exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_url)
+        if exit_status_wms_show == 0:
+            # reload source if it already exists
+            if len(sources_ids)>0:
+                for source_id in sources_ids:
+                    exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_url)
+                source_id = sources_ids[-1]
+            else:
+                # add source if it does not exist
+                exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
-                # 4) Clone template application: This will create a new application with a _imp suffix as application name.
-                try:
-                    stdin, stdout, stderr = client.exec_command(
-                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:application:clone {self.templateApplicationName};')
-                    out_application_clone = []
-                    for line in stdout:
-                        print(line.strip('\n'))
-                        out_application_clone.append(line.strip('\n'))
-                    print(out_application_clone)
-                    if len(out_application_clone) == 0:
-                        print('WMS could not be updated WMS as Mapbender source')
-                    else:
-                        print(f'Application {self.templateApplicationName} was successfully cloned ({out_application_clone[0]})')
-                except Exception as e:
-                    print(f'Error: Could not clone application. Reason {e}')
+                # depending on user's input (dulpicate template or use existing application):
+            if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
+                exit_status_app_clone, slug = mapbender_uploader.app_clone(slug_template)
+                if exit_status_app_clone == 0:
+                    exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id)
+                    if exit_status_wms_assign == 0:
+                        print('success')
+        mapbender_uploader.close_connection()
 
-                # 5) Add source to application: mapbender:wms:assign (Arguments:
-                # application: id or slug of the application
-                # source: id of the wms source
-                # layerset (optional): id or name of the layerset. Defaults to 'main' or the first layerset in the application.)
-                self.mapbenderSourceId = 15
-                try:
-                    stdin, stdout, stderr = client.exec_command(
-                        f'cd ..; cd /data/mapbender/application/; bin/console mapbender:wms:assign {self.templateApplicationName}_imp {self.mapbenderSourceId};')
-                    out_wms_assign = []
-                    for line in stdout:
-                        print(line.strip('\n'))
-                        out_wms_assign.append(line.strip('\n'))
-                    print(out_wms_assign)
-                    #if len(out_application_clone) == 0:
-                    #    print('WMS could not be updated WMS as Mapbender source')
-                    #else:
-                    #    print(f'Mapbender source was successfully assigned')
-                except Exception as e:
-                    print(f'Error: Could not assign Mapbender source to application {self.templateApplicationName}_imp. Reason {e}')
-
-            except Exception as e:
-                print(f'Error: Could not check if WMS is already available as source in Mapbender. Reason {e}')
-            client.close()
-        except Exception as e:
-            print(f'Error: Could not validate application. Reason {e}')
 
 
 
