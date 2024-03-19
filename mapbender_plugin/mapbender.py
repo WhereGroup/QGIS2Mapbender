@@ -42,6 +42,7 @@ class MapbenderUpload():
         #     ...
         parsed_json = json.loads(output)
         sources_ids = [obj["id"] for obj in parsed_json]
+        print(sources_ids)
         return exit_status, sources_ids
 
     def wms_add(self, url: str):
@@ -54,14 +55,12 @@ class MapbenderUpload():
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{url}'")
         print('output_add')
         print(output)
-        # output -> source_id
         spl_word = 'Saved new source #'
         source_id = output.split(spl_word,1)[1]
         print(source_id)
-        #source_id = 28 # replace after command output is updated
         return exit_status, source_id
 
-    def wms_reload(self, id, url: str): # MAPBENDER CONSOLE OUTPUT PENDING
+    def wms_reload(self, id, url: str):
         """
         Reloads (updates) a WMS source from given url.
         :param id: existing source id

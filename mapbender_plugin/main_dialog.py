@@ -50,7 +50,7 @@ class MainDialog(BASE, WIDGET):
 
         # tab1
         self.updateSectionComboBox()
-        self.uploadButton.clicked.connect(self.publishProjectAsWmsInApp)
+        self.uploadButton.clicked.connect(self.uploadProject)
         self.tmpMapbenderConsoleButton.clicked.connect(self.tempTestMapbenderConsole)
 
         # tab2
@@ -112,7 +112,7 @@ class MainDialog(BASE, WIDGET):
         remove_server_section_dialog = RemoveServerSectionDialog()
         remove_server_section_dialog.exec()
 
-    def publishProjectAsWmsInApp(self):
+    def uploadProject(self):
         # config params:
         selected_section = self.sectionComboBox.currentText()
         self.host = self.config.get(selected_section, 'url')
@@ -207,19 +207,31 @@ class MainDialog(BASE, WIDGET):
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_url)
                 source_id = sources_ids[-1]
+                print(source_id)
             else:
                 # add source to mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
                 # depending on user's input (duplicate template or use existing application):
-            #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
+            if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
                 exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
                     exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
                     if exit_status_wms_assign == 0:
-                        print('success')
+                        successBox = QMessageBox()
+                        successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+                        successBox.setWindowTitle("Success")
+                        successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
+                                           "\n \n and added to mapbender application: \n \n " + slug
+                                           )
+                        successBox.setStandardButtons(QMessageBox.Ok)
+                        successBox.exec_()
+
                     else:
                         print('failed')
+
+                else:
+                    print('failed')
 
         mapbender_uploader.close_connection()
 
