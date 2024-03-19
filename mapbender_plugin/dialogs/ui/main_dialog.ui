@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>573</width>
-    <height>304</height>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,7 +68,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>180</x>
-         <y>170</y>
+         <y>200</y>
          <width>161</width>
          <height>30</height>
         </rect>
@@ -83,11 +83,52 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>20</y>
          <width>531</width>
-         <height>142</height>
+         <height>200</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
+        <item row="2" column="0">
+         <widget class="QLabel" name="mapbenderConfigLabel">
+          <property name="text">
+           <string>Mapbender configuration:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QRadioButton" name="cloneTemplateRadioButton">
+          <property name="text">
+           <string>Clone template</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QRadioButton" name="addToAppRadioButton">
+          <property name="text">
+           <string>Add to existing application</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="mapbenderAppSlugLabel">
+          <property name="text">
+           <string>URL title</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="mapbenderCustomAppSlugLineEdit"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="layerSetLabel">
+          <property name="text">
+           <string>Layer set (optional)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="layerSetLineEdit"/>
+        </item>
+        <item row="1" column="0">
          <widget class="QLabel" name="sectionComboBoxLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -96,32 +137,12 @@ p, li { white-space: pre-wrap; }
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Server configuration</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QComboBox" name="sectionComboBox"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="mapbenderAppSlugLabel">
-          <property name="text">
-           <string>Template URL title</string>
+           <string>Server configuration:</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="mapbenderCustomAppSlugLineEdit"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="layerSetLabel">
-          <property name="text">
-           <string>Layer set (optional)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="layerSetLineEdit"/>
+         <widget class="QComboBox" name="sectionComboBox"/>
         </item>
        </layout>
       </widget>
@@ -129,7 +150,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>12</x>
-         <y>200</y>
+         <y>230</y>
          <width>521</width>
          <height>51</height>
         </rect>

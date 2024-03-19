@@ -186,8 +186,12 @@ class MainDialog(BASE, WIDGET):
                             self.tempTestMapbenderConsole(wms_getcapabilities_url)
 
     def tempTestMapbenderConsole(self, wms_getcapabilities_url):
-        # mapbender template slug:
-        template_slug = self.mapbenderCustomAppSlugLineEdit.text()
+        # mapbender params:
+        if self.cloneTemplateRadioButton.isChecked():
+            clone_app = True
+        if self.addToAppRadioButton.isChecked():
+            clone_app = False
+        # template slug:
         layer_set = self.layerSetLineEdit.text()
 
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
@@ -210,28 +214,33 @@ class MainDialog(BASE, WIDGET):
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_url)
                 source_id = sources_ids[-1]
-                print(source_id)
             else:
                 # add source to mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
                 # depending on user's input (duplicate template or use existing application):
             #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
-            exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
-            if exit_status_app_clone == 0:
+            if clone_app:
+                template_slug = self.mapbenderCustomAppSlugLineEdit.text()
+                exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
+                if exit_status_app_clone == 0:
+                    exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
+            else:
+                slug = self.mapbenderCustomAppSlugLineEdit.text()
                 exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
-                if exit_status_wms_assign == 0:
-                    successBox = QMessageBox()
-                    successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
-                    successBox.setWindowTitle("Success")
-                    successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
-                                           "\n \n And added to mapbender application: \n \n" + "http://" + self.host
-                                       + "/mapbender/application/"+ slug
-                                           )
-                    successBox.setStandardButtons(QMessageBox.Ok)
-                    result = successBox.exec_()
-                    if result == QMessageBox.Ok:
-                        self.close()
+
+            if exit_status_wms_assign == 0:
+                successBox = QMessageBox()
+                successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+                successBox.setWindowTitle("Success report")
+                successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
+                                   "\n \n And added to mapbender application: \n \n" + "http://" + self.host
+                                   + "/mapbender/application/"+ slug
+                                   )
+                successBox.setStandardButtons(QMessageBox.Ok)
+                result = successBox.exec_()
+                if result == QMessageBox.Ok:
+                    self.close()
 
                 else:
                     failBox = QMessageBox()
@@ -240,7 +249,6 @@ class MainDialog(BASE, WIDGET):
                     failBox.setText("WMS could not be added to mapbender application")
                     failBox.setStandardButtons(QMessageBox.Ok)
                     failBox.exec_()
-
             else:
                 failBox = QMessageBox()
                 failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
