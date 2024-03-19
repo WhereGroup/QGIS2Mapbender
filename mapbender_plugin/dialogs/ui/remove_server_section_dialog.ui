@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>720</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,27 +15,31 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="removeSectionComboBoxLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Please select the server configuration section to remove</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="removeSectionComboBox"/>
-   </item>
-   <item>
-    <widget class="QPushButton" name="removeSelectedSectionButton">
-     <property name="text">
-      <string>Remove selected section</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="removeSectionComboBoxLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Please select the server configuration section to remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="removeSelectedSectionButton">
+       <property name="text">
+        <string>Remove selected section</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="removeSectionComboBox"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="removeDialogButtonBox">

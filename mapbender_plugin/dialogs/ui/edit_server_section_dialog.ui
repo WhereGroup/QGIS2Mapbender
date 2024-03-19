@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>720</height>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,76 +31,56 @@
     <widget class="QComboBox" name="editSectionComboBox"/>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="editServiceNameLabel">
-         <property name="text">
-          <string>Service name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editServiceNameLineEdit"/>
-       </item>
-      </layout>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="editServiceNameLabel">
+       <property name="text">
+        <string>Service name</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QLabel" name="editServerAddressLabel">
-         <property name="text">
-          <string>Server address</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editServerAddressLineEdit"/>
-       </item>
-      </layout>
+     <item row="1" column="0">
+      <widget class="QLabel" name="editServerAddressLabel">
+       <property name="text">
+        <string>Server address</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="editPortLabel">
-         <property name="text">
-          <string>Port</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editPortLineEdit"/>
-       </item>
-      </layout>
+     <item row="2" column="0">
+      <widget class="QLabel" name="editPortLabel">
+       <property name="text">
+        <string>Port</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="editUserNameLabel">
-         <property name="text">
-          <string>User name</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editUserNameLineEdit"/>
-       </item>
-      </layout>
+     <item row="3" column="0">
+      <widget class="QLabel" name="editUserNameLabel">
+       <property name="text">
+        <string>User name</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="editPasswordLabel">
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="editPasswordLineEdit"/>
-       </item>
-      </layout>
+     <item row="4" column="0">
+      <widget class="QLabel" name="editPasswordLabel">
+       <property name="text">
+        <string>Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="editServiceNameLineEdit"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="editServerAddressLineEdit"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="editPortLineEdit"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="editUserNameLineEdit"/>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="editPasswordLineEdit"/>
      </item>
     </layout>
    </item>
