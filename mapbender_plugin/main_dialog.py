@@ -213,25 +213,25 @@ class MainDialog(BASE, WIDGET):
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
                 # depending on user's input (duplicate template or use existing application):
-            if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
-                exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
-                if exit_status_app_clone == 0:
-                    exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
-                    if exit_status_wms_assign == 0:
-                        successBox = QMessageBox()
-                        successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
-                        successBox.setWindowTitle("Success")
-                        successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
+            #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
+            exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
+            if exit_status_app_clone == 0:
+                exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
+                if exit_status_wms_assign == 0:
+                    successBox = QMessageBox()
+                    successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
+                    successBox.setWindowTitle("Success")
+                    successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
                                            "\n \n and added to mapbender application: \n \n " + slug
                                            )
-                        successBox.setStandardButtons(QMessageBox.Ok)
-                        successBox.exec_()
-
-                    else:
-                        print('failed')
+                    successBox.setStandardButtons(QMessageBox.Ok)
+                    successBox.exec_()
 
                 else:
                     print('failed')
+
+            else:
+                print('failed')
 
         mapbender_uploader.close_connection()
 
