@@ -50,7 +50,7 @@ class MainDialog(BASE, WIDGET):
 
         # tab1
         self.updateSectionComboBox()
-        self.uploadButton.clicked.connect(self.validateConfigParams)
+        self.uploadButton.clicked.connect(self.publishProjectAsWmsInApp)
         self.tmpMapbenderConsoleButton.clicked.connect(self.tempTestMapbenderConsole)
 
         # tab2
@@ -112,12 +112,17 @@ class MainDialog(BASE, WIDGET):
         remove_server_section_dialog = RemoveServerSectionDialog()
         remove_server_section_dialog.exec()
 
-    def validateConfigParams(self):
+    def publishProjectAsWmsInApp(self):
+        # config params:
         selected_section = self.sectionComboBox.currentText()
         self.host = self.config.get(selected_section, 'url')
         self.port = self.config.get(selected_section, 'port')
         self.username = self.config.get(selected_section, 'username')
         self.password = self.config.get(selected_section, 'password')
+
+        # mapbender template slug:
+        template_slug = self.mapbenderCustomAppSlugLineEdit.text()
+
         if self.host == '' or len(self.host)<5:
             failBox = QMessageBox()
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
@@ -171,6 +176,10 @@ class MainDialog(BASE, WIDGET):
                             self.tempTestMapbenderConsole()
 
     def tempTestMapbenderConsole(self):
+        # mapbender template slug:
+        template_slug = self.mapbenderCustomAppSlugLineEdit.text()
+        layer_set = self.layerSetLineEdit.text()
+
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
         # variable hard coded only for tests
         wms_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
@@ -184,23 +193,26 @@ class MainDialog(BASE, WIDGET):
         #...
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_url)
-        if exit_status_wms_show == 0:
+        if exit_status_wms_show == 0: # success
             # reload source if it already exists
             if len(sources_ids)>0:
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_url)
                 source_id = sources_ids[-1]
             else:
-                # add source if it does not exist
+                # add source to mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
-                # depending on user's input (dulpicate template or use existing application):
+                # depending on user's input (duplicate template or use existing application):
             if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
-                exit_status_app_clone, slug = mapbender_uploader.app_clone(slug_template)
+                exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
-                    exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id)
+                    exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
                     if exit_status_wms_assign == 0:
                         print('success')
+                    else:
+                        print('failed')
+
         mapbender_uploader.close_connection()
 
 

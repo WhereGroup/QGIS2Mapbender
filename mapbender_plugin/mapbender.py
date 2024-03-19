@@ -27,33 +27,69 @@ class MapbenderUpload():
         exit_status, output, error_output = self.run_mapbender_command(f"wms:parse:url --validate '{url}'")
         return exit_status, output, error_output
 
-    def wms_show(self, url: str): # output = source-id list
+    def wms_show(self, url: str):
+        """
+        Displays layer information of a persisted WMS source.
+        Parses the url of the WMS Source to get the information.
+        :param url: url of the WMS Source
+        :return: exit_status (0 = success, 1 = fail),
+        :return: sources_ids (list with sources ids if available)
+        """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:show --json '{url}'")
         #     if options:
         #         options_string = " ".join(("--{option}" for option in options))
         #     ... = run_app_console_mapbender_command(f"wms:parse:url {options_string if options_string else ''} {wms_id} {file_path}")
         #     ...
         parsed_json = json.loads(output)
-        sources_ids = [obj["id"] for obj in parsed_json]  # list
+        sources_ids = [obj["id"] for obj in parsed_json]
         return exit_status, sources_ids
 
     def wms_add(self, url: str):
+        """
+        Adds a new WMS Source to your Mapbender Service repository.
+        :param url: url of the WMS Source
+        :return: exit_status (0 = success, 1 = fail),
+        :return: source_id (id of the new added source)
+        """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{url}'")
+        print('output_add')
+        print(output)
         # output -> source_id
-        source_id = 23 # replace after command output is updated
+        source_id = 28 # replace after command output is updated
         return exit_status, source_id
+
     def wms_reload(self, id, url: str): # MAPBENDER CONSOLE OUTPUT PENDING
+        """
+        Reloads (updates) a WMS source from given url.
+        :param id: existing source id
+        :param url: url of the WMS Source
+        :return: exit_status (0 = success, 1 = fail)
+        """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{url}'")
         return exit_status
 
-    def app_clone(self, slug): # MAPBENDER CONSOLE OUTPUT PENDING
-        exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{slug}'")
-        # ouput -> slug
-        slug = 'template_plugin_imp' # replace after command output is updated
+    def app_clone(self, template_slug): # MAPBENDER CONSOLE OUTPUT PENDING
+        """
+        Clones an existing application in the Application backend. This will create a new application with
+        a _imp suffix as application name.
+        :param template_slug: template slug to clone
+        :return: exit_status (0 = success, 1 = fail),
+        :return:slug of the new clone app
+        """
+        exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
+        spl_word = 'slug'
+        slug = (output.split(spl_word,1)[1]).split(',')[0].strip()
         return exit_status, slug
 
-    def wms_assign(self, slug, source_id):
-        exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}'")
+    def wms_assign(self, slug, source_id, layer_set):
+        """
+        :param slug:
+        :param source_id:
+        :param layer_set:
+        :return: exit_status (0 = success, 1 = fail)
+        """
+        exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
+        print(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
         return exit_status
 
     def close_connection(self):
