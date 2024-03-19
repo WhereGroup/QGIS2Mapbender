@@ -42,7 +42,6 @@ class MapbenderUpload():
         #     ...
         parsed_json = json.loads(output)
         sources_ids = [obj["id"] for obj in parsed_json]
-        print(sources_ids)
         return exit_status, sources_ids
 
     def wms_add(self, url: str):
@@ -53,11 +52,8 @@ class MapbenderUpload():
         :return: source_id (id of the new added source)
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{url}'")
-        print('output_add')
-        print(output)
         spl_word = 'Saved new source #'
         source_id = output.split(spl_word,1)[1]
-        print(source_id)
         return exit_status, source_id
 
     def wms_reload(self, id, url: str):
@@ -91,7 +87,6 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail)
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
-        print(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
         return exit_status
 
     def close_connection(self):

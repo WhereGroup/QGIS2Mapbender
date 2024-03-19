@@ -113,6 +113,8 @@ class MainDialog(BASE, WIDGET):
         remove_server_section_dialog.exec()
 
     def uploadProject(self):
+        iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=5)
+
         # config params:
         selected_section = self.sectionComboBox.currentText()
         self.host = self.config.get(selected_section, 'url')
@@ -157,6 +159,9 @@ class MainDialog(BASE, WIDGET):
                         if removeProjectFolderFromServer(self.host, self.username, self.port, self.password,
                                                          self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                          qgis_project_folder_name):
+                            iface.messageBar().pushMessage("", "Uploading QGIS project and data to server ...",
+                                                           level=Qgis.Info, duration=5)
+
                             if uploadProjectZipFile(self.host, self.username, self.port, self.password, self.plugin_dir,
                                                  source_project_zip_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                  qgis_project_folder_name):
@@ -165,11 +170,11 @@ class MainDialog(BASE, WIDGET):
                                     wms_getcapabilities_url = (
                                             "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                             + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
-                                    print('test wms_getcapabilities_url')
-                                    print(wms_getcapabilities_url)
                                     self.tempTestMapbenderConsole(wms_getcapabilities_url)
                 else:
                     # if return = False (folder does not exist yet on the server)
+                    iface.messageBar().pushMessage("", "Uploading QGIS project and data to server ...",
+                                                   level=Qgis.Info, duration=5)
                     if uploadProjectZipFile(self.host, self.username, self.port, self.password, self.plugin_dir,
                                          source_project_zip_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                          qgis_project_folder_name):
@@ -178,9 +183,6 @@ class MainDialog(BASE, WIDGET):
                             wms_getcapabilities_url = (
                                     "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                     + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
-                            print('test wms_getcapabilities_url')
-                            print(wms_getcapabilities_url)
-
                             self.tempTestMapbenderConsole(wms_getcapabilities_url)
 
     def tempTestMapbenderConsole(self, wms_getcapabilities_url):
@@ -193,7 +195,8 @@ class MainDialog(BASE, WIDGET):
         #wms_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
         wms_url = wms_getcapabilities_url
 
-        mapbender_uploader = MapbenderUpload('mapbender-qgis.wheregroup.lan', 'root')
+        #mapbender_uploader = MapbenderUpload('mapbender-qgis.wheregroup.lan', 'root')
+        mapbender_uploader = MapbenderUpload(self.host, self.username)
 
         # Optional
         # wms_is_valid = mapbender_uploader.wms_parse_url_validate(wms_url)
@@ -222,16 +225,29 @@ class MainDialog(BASE, WIDGET):
                     successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
                     successBox.setWindowTitle("Success")
                     successBox.setText("WMS succesfully created:\n \n" + wms_getcapabilities_url +
-                                           "\n \n and added to mapbender application: \n \n " + slug
+                                           "\n \n And added to mapbender application: \n \n" + "http://" + self.host
+                                       + "/mapbender/application/"+ slug
                                            )
                     successBox.setStandardButtons(QMessageBox.Ok)
-                    successBox.exec_()
+                    result = successBox.exec_()
+                    if result == QMessageBox.Ok:
+                        self.close()
 
                 else:
-                    print('failed')
+                    failBox = QMessageBox()
+                    failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                    failBox.setWindowTitle("Failed")
+                    failBox.setText("WMS could not be added to mapbender application")
+                    failBox.setStandardButtons(QMessageBox.Ok)
+                    failBox.exec_()
 
             else:
-                print('failed')
+                failBox = QMessageBox()
+                failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+                failBox.setWindowTitle("Failed")
+                failBox.setText("Application could not be cloned")
+                failBox.setStandardButtons(QMessageBox.Ok)
+                failBox.exec_()
 
         mapbender_uploader.close_connection()
 
