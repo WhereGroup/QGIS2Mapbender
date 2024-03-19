@@ -90,7 +90,7 @@ p, li { white-space: pre-wrap; }
         <item row="2" column="0">
          <widget class="QLabel" name="mapbenderConfigLabel">
           <property name="text">
-           <string>Mapbender configuration:</string>
+           <string>Mapbender parameters:</string>
           </property>
          </widget>
         </item>

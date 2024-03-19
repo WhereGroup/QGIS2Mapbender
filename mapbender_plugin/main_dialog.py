@@ -113,6 +113,20 @@ class MainDialog(BASE, WIDGET):
         remove_server_section_dialog.exec()
 
     def uploadProject(self):
+        # mapbender params:
+        if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
+                self.mapbenderCustomAppSlugLineEdit.text() != ''):
+            pass
+        else:
+            failBox = QMessageBox()
+            failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
+            failBox.setWindowTitle("Please complete Mapbender Parameters")
+            failBox.setText("Please select clone template / add to existing application and enter a valid URL title")
+            failBox.setStandardButtons(QMessageBox.Ok)
+            result = failBox.exec_()
+            if result == QMessageBox.Ok:
+                return
+
         iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=5)
 
         # config params:
@@ -151,7 +165,7 @@ class MainDialog(BASE, WIDGET):
                     failBox.setWindowTitle("Failed")
                     failBox.setText(
                         "Project directory could not be uploaded: Project directory already exists on the server. Do you want to "
-                        "overwrite the existing project directory '" + qgis_project_folder_name + "'?")
+                        "overwrite the existing project directory '" + qgis_project_folder_name + "' and update the WMS?")
                     failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
                     result = failBox.exec_()
                     if result == QMessageBox.Yes:
