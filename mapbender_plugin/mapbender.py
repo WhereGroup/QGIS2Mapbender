@@ -55,7 +55,10 @@ class MapbenderUpload():
         print('output_add')
         print(output)
         # output -> source_id
-        source_id = 28 # replace after command output is updated
+        spl_word = 'Saved new source #'
+        source_id = output.split(spl_word,1)[1]
+        print(source_id)
+        #source_id = 28 # replace after command output is updated
         return exit_status, source_id
 
     def wms_reload(self, id, url: str): # MAPBENDER CONSOLE OUTPUT PENDING

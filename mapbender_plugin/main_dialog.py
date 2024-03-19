@@ -120,9 +120,6 @@ class MainDialog(BASE, WIDGET):
         self.username = self.config.get(selected_section, 'username')
         self.password = self.config.get(selected_section, 'password')
 
-        # mapbender template slug:
-        template_slug = self.mapbenderCustomAppSlugLineEdit.text()
-
         if self.host == '' or len(self.host)<5:
             failBox = QMessageBox()
             failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
@@ -165,7 +162,12 @@ class MainDialog(BASE, WIDGET):
                                                  qgis_project_folder_name):
                                 if unzipProjectFolderOnServer(self.host, self.username, self.port, self.password,
                                                               qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
-                                    self.tempTestMapbenderConsole()
+                                    wms_getcapabilities_url = (
+                                            "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                                            + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
+                                    print('test wms_getcapabilities_url')
+                                    print(wms_getcapabilities_url)
+                                    self.tempTestMapbenderConsole(wms_getcapabilities_url)
                 else:
                     # if return = False (folder does not exist yet on the server)
                     if uploadProjectZipFile(self.host, self.username, self.port, self.password, self.plugin_dir,
@@ -173,17 +175,23 @@ class MainDialog(BASE, WIDGET):
                                          qgis_project_folder_name):
                         if unzipProjectFolderOnServer(self.host, self.username, self.port, self.password,
                                                               qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
-                            self.tempTestMapbenderConsole()
+                            wms_getcapabilities_url = (
+                                    "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                                    + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
+                            print('test wms_getcapabilities_url')
+                            print(wms_getcapabilities_url)
 
-    def tempTestMapbenderConsole(self):
+                            self.tempTestMapbenderConsole(wms_getcapabilities_url)
+
+    def tempTestMapbenderConsole(self, wms_getcapabilities_url):
         # mapbender template slug:
         template_slug = self.mapbenderCustomAppSlugLineEdit.text()
         layer_set = self.layerSetLineEdit.text()
 
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
         # variable hard coded only for tests
-        wms_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
-        slug_template = 'template_plugin' # replace with user input
+        #wms_url = 'http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&service=WMS&Request=GetCapabilities&map=/data/qgis-projects/source_ordner/test_project.qgz'
+        wms_url = wms_getcapabilities_url
 
         mapbender_uploader = MapbenderUpload('mapbender-qgis.wheregroup.lan', 'root')
 
@@ -204,7 +212,7 @@ class MainDialog(BASE, WIDGET):
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_url)
 
                 # depending on user's input (duplicate template or use existing application):
-            if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
+            #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
                 exit_status_app_clone, slug = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
                     exit_status_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
