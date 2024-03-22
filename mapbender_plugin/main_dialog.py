@@ -19,7 +19,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, create_fail_box_ok, create_fail_box_yes_no
+    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok
 from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
@@ -137,10 +137,8 @@ class MainDialog(BASE, WIDGET):
                 self.mapbenderCustomAppSlugLineEdit.text() != ''):
             self.upload_project()
         else:
-            failBox = create_fail_box_ok(self.plugin_dir, "Please complete Mapbender Parameters",
-                                         "Please select clone template / add to existing application and enter a valid URL title")
-            result = failBox.exec_()
-            if result == QMessageBox.Ok:
+            if (show_fail_box_ok(self.plugin_dir, "Please complete Mapbender Parameters",
+                                         "Please select clone template / add to existing application and enter a valid URL title")) == QMessageBox.Ok:
                 return
 
     def update_project(self):
@@ -172,11 +170,10 @@ class MainDialog(BASE, WIDGET):
                                                         SERVER_QGIS_PROJECTS_FOLDER_REL_PATH, qgis_project_folder_name):
                 # if return = True (folder already exists on server)
                 if self.publishRadioButton.isChecked():
-                    failBox = create_fail_box_yes_no(self.plugin_dir, "Failed",
+                    if (show_fail_box_yes_no(self.plugin_dir, "Failed",
                                                  "Project directory already exists on the server. \n \n Do you want to "
-                        "overwrite the existing project directory '" + qgis_project_folder_name + "' and update the WMS?")
-                    result = failBox.exec_()
-                    if result == QMessageBox.Yes:
+                                                 "overwrite the existing project directory '" + qgis_project_folder_name +
+                                                 "' and update the WMS?")) == QMessageBox.Yes:
                         if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                              self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                              qgis_project_folder_name):
@@ -234,13 +231,12 @@ class MainDialog(BASE, WIDGET):
                                     + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
                             self.mapbender_upload(wms_getcapabilities_url)
                 else:
-                    failBox = create_fail_box_ok(self.plugin_dir, "Failed",
+                    show_fail_box_ok(self.plugin_dir, "Failed",
 
-                        "Project directory "+ qgis_project_folder_name + " does not exist on the server and therefore "
+                        "Project directory " + qgis_project_folder_name + " does not exist on the server and therefore "
                                                                          "can not be updated. \n \nIf you want to upload a new"
                                                                          " QGIS-Project please select the option 'Publish "
                                                                          " in Mapbender app'")
-                    failBox.exec_()
 
 
     def mapbender_upload(self, wms_getcapabilities_url):
@@ -282,8 +278,7 @@ class MainDialog(BASE, WIDGET):
                     print(error_wms_assign)
 
                 else:
-                    failBox = create_fail_box_ok(self.plugin_dir, "Failed",f"Application could not be cloned. {error}")
-                    failBox.exec_()
+                    show_fail_box_ok(self.plugin_dir, "Failed", f"Application could not be cloned. {error}")
                     return
             else:
                 slug = self.mapbenderCustomAppSlugLineEdit.text()
@@ -291,19 +286,15 @@ class MainDialog(BASE, WIDGET):
                 print(error_wms_assign)
 
             if exit_status_wms_assign == 0:
-                successBox = create_fail_box_ok(self.plugin_dir, "Success report",
+                if (show_succes_box_ok(self.plugin_dir, "Success report",
                                                 "WMS succesfully created:\n \n" + wms_getcapabilities_url +
                                                 "\n \n And added to mapbender application: \n \n" + "http://" + self.host
-                                                + "/mapbender/application/"+ slug
-                                                )
-                result = successBox.exec_()
-                if result == QMessageBox.Ok:
+                                                + "/mapbender/application/" + slug)) == QMessageBox.Ok:
                     self.close()
 
             else:
-                failBox = create_fail_box_ok(self.plugin_dir, "Failed",
+                show_fail_box_ok(self.plugin_dir, "Failed",
                                              f"WMS could not be assigend to Mapbender application {error_wms_assign}")
-                failBox.exec_()
 
         mapbender_uploader.close_connection()
 
@@ -316,19 +307,12 @@ class MainDialog(BASE, WIDGET):
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
                     if exit_status_wms_reload == 0:  # success
-                        successBox = QMessageBox()
-                        successBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconSuccess.svg'))
-                        successBox.setWindowTitle("Success report")
-                        successBox.setText("WMS succesfully updated:\n \n" + wms_getcapabilities_url +
-                                           "\n \non Mapbender source(s): " + str(sources_ids))
-                        successBox.setStandardButtons(QMessageBox.Ok)
-                        result = successBox.exec_()
-                        if result == QMessageBox.Ok:
+                        if (show_succes_box_ok(self.plugin_dir , "Success report" , "WMS succesfully updated:\n \n" + wms_getcapabilities_url +
+                                           "\n \non Mapbender source(s): " + str(sources_ids))) == QMessageBox.Ok:
                             self.close()
             else:
-                failBox = create_fail_box_ok(self.plugin_dir, "Failed",
+                show_fail_box_ok(self.plugin_dir, "Failed",
                                              f"WMS is not an existing source in Mapbender and could not be updated")
-                failBox.exec_()
 
 
 
