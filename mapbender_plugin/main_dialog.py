@@ -55,7 +55,7 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
 
-        self.tmpMapbenderConsoleButton.clicked.connect(self.mapbender_upload)
+        self.tmpMapbenderConsoleButton.clicked.connect(self.test_console)
         self.publishRadioButton.setChecked(True)
         self.cloneTemplateRadioButton.setChecked(True)
         self.updateButton.setEnabled(False)
@@ -238,6 +238,9 @@ class MainDialog(BASE, WIDGET):
                                                                          " QGIS-Project please select the option 'Publish "
                                                                          " in Mapbender app'")
 
+    def test_console(self):
+        self.mapbender_upload("http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz")
+        #self.mapbender_update()
 
     def mapbender_upload(self, wms_getcapabilities_url):
         # mapbender params:
@@ -251,6 +254,10 @@ class MainDialog(BASE, WIDGET):
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
 
         mapbender_uploader = MapbenderUpload(self.host, self.username) # other parameters?
+        # TEST CONSOLE:
+        #host= "mapbender-qgis.wheregroup.lan"
+        #user = "root"
+        #mapbender_uploader = MapbenderUpload( host, user)
 
         # Optional
         # wms_is_valid = mapbender_uploader.wms_parse_url_validate(wms_getcapabilities_url)
@@ -265,7 +272,7 @@ class MainDialog(BASE, WIDGET):
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
                 source_id = sources_ids[-1]
             else:
-                # add source to mapbender if it does not exist
+                # add source to Mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_getcapabilities_url)
 
                 # depending on user's input (duplicate template or use existing application):
@@ -275,15 +282,15 @@ class MainDialog(BASE, WIDGET):
                 exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
                     exit_status_wms_assign, output_wms_assign, error_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
-                    print(error_wms_assign)
+                    print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
 
                 else:
-                    show_fail_box_ok(self.plugin_dir, "Failed", f"Application could not be cloned. {error}")
+                    show_fail_box_ok(self.plugin_dir, "Failed", f"Application could not be cloned.\n \n Error:  {error}")
                     return
             else:
                 slug = self.mapbenderCustomAppSlugLineEdit.text()
                 exit_status_wms_assign, output_wms_assign, error_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
-                print(error_wms_assign)
+                print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
 
             if exit_status_wms_assign == 0:
                 if (show_succes_box_ok(self.plugin_dir, "Success report",
@@ -294,7 +301,7 @@ class MainDialog(BASE, WIDGET):
 
             else:
                 show_fail_box_ok(self.plugin_dir, "Failed",
-                                             f"WMS could not be assigend to Mapbender application {error_wms_assign}")
+                                             f"WMS could not be assigend to Mapbender application.\n{output_wms_assign}")
 
         mapbender_uploader.close_connection()
 
@@ -313,6 +320,7 @@ class MainDialog(BASE, WIDGET):
             else:
                 show_fail_box_ok(self.plugin_dir, "Failed",
                                              f"WMS is not an existing source in Mapbender and could not be updated")
+        mapbender_uploader.close_connection()
 
 
 
