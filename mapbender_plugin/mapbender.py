@@ -92,6 +92,7 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail), output, error_output
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
+        print(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
         return exit_status, output, error_output
 
     def close_connection(self):

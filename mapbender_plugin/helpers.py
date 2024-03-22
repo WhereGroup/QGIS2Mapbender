@@ -441,3 +441,29 @@ def get_get_capabilities_url(host: str, plugin_dir, server_project_dir_path, qgi
     successBox.exec_()
     print(wms_getcapabilities_url)
     return wms_getcapabilities_url
+
+def create_fail_box_ok(plugin_dir, title, text):
+    failBox = QMessageBox()
+    failBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconWarning.svg'))
+    failBox.setWindowTitle(title)
+    failBox.setText(text)
+    failBox.setStandardButtons(QMessageBox.Ok)
+    return failBox
+
+def create_fail_box_yes_no(plugin_dir, title, text):
+    failBox = QMessageBox()
+    failBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconWarning.svg'))
+    failBox.setWindowTitle(title)
+    failBox.setText(text)
+    failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    return failBox
+
+def create_succes_box_ok(plugin_dir, title, text):
+    successBox = QMessageBox()
+    successBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconSuccess.svg'))
+    successBox.setWindowTitle(title)
+    successBox.setText(text)
+    successBox.setStandardButtons(QMessageBox.Ok)
+    return successBox
+
+
