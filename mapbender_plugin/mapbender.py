@@ -66,28 +66,33 @@ class MapbenderUpload():
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{url}'")
         return exit_status
 
-    def app_clone(self, template_slug): # MAPBENDER CONSOLE OUTPUT PENDING
+    def app_clone(self, template_slug):
         """
         Clones an existing application in the Application backend. This will create a new application with
         a _imp suffix as application name.
         :param template_slug: template slug to clone
         :return: exit_status (0 = success, 1 = fail),
         :return:slug of the new clone app
+        :return:error_output
         """
         exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
-        spl_word = 'slug'
-        slug = (output.split(spl_word,1)[1]).split(',')[0].strip()
-        return exit_status, slug
+        if output != '':
+            spl_word = 'slug'
+            slug = (output.split(spl_word,1)[1]).split(',')[0].strip()
+            return exit_status, slug, error_output
+        else:
+            slug = ''
+            return exit_status, slug, error_output
 
     def wms_assign(self, slug, source_id, layer_set):
         """
         :param slug:
         :param source_id:
         :param layer_set:
-        :return: exit_status (0 = success, 1 = fail)
+        :return: exit_status (0 = success, 1 = fail), output, error_output
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
-        return exit_status
+        return exit_status, output, error_output
 
     def close_connection(self):
         self.client.close()

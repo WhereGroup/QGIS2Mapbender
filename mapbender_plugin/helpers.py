@@ -13,13 +13,13 @@ from mapbender_plugin.settings import SERVER_MB_CD_APPLICATION_PATH
 from mapbender_plugin.mapbender import TAG
 
 
-def getPluginDir() -> str:
+def get_plugin_dir() -> str:
     """Returns the plugin directory"""
     plugin_dir = os.path.dirname(__file__)
     return plugin_dir
 
 
-def checkIfConfigFileExists(config_path: str) -> bool:
+def check_if_config_file_exists(config_path: str) -> bool:
     """Checks if configuration file exists in Plugin folder and creates it if
     it did not exist
 
@@ -38,7 +38,7 @@ def checkIfConfigFileExists(config_path: str) -> bool:
         return True
 
 
-def getProjectLayers() -> list:
+def get_project_layers() -> list:
     """ Returns project layers"""
     project = QgsProject.instance()
     project.read()
@@ -48,7 +48,7 @@ def getProjectLayers() -> list:
     return layers_names
 
 
-def checkIfQgisProject(plugin_dir: str) -> bool:
+def check_if_qgis_project(plugin_dir: str) -> bool:
     """
         Checks if plugin is used within a QGIS-Project
         :param plugin_dir:
@@ -69,16 +69,17 @@ def checkIfQgisProject(plugin_dir: str) -> bool:
         return True
 
 
-def getPaths(server_qgis_projects_folder_rel_path: str) -> dict:
+def get_paths(server_qgis_projects_folder_rel_path: str):
     """
     Check if plugin is used within a QGIS-Project and get the paths if true
     :param server_qgis_projects_folder_rel_path:
     :param plugin_dir:
-    :return:
+    :return: paths
     """
     source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
     qgis_project_name = source_project_file_path.split("/")[-1]
+    source_project_dir_path = QgsProject.instance().readPath("./")
     paths = {'source_project_dir_path': QgsProject.instance().readPath("./"),
                  'source_project_file_path': QgsProject.instance().fileName(),
                  'qgis_project_name': source_project_file_path.split("/")[-1],
@@ -90,8 +91,8 @@ def getPaths(server_qgis_projects_folder_rel_path: str) -> dict:
     return (paths)
 
 
-def zipLocalProjectFolder(plugin_dir: str, source_project_dir_path: str,
-                          source_project_zip_dir_path: str, qgis_project_folder_name: str):
+def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
+                             source_project_zip_dir_path: str, qgis_project_folder_name: str):
     """
     Copies project directory and removes unwanted files. Zips local project folder
     :param server_qgis_projects_folder_rel_path:
@@ -147,8 +148,8 @@ def zipLocalProjectFolder(plugin_dir: str, source_project_dir_path: str,
         failBox.setStandardButtons(QMessageBox.Ok)
         failBox.exec_()
 
-def checkIfProjectFolderExistsOnServer(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
-                         server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
+def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
+                                             server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
     """
     Checks if project folder already exists on server
     :param host:
@@ -161,6 +162,8 @@ def checkIfProjectFolderExistsOnServer(host: str, username: str, port: str, pass
     :param qgis_project_folder_name:
     :return: bool
     """
+    iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=2)
+
     sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
         "password": password})
     try:
@@ -194,8 +197,8 @@ def checkIfProjectFolderExistsOnServer(host: str, username: str, port: str, pass
         failBox.exec_()
 
 
-def uploadProjectZipFile(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
-                         server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
+def upload_project_zip_file(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
+                            server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
     """
     Uploads project zip file to the server
     :param host:
@@ -251,8 +254,8 @@ def uploadProjectZipFile(host: str, username: str, port: str, password: str, plu
         failBox.exec_()
 
 
-def removeProjectFolderFromServer(host: str, username: str, port: str, password: str, plugin_dir: str,
-                                  server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str):
+def remove_project_folder_from_server(host: str, username: str, port: str, password: str, plugin_dir: str,
+                                      server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str):
     """
     Removes a project folder from server
     :param host:
@@ -306,8 +309,8 @@ def removeProjectFolderFromServer(host: str, username: str, port: str, password:
         failBox.exec_()
 
 
-def unzipProjectFolderOnServer(host: str, username: str, port: str, password: str, qgis_project_folder_name: str,
-                               server_qgis_projects_folder_rel_path: str) -> bool:
+def unzip_project_folder_on_server(host: str, username: str, port: str, password: str, qgis_project_folder_name: str,
+                                   server_qgis_projects_folder_rel_path: str) -> bool:
     """
     Unzips project folder on the server
     :param host:
@@ -348,8 +351,8 @@ def unzipProjectFolderOnServer(host: str, username: str, port: str, password: st
         print(f"Could not create connection. Reason: {e}")
 
 
-def checkUploadedFiles(host: str, username: str, port: str, password: str, plugin_dir, qgis_project_folder_name,
-    source_project_dir_path: str, server_project_dir_path: str):
+def check_uploaded_files(host: str, username: str, port: str, password: str, plugin_dir, qgis_project_folder_name,
+                         source_project_dir_path: str, server_project_dir_path: str):
     """
     Checks uploaded files to the server
     :param host:
@@ -420,7 +423,7 @@ def checkUploadedFiles(host: str, username: str, port: str, password: str, plugi
 #         print(f"Could not connect to server. Reason: {e}")
 
 
-def getGetCapabilitiesUrl(host: str, plugin_dir, server_project_dir_path, qgis_project_name) -> str:
+def get_get_capabilities_url(host: str, plugin_dir, server_project_dir_path, qgis_project_name) -> str:
     """
     Returns the getCapabilities Url for the created WMS
     :return:
