@@ -19,12 +19,11 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok
+    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, list_sections
 from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
-    SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
-    TEMPLATE_APPLICATION_NAME, CONFIG_FILE_NAME,
+    SERVER_QGIS_PROJECTS_FOLDER_REL_PATH, CONFIG_FILE_NAME,
 )
 
 # Dialog aus .ui-Datei
@@ -37,7 +36,6 @@ class MainDialog(BASE, WIDGET):
         self.setupUi(self)
 
         self.server_qgis_projects_folder_rel_path = SERVER_QGIS_PROJECTS_FOLDER_REL_PATH
-        templateApplicationName = TEMPLATE_APPLICATION_NAME
 
         self.plugin_dir = get_plugin_dir()
         self.config_path = self.plugin_dir + "/" + CONFIG_FILE_NAME
@@ -52,15 +50,21 @@ class MainDialog(BASE, WIDGET):
 
         # tab1
         self.update_section_combo_box()
-        self.publishButton.clicked.connect(self.publish_project)
-        self.updateButton.clicked.connect(self.update_project)
-
-        self.tmpMapbenderConsoleButton.clicked.connect(self.test_console)
         self.publishRadioButton.setChecked(True)
+
+        self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
         self.cloneTemplateRadioButton.setChecked(True)
         self.updateButton.setEnabled(False)
         self.updateRadioButton.clicked.connect(self.disable_publish_parameters)
-        self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
+
+        self.publishButton.clicked.connect(self.publish_project)
+        self.updateButton.clicked.connect(self.update_project)
+
+        #tmp, for testing
+        self.tmpMapbenderConsoleButton.clicked.connect(self.test_console)
+        self.tmpMapbenderConsoleButton.hide()
+        # tmp, for testing
+
 
         # tab2
         self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
@@ -71,17 +75,17 @@ class MainDialog(BASE, WIDGET):
 
     def update_section_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
-        # parse config file
-        try:
-            # As the documentation makes clear, any number of filenames can be passed to the read method,
-            # and it will silently ignore the ones that cannot be opened.
-            self.config = configparser.ConfigParser()
-            self.config.read(self.config_path)
-        except configparser.Error as error:
-            self.iface.messageBar().pushMessage("Error: Could not parse config file ", error, level=Qgis.Critical)
+        # # parse config file
+        # try:
+        #     # As the documentation makes clear, any number of filenames can be passed to the read method,
+        #     # and it will silently ignore the ones that cannot be opened.
+        #     self.config = configparser.ConfigParser()
+        #     self.config.read(self.config_path)
+        # except configparser.Error as error:
+        #     self.iface.messageBar().pushMessage("Error: Could not parse config file ", error, level=Qgis.Critical)
 
         # read config sections
-        config_sections = self.config.sections()
+        config_sections = list_sections("mapbender-plugin/connection")
         if len(config_sections) == 0:
             self.warningAddServiceText.show()
             self.sectionComboBoxLabel.hide()
@@ -91,10 +95,9 @@ class MainDialog(BASE, WIDGET):
             self.editServiceConfigLabel.hide()
             self.removeServerConfigButton.hide()
             self.removeServiceConfigLabel.hide()
-            self.exportServiceConfigFileButton.hide()
-            self.exportServiceConfigFileLabel.hide()
+
         else:
-            # sections-combobox
+            # update sections-combobox
             self.warningAddServiceText.hide()
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
@@ -106,8 +109,7 @@ class MainDialog(BASE, WIDGET):
             self.editServiceConfigLabel.show()
             self.removeServerConfigButton.show()
             self.removeServiceConfigLabel.show()
-            self.exportServiceConfigFileButton.show()
-            self.exportServiceConfigFileLabel.show()
+
 
     def disable_publish_parameters(self):
         self.mbParamsFrame.setEnabled(False)
@@ -170,10 +172,10 @@ class MainDialog(BASE, WIDGET):
                                                         SERVER_QGIS_PROJECTS_FOLDER_REL_PATH, qgis_project_folder_name):
                 # if return = True (folder already exists on server)
                 if self.publishRadioButton.isChecked():
-                    if (show_fail_box_yes_no(self.plugin_dir, "Failed",
-                                                 "Project directory already exists on the server. \n \n Do you want to "
-                                                 "overwrite the existing project directory '" + qgis_project_folder_name +
-                                                 "' and update the WMS?")) == QMessageBox.Yes:
+                    if (show_fail_box_yes_no("Failed",
+                                             f"""Project directory already exists on the server. \n \n Do you want to "
+                                                 "overwrite the existing project directory '{qgis_project_folder_name}' 
+                                                 and update the WMS?""")) == QMessageBox.Yes:
                         if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                              self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                              qgis_project_folder_name):
@@ -188,6 +190,7 @@ class MainDialog(BASE, WIDGET):
                                                        qgis_project_folder_name):
                                 if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
                                                                   qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
+                                    # check "http://"
                                     wms_getcapabilities_url = (
                                             "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                             + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
@@ -208,6 +211,7 @@ class MainDialog(BASE, WIDGET):
                             if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
                                                               qgis_project_folder_name,
                                                               SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
+                                # check "http://"
                                 wms_getcapabilities_url = (
                                         "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                         + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
@@ -281,27 +285,30 @@ class MainDialog(BASE, WIDGET):
                 template_slug = self.mapbenderCustomAppSlugLineEdit.text()
                 exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
-                    exit_status_wms_assign, output_wms_assign, error_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
+                    exit_status_wms_assign, output_wms_assign, error_wms_assign = (
+                        mapbender_uploader.wms_assign(slug, source_id, layer_set))
                     print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
 
                 else:
-                    show_fail_box_ok(self.plugin_dir, "Failed", f"Application could not be cloned.\n \n Error:  {error}")
+                    show_fail_box_ok(self.plugin_dir, "Failed",
+                                     f"Application could not be cloned.\n \n Error:  {error}")
                     return
             else:
                 slug = self.mapbenderCustomAppSlugLineEdit.text()
-                exit_status_wms_assign, output_wms_assign, error_wms_assign = mapbender_uploader.wms_assign(slug, source_id, layer_set)
+                exit_status_wms_assign, output_wms_assign, error_wms_assign = (
+                    mapbender_uploader.wms_assign(slug, source_id, layer_set))
                 print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
 
             if exit_status_wms_assign == 0:
                 if (show_succes_box_ok(self.plugin_dir, "Success report",
                                                 "WMS succesfully created:\n \n" + wms_getcapabilities_url +
-                                                "\n \n And added to mapbender application: \n \n" + "http://" + self.host
-                                                + "/mapbender/application/" + slug)) == QMessageBox.Ok:
+                                                "\n \n And added to mapbender application: \n \n" + "http://" +
+                                                self.host + "/mapbender/application/" + slug)) == QMessageBox.Ok:
                     self.close()
 
             else:
-                show_fail_box_ok(self.plugin_dir, "Failed",
-                                             f"WMS could not be assigend to Mapbender application.\n{output_wms_assign}")
+                show_fail_box_ok(self.plugin_dir,
+                                 "Failed",f"WMS could not be assigend to Mapbender application.\n{output_wms_assign}")
 
         mapbender_uploader.close_connection()
 
@@ -314,12 +321,14 @@ class MainDialog(BASE, WIDGET):
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
                     if exit_status_wms_reload == 0:  # success
-                        if (show_succes_box_ok(self.plugin_dir , "Success report" , "WMS succesfully updated:\n \n" + wms_getcapabilities_url +
-                                           "\n \non Mapbender source(s): " + str(sources_ids))) == QMessageBox.Ok:
+                        if (show_succes_box_ok(self.plugin_dir , "Success report" ,
+                                               "WMS succesfully updated:\n \n"+ wms_getcapabilities_url +
+                                               "\n \non Mapbender source(s): " + str(sources_ids))) == QMessageBox.Ok:
                             self.close()
             else:
-                show_fail_box_ok(self.plugin_dir, "Failed",
-                                             f"WMS is not an existing source in Mapbender and could not be updated")
+                show_fail_box_ok(self.plugin_dir,
+                                 "Failed",
+                                 f"WMS is not an existing source in Mapbender and could not be updated")
         mapbender_uploader.close_connection()
 
 

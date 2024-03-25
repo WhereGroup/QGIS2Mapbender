@@ -6,7 +6,7 @@ import paramiko
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsProject, Qgis, QgsMessageLog
+from qgis._core import QgsProject, Qgis, QgsMessageLog, QgsSettings
 from qgis.utils import iface
 
 from mapbender_plugin.settings import SERVER_MB_CD_APPLICATION_PATH
@@ -58,8 +58,9 @@ def check_if_qgis_project(plugin_dir: str) -> bool:
     source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
     if source_project_dir_path == "./" or source_project_file_path == "":
-        show_fail_box_ok('', "Failed",
-                                     "Please use the Mapbender Plugin from a valid QGIS-Project with QGIS-Server configurations")
+        show_fail_box_ok('Failed',
+                                     "Please use the Mapbender Plugin from a valid QGIS-Project "
+                                     "with QGIS-Server configurations")
         return False
     else:
         return True
@@ -123,11 +124,11 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
                 #uploadProjectZipFile(server_qgis_projects_folder_rel_path)
 
             except Exception as e:
-                show_fail_box_ok('', "Failed", f"Could not compress copy of project folder. Reason: {e}")
+                show_fail_box_ok("Failed", f"Could not compress copy of project folder. Reason: {e}")
         except Exception as e:
-            show_fail_box_ok('', "Failed", f"Could not remove unwanted files. Reason: {e}")
+            show_fail_box_ok("Failed", f"Could not remove unwanted files. Reason: {e}")
     except Exception as e:
-        show_fail_box_ok('', "Failed", f"Could not copy project folder. Reason: {e}")
+        show_fail_box_ok("Failed", f"Could not copy project folder. Reason: {e}")
 
 def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                                              server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -161,10 +162,10 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
                     print('Folder already exists in server')
                     return True
             except Exception as e:
-                show_fail_box_ok('', "Failed",
+                show_fail_box_ok("Failed",
                                              f"Could not check if project directory exists already on the server. Reason: {e}")
     except Exception as e:
-        show_fail_box_ok('', "Failed", f"Could not create connection. Reason: {e}")
+        show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
 
 def upload_project_zip_file(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                             server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -192,7 +193,7 @@ def upload_project_zip_file(host: str, username: str, port: str, password: str, 
                          warn=True).failed:  # with .zip (if exists, is zipped), wihout -d option (to test if
                     # the file exist, not a directory)
                     # Upload not successful:: Folder does not exist in server
-                    show_fail_box_ok('', "Failed", "Project directory could not be uploaded")
+                    show_fail_box_ok("Failed", "Project directory could not be uploaded")
                     return False
                 else:
                     # Upload was successful: Folder exists now in server
@@ -200,9 +201,9 @@ def upload_project_zip_file(host: str, username: str, port: str, password: str, 
                     return True
                         #self.unzipProjectFolderInServer(server_qgis_projects_folder_rel_path)
             except Exception as e:
-                show_fail_box_ok('', "Failed", f"Project directory could not be uploaded. Reason: {e}")
+                show_fail_box_ok("Failed", f"Project directory could not be uploaded. Reason: {e}")
     except Exception as e:
-        show_fail_box_ok('', "Failed", f"Could not create connection. Reason: {e}")
+        show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
 
 
 def remove_project_folder_from_server(host: str, username: str, port: str, password: str, plugin_dir: str,
@@ -231,16 +232,16 @@ def remove_project_folder_from_server(host: str, username: str, port: str, passw
             #check
             out = stdout.readlines()
             if os.path.isdir(f'{server_qgis_projects_folder_rel_path}{qgis_project_folder_name}'):
-                show_fail_box_ok('', "Failed", f"Could not remove existing project folder from server.")
+                show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
                 return False
             else:
                 print('Existing project folder successfully removed from server')
                 return True
 
         except Exception as e:
-            show_fail_box_ok('', "Failed", f"Could not remove existing project folder from server. Reason: {e}")
+            show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
     except Exception as e:
-        show_fail_box_ok('', "Failed", f"Could not connect to server. Reason: {e}")
+        show_fail_box_ok("Failed", f"Could not connect to server. Reason: {e}")
 
 def unzip_project_folder_on_server(host: str, username: str, port: str, password: str, qgis_project_folder_name: str,
                                    server_qgis_projects_folder_rel_path: str) -> bool:
@@ -382,22 +383,43 @@ def create_fail_box(plugin_dir, title, text):
     failBox.setText(text)
     return failBox
 
-def show_fail_box_ok(plugin_dir, title, text):
+def show_fail_box_ok(title, text):
+    plugin_dir = get_plugin_dir()
     failBox = create_fail_box(plugin_dir, title, text)
     failBox.setStandardButtons(QMessageBox.Ok)
     failBox.exec_()
 
-def show_fail_box_yes_no(plugin_dir, title, text):
+def show_fail_box_yes_no(title, text):
+    plugin_dir = get_plugin_dir()
     failBox = create_fail_box(plugin_dir, title, text)
     failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     failBox.exec_()
 
-def show_succes_box_ok(plugin_dir, title, text):
+def show_succes_box_ok(title, text):
+    plugin_dir = get_plugin_dir()
     successBox = QMessageBox()
     successBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconSuccess.svg'))
     successBox.setWindowTitle(title)
     successBox.setText(text)
     successBox.setStandardButtons(QMessageBox.Ok)
+    #return successBox
     successBox.exec_()
 
+def show_question_box(text):
+    questionBox = QMessageBox()
+    questionBox.setIcon(QMessageBox.Question)
+    questionBox.setText(text)
+    questionBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    questionBox.exec_()
 
+def get_plugin_dir():
+    file = os.path.dirname(__file__)
+    plugin_dir = os.path.dirname(file) + '/mapbender_plugin'
+    return plugin_dir
+
+def list_sections(key):
+    s = QgsSettings()
+    s.beginGroup(key)
+    subkeys = s.childGroups()
+    s.endGroup
+    return subkeys

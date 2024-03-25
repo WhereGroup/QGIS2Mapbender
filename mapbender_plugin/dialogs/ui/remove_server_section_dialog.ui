@@ -30,14 +30,14 @@
       </widget>
      </item>
      <item>
+      <widget class="QComboBox" name="removeSectionComboBox"/>
+     </item>
+     <item>
       <widget class="QPushButton" name="removeSelectedSectionButton">
        <property name="text">
         <string>Remove selected section</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="removeSectionComboBox"/>
      </item>
     </layout>
    </item>

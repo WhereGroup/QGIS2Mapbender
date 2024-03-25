@@ -17,7 +17,8 @@ class MapbenderUpload():
         self.client.connect(hostname=host, username=user)
 
     def run_mapbender_command(self, command: str):
-        stdin, stdout, stderr = self.client.exec_command(f"cd ..; cd /data/mapbender/application/; bin/console mapbender:{command}")
+        stdin, stdout, stderr = (
+            self.client.exec_command(f"cd ..; cd /data/mapbender/application/; bin/console mapbender:{command}"))
         exit_status = stdout.channel.recv_exit_status()
         output = stdout.read().decode("utf-8")
         error_output = stderr.read().decode("utf-8")
@@ -52,8 +53,8 @@ class MapbenderUpload():
         :return: source_id (id of the new added source)
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{url}'")
-        spl_word = 'Saved new source #'
-        source_id = output.split(spl_word,1)[1]
+        spl = 'Saved new source #'
+        source_id = output.split(spl,1)[1]
         return exit_status, source_id
 
     def wms_reload(self, id, url: str):
@@ -77,8 +78,8 @@ class MapbenderUpload():
         """
         exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
         if output != '':
-            spl_word = 'slug'
-            slug = (output.split(spl_word,1)[1]).split(',')[0].strip()
+            spl = 'slug'
+            slug = (output.split(spl,1)[1]).split(',')[0].strip()
             return exit_status, slug, error_output
         else:
             slug = ''
@@ -91,7 +92,8 @@ class MapbenderUpload():
         :param layer_set:
         :return: exit_status (0 = success, 1 = fail), output, error_output
         """
-        exit_status, output, error_output = self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
+        exit_status, output, error_output = (
+            self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
         print(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
         return exit_status, output, error_output
 
