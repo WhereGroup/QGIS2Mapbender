@@ -4,6 +4,8 @@ from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 
+from mapbender_plugin.helpers import list_qgs_settings_child_groups
+
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/edit_server_section_dialog.ui'))
@@ -16,25 +18,11 @@ class EditServerSectionDialog(BASE, WIDGET):
         self.saveEditedSectionButton.clicked.connect(self.saveEditedConfigSection)
         self.removeDialogButtonBox.rejected.connect(self.reject)
 
-        # get config file path
-        self.file = os.path.dirname(__file__)
-        self.plugin_dir = os.path.dirname(self.file)
-        self.config_path = self.plugin_dir + '/server_config.cfg'
+        server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        self.editSectionComboBox.addItems(server_config_sections)
 
-        # parse config file
-        try:
-            self.config = configparser.ConfigParser()
-            self.config.read(self.config_path)
-        except configparser.Error as error:
-            self.iface.messageBar().pushMessage("Error: Could not parse", error, level=Qgis.Critical)
-
-        # read config sections
-        config_sections = self.config.sections()
-        self.editSectionComboBox.addItems(config_sections)
         self.setServiceParameters()
         self.editSectionComboBox.currentIndexChanged.connect(self.setServiceParameters)
-
-
 
     def setServiceParameters(self):
         selected_section = self.editSectionComboBox.currentText()

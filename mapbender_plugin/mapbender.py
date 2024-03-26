@@ -41,9 +41,13 @@ class MapbenderUpload():
         #         options_string = " ".join(("--{option}" for option in options))
         #     ... = run_app_console_mapbender_command(f"wms:parse:url {options_string if options_string else ''} {wms_id} {file_path}")
         #     ...
-        parsed_json = json.loads(output)
-        sources_ids = [obj["id"] for obj in parsed_json]
-        return exit_status, sources_ids
+        if exit_status == 0:
+            parsed_json = json.loads(output)
+            sources_ids = [obj["id"] for obj in parsed_json]
+            return exit_status, sources_ids
+        else:
+            sources_ids = []
+            return exit_status,  sources_ids
 
     def wms_add(self, url: str):
         """
@@ -53,9 +57,14 @@ class MapbenderUpload():
         :return: source_id (id of the new added source)
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{url}'")
-        spl = 'Saved new source #'
-        source_id = output.split(spl,1)[1]
-        return exit_status, source_id
+        if exit_status == 0 and output:
+            spl = 'Saved new source #'
+            source_id = output.split(spl,1)[1]
+            return exit_status, source_id
+        else:
+            source_id = ''
+            return exit_status, source_id
+
 
     def wms_reload(self, id, url: str):
         """
