@@ -424,3 +424,14 @@ def list_qgs_settings_child_groups(key):
     s.endGroup
     return subkeys
 
+def list_qgs_settings_values(key):
+    s = QgsSettings()
+    s.beginGroup('mapbender-plugin/connection/'+ key)
+    subkeys = s.childKeys()
+    values_dict = {}
+    for subkey in subkeys:
+        value = s.value(subkey)
+        values_dict[subkey] = value
+    s.endGroup()
+    return values_dict
+

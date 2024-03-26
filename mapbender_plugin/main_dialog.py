@@ -19,7 +19,8 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, list_qgs_settings_child_groups
+    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
+    list_qgs_settings_child_groups, list_qgs_settings_values
 from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
@@ -81,15 +82,17 @@ class MainDialog(BASE, WIDGET):
 
 
     def update_server_table(self):
-        print('update server table')
         server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
-        print(server_config_sections)
         self.serverTableWidget.setRowCount(len(server_config_sections))
         for i, (name) in enumerate(server_config_sections):
             item_name = QTableWidgetItem(name)
             item_name.setText(server_config_sections[i])
-            print(item_name.text())
             self.serverTableWidget.setItem(i, 0, item_name)
+
+            values_dict = list_qgs_settings_values(server_config_sections[i])
+            item_url = QTableWidgetItem()
+            item_url.setText(values_dict['url'])
+            self.serverTableWidget.setItem(i, 1, item_url)
 
     def update_section_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
