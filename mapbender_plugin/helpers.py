@@ -387,13 +387,13 @@ def show_fail_box_ok(title, text):
     plugin_dir = get_plugin_dir()
     failBox = create_fail_box(plugin_dir, title, text)
     failBox.setStandardButtons(QMessageBox.Ok)
-    failBox.exec_()
+    return failBox.exec_()
 
 def show_fail_box_yes_no(title, text):
     plugin_dir = get_plugin_dir()
     failBox = create_fail_box(plugin_dir, title, text)
     failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-    failBox.exec_()
+    return failBox.exec_()
 
 def show_succes_box_ok(title, text):
     plugin_dir = get_plugin_dir()
@@ -402,24 +402,25 @@ def show_succes_box_ok(title, text):
     successBox.setWindowTitle(title)
     successBox.setText(text)
     successBox.setStandardButtons(QMessageBox.Ok)
-    #return successBox
-    successBox.exec_()
+    return successBox.exec_()
+
 
 def show_question_box(text):
     questionBox = QMessageBox()
     questionBox.setIcon(QMessageBox.Question)
     questionBox.setText(text)
     questionBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-    questionBox.exec_()
+    return questionBox.exec_()
 
 def get_plugin_dir():
     file = os.path.dirname(__file__)
     plugin_dir = os.path.dirname(file) + '/mapbender_plugin'
     return plugin_dir
 
-def list_sections(key):
+def list_qgs_settings_child_groups(key):
     s = QgsSettings()
     s.beginGroup(key)
     subkeys = s.childGroups()
     s.endGroup
     return subkeys
+

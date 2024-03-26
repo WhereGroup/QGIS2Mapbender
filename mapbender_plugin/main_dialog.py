@@ -7,7 +7,7 @@ from PyQt5 import uic
 import configparser
 
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
 from qgis._core import Qgis, QgsProject
 from qgis.utils import iface
@@ -19,7 +19,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, list_sections
+    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, list_qgs_settings_child_groups
 from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
@@ -67,11 +67,29 @@ class MainDialog(BASE, WIDGET):
 
 
         # tab2
+        # server table
+        self.serverTableWidget.setColumnCount(2)
+        self.serverTableWidget.setHorizontalHeaderLabels(["Name", "URL"])
+        self.update_server_table()
+        #self.serverTableWidget.table.setRowCount
+        # buttons
         self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
         self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
         self.removeServerConfigButton.clicked.connect(self.open_dialog_remove_config_section)
         self.buttonBoxTab1.rejected.connect(self.reject)
         self.buttonBoxTab2.rejected.connect(self.reject)
+
+
+    def update_server_table(self):
+        print('update server table')
+        server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        print(server_config_sections)
+        self.serverTableWidget.setRowCount(len(server_config_sections))
+        for i, (name) in enumerate(server_config_sections):
+            item_name = QTableWidgetItem(name)
+            item_name.setText(server_config_sections[i])
+            print(item_name.text())
+            self.serverTableWidget.setItem(i, 0, item_name)
 
     def update_section_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
@@ -85,30 +103,26 @@ class MainDialog(BASE, WIDGET):
         #     self.iface.messageBar().pushMessage("Error: Could not parse config file ", error, level=Qgis.Critical)
 
         # read config sections
-        config_sections = list_sections("mapbender-plugin/connection")
+        config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
             self.warningAddServiceText.show()
-            self.sectionComboBoxLabel.hide()
+            self.serverComboBoxLabel.hide()
             self.sectionComboBox.hide()
             self.publishButton.hide()
             self.editServerConfigButton.hide()
-            self.editServiceConfigLabel.hide()
             self.removeServerConfigButton.hide()
-            self.removeServiceConfigLabel.hide()
 
         else:
             # update sections-combobox
             self.warningAddServiceText.hide()
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
-            self.sectionComboBoxLabel.show()
+            self.serverComboBoxLabel.show()
             self.sectionComboBox.show()
             self.publishButton.show()
             # config management
             self.editServerConfigButton.show()
-            self.editServiceConfigLabel.show()
             self.removeServerConfigButton.show()
-            self.removeServiceConfigLabel.show()
 
 
     def disable_publish_parameters(self):
@@ -124,14 +138,17 @@ class MainDialog(BASE, WIDGET):
     def open_dialog_add_new_config_section(self):
         new_server_section_dialog = AddServerSectionDialog()
         new_server_section_dialog.exec()
+        self.update_server_table()
 
     def open_dialog_edit_config_section(self):
         edit_server_section_dialog = EditServerSectionDialog()
         edit_server_section_dialog.exec()
+        self.update_server_table()
 
     def open_dialog_remove_config_section(self):
         remove_server_section_dialog = RemoveServerSectionDialog()
         remove_server_section_dialog.exec()
+        self.update_server_table()
 
     def publish_project(self):
         # check mapbender params:
