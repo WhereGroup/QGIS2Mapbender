@@ -39,8 +39,8 @@ class EditServerSectionDialog(BASE, WIDGET):
         self.editUserNameLineEdit.setText(server_username)
         self.editPasswordLineEdit.setText(server_password)
         self.editQgisProjectPathLineEdit.setText(server_qgis_projects_path)
-        self.editMapbenderPathLineEdit.setText(server_mapbender_app_path)
-        self.editMapbenderUrlLineEdit.setText(mapbender_basis_url)
+        self.editMbPathLineEdit.setText(server_mapbender_app_path)
+        self.editMbBasisUrlLineEdit.setText(mapbender_basis_url)
 
     def saveEditedConfigSection(self):
         edited_section_name = self.editServiceNameLineEdit.text()
@@ -49,8 +49,8 @@ class EditServerSectionDialog(BASE, WIDGET):
         edited_user_name = self.editUserNameLineEdit.text()
         edited_password = self.editPasswordLineEdit.text()
         edited_server_qgis_projects_path = self.editQgisProjectPathLineEdit.text()
-        edited_server_mapbender_app_path = self.editMapbenderPathLineEdit.text()
-        edited_mapbender_basis_url = self.editMapbenderUrlLineEdit.text()
+        edited_server_mapbender_app_path = self.editMbPathLineEdit.text()
+        edited_mapbender_basis_url = self.editMbBasisUrlLineEdit.text()
 
 
         s = QgsSettings()

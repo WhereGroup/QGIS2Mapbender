@@ -99,6 +99,8 @@ class MainDialog(BASE, WIDGET):
             item_mapbender_basis_url.setText(con_params['mapbender_basis_url'])
             self.serverTableWidget.setItem(i, 4, item_mapbender_basis_url)
 
+        self.update_section_combo_box()
+
 
     def update_section_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
@@ -106,7 +108,7 @@ class MainDialog(BASE, WIDGET):
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
             self.warningFirstServerLabel.show()
-            self.serverComboBoxLabel.setText("Please add the first server")
+            self.serverComboBoxLabel.setText("Please add a server")
 
         else:
             # update sections-combobox
@@ -129,6 +131,7 @@ class MainDialog(BASE, WIDGET):
         new_server_section_dialog = AddServerSectionDialog()
         new_server_section_dialog.exec()
         self.update_server_table()
+        self.update_section_combo_box()
 
     def open_dialog_edit_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
@@ -138,6 +141,7 @@ class MainDialog(BASE, WIDGET):
             edit_server_section_dialog.setServiceParameters(selected_section)
             edit_server_section_dialog.exec()
             self.update_server_table()
+            self.update_section_combo_box()
         else:
             pass
 
@@ -152,6 +156,7 @@ class MainDialog(BASE, WIDGET):
                     s.remove(f"mapbender-plugin/connection/{selected_section}")
                     if (show_succes_box_ok('Success', 'Section successfully removed')) == QMessageBox.Ok:
                         self.update_server_table()
+                        self.update_section_combo_box()
                 except:
                     show_fail_box_ok('Failed', "Section could not be deleted")
         else:

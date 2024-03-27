@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>794</width>
-    <height>532</height>
+    <width>840</width>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -117,7 +117,7 @@
         <item row="7" column="0">
          <widget class="QLabel" name="newQgisProjectPathLabel">
           <property name="text">
-           <string>Mapbender application relative path</string>
+           <string>QGIS-Projects relative path</string>
           </property>
          </widget>
         </item>
@@ -137,12 +137,12 @@
          </widget>
         </item>
         <item row="9" column="1">
-         <widget class="QLineEdit" name="newMapbenderRelPathLineEdit"/>
+         <widget class="QLineEdit" name="newMbPathLineEdit"/>
         </item>
         <item row="9" column="0">
-         <widget class="QLabel" name="newMapbenderPathLabel">
+         <widget class="QLabel" name="newMbPathLabel">
           <property name="text">
-           <string>Mapbender application relative path</string>
+           <string>Mapbender application path</string>
           </property>
          </widget>
         </item>
@@ -162,10 +162,10 @@
          </widget>
         </item>
         <item row="11" column="1">
-         <widget class="QLineEdit" name="newMapbenderUrlLineEdit"/>
+         <widget class="QLineEdit" name="newMbBasisUrlLineEdit"/>
         </item>
         <item row="11" column="0">
-         <widget class="QLabel" name="newMapbenderUrlLabel">
+         <widget class="QLabel" name="newMbBasisUrlLabel">
           <property name="text">
            <string>Mapbender basis URL</string>
           </property>

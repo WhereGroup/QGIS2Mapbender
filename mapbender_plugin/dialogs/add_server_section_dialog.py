@@ -34,9 +34,9 @@ class AddServerSectionDialog(BASE, WIDGET):
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/projects_path",
                        self.newQgisProjectPathLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/mapbender_app_path",
-                       self.newMapbenderPathLineEdit.text())
+                       self.newMbPathLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/mapbender_basis_url",
-                       self.newMapbenderUrlLineEdit.text())
+                       self.newMbBasisUrlLineEdit.text())
 
             if (show_succes_box_ok('Success', 'New section successfully added')) == QMessageBox.Ok:
                 self.close()
