@@ -438,7 +438,6 @@ def list_qgs_settings_values(key):
 
 def show_new_info_message_bar(text, previous_messagebars):
     previous_messagebars = delete_previous_messages(previous_messagebars)
-
     messagebar = iface.messageBar().createMessage(text)
     #messagebar.setLevel(QgsMessageBar.INFO)
     iface.messageBar().pushWidget(messagebar)

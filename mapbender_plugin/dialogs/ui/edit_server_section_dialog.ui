@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
-    <height>384</height>
+    <width>744</width>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@
         <item row="6" column="0">
          <widget class="QLabel" name="editQgisProjectPathLabel">
           <property name="text">
-           <string>QGIS-Projects path</string>
+           <string>QGIS-Projects relative path</string>
           </property>
          </widget>
         </item>
@@ -100,6 +100,50 @@
           </property>
           <property name="text">
            <string>Service name without blank spaces</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QLineEdit" name="editMapbenderPathLineEdit"/>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="editMapbenderPathLabel">
+          <property name="text">
+           <string>Mapbender application relative path</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: /data/mapbender/application/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QLineEdit" name="editMapbenderUrlLineEdit"/>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="editMapbenderUrlLabel">
+          <property name="text">
+           <string>Mapbender basis URL</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
           </property>
          </widget>
         </item>

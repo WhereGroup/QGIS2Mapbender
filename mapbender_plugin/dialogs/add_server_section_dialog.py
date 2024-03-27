@@ -23,12 +23,6 @@ class AddServerSectionDialog(BASE, WIDGET):
 
     def saveNewConfigSection(self):
         new_section_name = self.newServiceNameLineEdit.text()
-        new_server_address = self.newServerAddressLineEdit.text()
-        new_server_port = self.newServerPortLineEdit.text()
-        new_user_name = self.newUserNameLineEdit.text()
-        new_password = self.newPasswordLineEdit.text()
-        new_qgis_projects_path = self.newQgisProjectPathLineEdit.text()
-
         try:
             s = QgsSettings()
             # setValue: Sets the value of setting key to value. If the key already exists, the previous value is
@@ -37,13 +31,20 @@ class AddServerSectionDialog(BASE, WIDGET):
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/port", self.newServerPortLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/username", self.newUserNameLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/password", self.newPasswordLineEdit.text())
-            s.setValue(f"mapbender-plugin/connection/{new_section_name}/projects_path", self.newQgisProjectPathLineEdit.text())
+            s.setValue(f"mapbender-plugin/connection/{new_section_name}/projects_path",
+                       self.newQgisProjectPathLineEdit.text())
+            s.setValue(f"mapbender-plugin/connection/{new_section_name}/mapbender_app_path",
+                       self.newMapbenderPathLineEdit.text())
+            s.setValue(f"mapbender-plugin/connection/{new_section_name}/mapbender_basis_url",
+                       self.newMapbenderUrlLineEdit.text())
 
             if (show_succes_box_ok('Success', 'New section successfully added')) == QMessageBox.Ok:
                 self.close()
         except:
             if (show_fail_box_ok('Failed', 'Section could not be added')) == QMessageBox.Ok:
                 self.close()
+
+        # CHECK IF NAME ALREADY EXISTS!
 
         # except configparser.DuplicateSectionError:
         #     failBox = QMessageBox()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>703</width>
-    <height>429</height>
+    <width>794</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,6 +39,19 @@
       </item>
       <item row="3" column="0">
        <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="addSectionComboBoxLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Please fill the server configuration fields</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="newServiceNameLabel">
           <property name="text">
@@ -48,6 +61,18 @@
         </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="newServiceNameLineEdit"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Service name without blank spaces</string>
+          </property>
+         </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="newServerAddressLabel">
@@ -92,37 +117,12 @@
         <item row="7" column="0">
          <widget class="QLabel" name="newQgisProjectPathLabel">
           <property name="text">
-           <string>QGIS-Projects path</string>
+           <string>Mapbender application relative path</string>
           </property>
          </widget>
         </item>
         <item row="7" column="1">
          <widget class="QLineEdit" name="newQgisProjectPathLineEdit"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="addSectionComboBoxLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Please fill the server configuration fields</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="text">
-           <string>Service name without blank spaces</string>
-          </property>
-         </widget>
         </item>
         <item row="8" column="1">
          <widget class="QLabel" name="label_3">
@@ -133,6 +133,53 @@
           </property>
           <property name="text">
            <string>Example: /data/qgis-projects/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLineEdit" name="newMapbenderRelPathLineEdit"/>
+        </item>
+        <item row="9" column="0">
+         <widget class="QLabel" name="newMapbenderPathLabel">
+          <property name="text">
+           <string>Mapbender application relative path</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::DefaultContextMenu</enum>
+          </property>
+          <property name="text">
+           <string>Example: /data/mapbender/application/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLineEdit" name="newMapbenderUrlLineEdit"/>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="newMapbenderUrlLabel">
+          <property name="text">
+           <string>Mapbender basis URL</string>
+          </property>
+         </widget>
+        </item>
+        <item row="12" column="1">
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
           </property>
          </widget>
         </item>

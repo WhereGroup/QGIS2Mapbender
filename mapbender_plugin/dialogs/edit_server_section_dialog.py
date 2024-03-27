@@ -30,6 +30,8 @@ class EditServerSectionDialog(BASE, WIDGET):
         server_username = con_params['username']
         server_password = con_params['password']
         server_qgis_projects_path = con_params['projects_path']
+        server_mapbender_app_path = con_params['mapbender_app_path']
+        mapbender_basis_url = con_params['mapbender_basis_url']
 
         self.editServiceNameLineEdit.setText(selected_section)
         self.editPortLineEdit.setText(server_port)
@@ -37,6 +39,8 @@ class EditServerSectionDialog(BASE, WIDGET):
         self.editUserNameLineEdit.setText(server_username)
         self.editPasswordLineEdit.setText(server_password)
         self.editQgisProjectPathLineEdit.setText(server_qgis_projects_path)
+        self.editMapbenderPathLineEdit.setText(server_mapbender_app_path)
+        self.editMapbenderUrlLineEdit.setText(mapbender_basis_url)
 
     def saveEditedConfigSection(self):
         edited_section_name = self.editServiceNameLineEdit.text()
@@ -45,6 +49,9 @@ class EditServerSectionDialog(BASE, WIDGET):
         edited_user_name = self.editUserNameLineEdit.text()
         edited_password = self.editPasswordLineEdit.text()
         edited_server_qgis_projects_path = self.editQgisProjectPathLineEdit.text()
+        edited_server_mapbender_app_path = self.editMapbenderPathLineEdit.text()
+        edited_mapbender_basis_url = self.editMapbenderUrlLineEdit.text()
+
 
         s = QgsSettings()
         try:
@@ -55,7 +62,13 @@ class EditServerSectionDialog(BASE, WIDGET):
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/port", edited_port)
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/username", edited_user_name)
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/password", edited_password)
-            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/projects_path", edited_server_qgis_projects_path)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/projects_path",
+                       edited_server_qgis_projects_path)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/mapbender_app_path",
+                       edited_server_mapbender_app_path)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/mapbender_basis_url",
+                       edited_mapbender_basis_url)
+
 
             if (show_succes_box_ok('Success', 'Section successfully updated')) == QMessageBox.Ok:
                 self.close()
