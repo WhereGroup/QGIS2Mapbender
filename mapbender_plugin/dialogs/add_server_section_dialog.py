@@ -18,12 +18,8 @@ class AddServerSectionDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.saveNewSectionButton.clicked.connect(self.saveNewConfigSection)
+        self.addSectionDialogButtonBox.accepted.connect(self.saveNewConfigSection)
         self.addSectionDialogButtonBox.rejected.connect(self.reject)
-
-        # # get config file path
-        # self.file = os.path.dirname(__file__)
-        # self.plugin_dir = os.path.dirname(self.file)
 
     def saveNewConfigSection(self):
         new_section_name = self.newServiceNameLineEdit.text()
@@ -31,6 +27,7 @@ class AddServerSectionDialog(BASE, WIDGET):
         new_server_port = self.newServerPortLineEdit.text()
         new_user_name = self.newUserNameLineEdit.text()
         new_password = self.newPasswordLineEdit.text()
+        new_qgis_projects_path = self.newQgisProjectPathLineEdit.text()
 
         try:
             s = QgsSettings()
@@ -40,6 +37,7 @@ class AddServerSectionDialog(BASE, WIDGET):
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/port", self.newServerPortLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/username", self.newUserNameLineEdit.text())
             s.setValue(f"mapbender-plugin/connection/{new_section_name}/password", self.newPasswordLineEdit.text())
+            s.setValue(f"mapbender-plugin/connection/{new_section_name}/projects_path", self.newQgisProjectPathLineEdit.text())
 
             if (show_succes_box_ok('Success', 'New section successfully added')) == QMessageBox.Ok:
                 self.close()

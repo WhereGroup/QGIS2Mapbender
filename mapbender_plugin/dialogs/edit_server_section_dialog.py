@@ -17,26 +17,26 @@ class EditServerSectionDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.saveEditedSectionButton.clicked.connect(self.saveEditedConfigSection)
-        self.removeDialogButtonBox.rejected.connect(self.reject)
+        self.editDialogButtonBox.accepted.connect(self.saveEditedConfigSection)
+        self.editDialogButtonBox.rejected.connect(self.reject)
 
         server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
-        self.editSectionComboBox.addItems(server_config_sections)
 
     def setServiceParameters(self, selected_section):
-        #self.selected_section = self.editSectionComboBox.currentText()
         self.selected_section = selected_section
         con_params = list_qgs_settings_values(selected_section)
         server_url = con_params['url']
         server_port = con_params['port']
         server_username = con_params['username']
         server_password = con_params['password']
+        server_qgis_projects_path = con_params['projects_path']
 
         self.editServiceNameLineEdit.setText(selected_section)
         self.editPortLineEdit.setText(server_port)
         self.editServerAddressLineEdit.setText(server_url)
         self.editUserNameLineEdit.setText(server_username)
         self.editPasswordLineEdit.setText(server_password)
+        self.editQgisProjectPathLineEdit.setText(server_qgis_projects_path)
 
     def saveEditedConfigSection(self):
         edited_section_name = self.editServiceNameLineEdit.text()
@@ -44,6 +44,7 @@ class EditServerSectionDialog(BASE, WIDGET):
         edited_port = self.editPortLineEdit.text()
         edited_user_name = self.editUserNameLineEdit.text()
         edited_password = self.editPasswordLineEdit.text()
+        edited_server_qgis_projects_path = self.editQgisProjectPathLineEdit.text()
 
         s = QgsSettings()
         try:
@@ -54,6 +55,7 @@ class EditServerSectionDialog(BASE, WIDGET):
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/port", edited_port)
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/username", edited_user_name)
             s.setValue(f"mapbender-plugin/connection/{edited_section_name}/password", edited_password)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/projects_path", edited_server_qgis_projects_path)
 
             if (show_succes_box_ok('Success', 'Section successfully updated')) == QMessageBox.Ok:
                 self.close()

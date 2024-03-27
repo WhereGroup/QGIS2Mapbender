@@ -39,13 +39,14 @@ class MainDialog(BASE, WIDGET):
 
         self.server_qgis_projects_folder_rel_path = SERVER_QGIS_PROJECTS_FOLDER_REL_PATH
 
-        self.previous_messagebars = []
+        self.previous_message_bars = []
 
         self.plugin_dir = get_plugin_dir()
 
         # tabs
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget.currentChanged.connect(self.update_section_combo_box)
+
 
         # tab1
         self.update_section_combo_box()
@@ -58,6 +59,7 @@ class MainDialog(BASE, WIDGET):
 
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
+        self.buttonBoxTab1.rejected.connect(self.reject)
 
         # tab2
         # server table
@@ -72,8 +74,8 @@ class MainDialog(BASE, WIDGET):
         self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
         self.removeServerConfigButton.setToolTip("Remove server")
         self.removeServerConfigButton.clicked.connect(self.remove_config_section)
-        self.buttonBoxTab1.rejected.connect(self.reject)
         self.buttonBoxTab2.rejected.connect(self.reject)
+
 
 
     def update_server_table(self):
@@ -91,15 +93,6 @@ class MainDialog(BASE, WIDGET):
 
     def update_section_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
-        # # parse config file
-        # try:
-        #     # As the documentation makes clear, any number of filenames can be passed to the read method,
-        #     # and it will silently ignore the ones that cannot be opened.
-        #     self.config = configparser.ConfigParser()
-        #     self.config.read(self.config_path)
-        # except configparser.Error as error:
-        #     self.iface.messageBar().pushMessage("Error: Could not parse config file ", error, level=Qgis.Critical)
-
         # read config sections
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
@@ -112,13 +105,6 @@ class MainDialog(BASE, WIDGET):
             self.warningFirstServerLabel.hide()
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
-            self.serverComboBoxLabel.show()
-            self.sectionComboBox.show()
-            self.publishButton.show()
-            # config management
-            self.editServerConfigButton.show()
-            self.removeServerConfigButton.show()
-
 
     def disable_publish_parameters(self):
         self.mbParamsFrame.setEnabled(False)
@@ -187,7 +173,7 @@ class MainDialog(BASE, WIDGET):
         self.username = con_params['username']
         self.password = con_params['password']
 
-        self.previous_messagebars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_messagebars)
+        self.previous_message_bars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_message_bars)
         #iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
         if check_if_qgis_project(self.plugin_dir):
             paths = get_paths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
@@ -201,8 +187,8 @@ class MainDialog(BASE, WIDGET):
 
 
             # then check if folder exists on the server:
-            self.previous_messagebars = show_new_info_message_bar("Connecting to server ...",
-                                                                  self.previous_messagebars)
+            self.previous_message_bars = show_new_info_message_bar("Connecting to server ...",
+                                                                   self.previous_message_bars)
             if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
                                                         self.plugin_dir, source_project_zip_dir_path,
                                                         SERVER_QGIS_PROJECTS_FOLDER_REL_PATH, qgis_project_folder_name):
@@ -224,8 +210,8 @@ class MainDialog(BASE, WIDGET):
                             if upload_project_zip_file(self.host, self.username, self.port, self.password, self.plugin_dir,
                                                        source_project_zip_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                        qgis_project_folder_name):
-                                self.previous_messagebars = show_new_info_message_bar("QGIS-Project folder successfully uploaded",
-                                                                                      self.previous_messagebars)
+                                self.previous_message_bars = show_new_info_message_bar("QGIS-Project folder successfully uploaded",
+                                                                                       self.previous_message_bars)
                                 if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
                                                                   qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
                                     # check "http://"
@@ -233,9 +219,9 @@ class MainDialog(BASE, WIDGET):
                                             "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                             + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
 
-                                    self.previous_messagebars = show_new_info_message_bar(
+                                    self.previous_message_bars = show_new_info_message_bar(
                                         "WMS successfully created. Adding WMS as Mapbender source ...",
-                                        self.previous_messagebars)
+                                        self.previous_message_bars)
                                     # iface.messageBar().pushMessage("", "WMS successfully created. Adding WMS as "
                                     #                                    "Mapbender source ...",level=Qgis.Info, duration=2)
 
@@ -246,9 +232,9 @@ class MainDialog(BASE, WIDGET):
                     if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                          self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                          qgis_project_folder_name):
-                        self.previous_messagebars = show_new_info_message_bar(
+                        self.previous_message_bars = show_new_info_message_bar(
                             "Updating QGIS project and data on server ...",
-                            self.previous_messagebars)
+                            self.previous_message_bars)
                         # iface.messageBar().pushMessage("", "Updating QGIS project and data on server ...",
                         #                                level=Qgis.Info, duration=2)
 
