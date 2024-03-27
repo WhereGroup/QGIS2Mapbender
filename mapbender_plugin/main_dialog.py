@@ -106,11 +106,13 @@ class MainDialog(BASE, WIDGET):
         # read config sections
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
-            pass
+            self.warningFirstServerLabel.show()
+            self.serverComboBoxLabel.setText("Please add the first server")
 
         else:
             # update sections-combobox
-            #self.warningAddServiceText.hide()
+            self.serverComboBoxLabel.setText("Server")
+            self.warningFirstServerLabel.hide()
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
             self.serverComboBoxLabel.show()
