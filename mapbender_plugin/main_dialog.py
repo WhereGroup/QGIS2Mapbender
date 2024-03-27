@@ -109,6 +109,7 @@ class MainDialog(BASE, WIDGET):
         if len(config_sections) == 0:
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
+            self.sectionComboBox.clear()
 
         else:
             # update sections-combobox
