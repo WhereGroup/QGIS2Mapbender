@@ -65,12 +65,6 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
 
-        #tmp, for testing
-        self.tmpMapbenderConsoleButton.clicked.connect(self.test_console)
-        self.tmpMapbenderConsoleButton.hide()
-        # tmp, for testing
-
-
         # tab2
         # server table
         serverTableHeaders = ["Name", "URL"]
@@ -113,13 +107,6 @@ class MainDialog(BASE, WIDGET):
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
             pass
-            #self.warningAddServiceText.show()
-
-            # self.serverComboBoxLabel.hide()
-            # self.sectionComboBox.hide()
-            # self.publishButton.hide()
-            # self.editServerConfigButton.hide()
-            # self.removeServerConfigButton.hide()
 
         else:
             # update sections-combobox
@@ -306,10 +293,6 @@ class MainDialog(BASE, WIDGET):
                                                                          "can not be updated. \n \nIf you want to upload a new"
                                                                          " QGIS-Project please select the option 'Publish "
                                                                          " in Mapbender app'")
-
-    def test_console(self):
-        self.mapbender_publish("http://mapbender-qgis.wheregroup.lan/cgi-bin/qgis_mapserv.fcgi?VERSION=1.3.0&map=/data/qgis-projects/source_ordner/test_project.qgz")
-        #self.mapbender_update()
 
     def mapbender_publish(self, wms_getcapabilities_url):
         # mapbender params:

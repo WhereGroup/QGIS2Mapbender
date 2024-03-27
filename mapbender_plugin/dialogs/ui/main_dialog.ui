@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>798</width>
-    <height>384</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../resources/icons/mapbender_logo.png</normaloff>../../resources/icons/mapbender_logo.png</iconset>
+    <normaloff>../../../../../resources/icons/mapbender_logo.png</normaloff>../../../../../resources/icons/mapbender_logo.png</iconset>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -49,29 +49,50 @@
        <item>
         <widget class="QWidget" name="widget" native="true">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="2">
-           <widget class="QRadioButton" name="updateRadioButton">
-            <property name="text">
-             <string>Update Mapbender source</string>
+          <item row="0" column="0">
+           <widget class="QLabel" name="serverComboBoxLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroup</string>
-            </attribute>
+            <property name="text">
+             <string>Server:</string>
+            </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="8" column="1">
            <widget class="QPushButton" name="updateButton">
             <property name="text">
              <string>Update</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>../../resources/icons/mActionRefresh.svg</normaloff>../../resources/icons/mActionRefresh.svg</iconset>
+              <normaloff>../../../../../resources/icons/mActionRefresh.svg</normaloff>../../../../../resources/icons/mActionRefresh.svg</iconset>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
            <widget class="QComboBox" name="sectionComboBox"/>
+          </item>
+          <item row="8" column="2">
+           <widget class="QDialogButtonBox" name="buttonBoxTab1">
+            <property name="standardButtons">
+             <set>QDialogButtonBox::Close|QDialogButtonBox::Help</set>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QPushButton" name="publishButton">
+            <property name="text">
+             <string>Publish </string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../../../../../resources/icons/mActionSharingExport.svg</normaloff>../../../../../resources/icons/mActionSharingExport.svg</iconset>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0" colspan="3">
            <widget class="QFrame" name="mbParamsFrame">
@@ -81,7 +102,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QGridLayout" name="gridLayout_2">
+            <layout class="QFormLayout" name="formLayout">
              <item row="0" column="0">
               <widget class="QLabel" name="mapbenderConfigLabel">
                <property name="font">
@@ -96,62 +117,40 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <layout class="QFormLayout" name="formLayout_2">
-               <item row="0" column="1">
-                <widget class="QRadioButton" name="addToAppRadioButton">
-                 <property name="text">
-                  <string>Add to existing application</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="mapbenderAppSlugLabel">
-                 <property name="text">
-                  <string>URL title</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="mapbenderCustomAppSlugLineEdit"/>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="layerSetLabel">
-                 <property name="text">
-                  <string>Layer set (optional)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="layerSetLineEdit"/>
-               </item>
-               <item row="0" column="0">
-                <widget class="QRadioButton" name="cloneTemplateRadioButton">
-                 <property name="text">
-                  <string>Clone template</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <widget class="QRadioButton" name="cloneTemplateRadioButton">
+               <property name="text">
+                <string>Clone template</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QRadioButton" name="addToAppRadioButton">
+               <property name="text">
+                <string>Add to existing application</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="mapbenderAppSlugLabel">
+               <property name="text">
+                <string>URL title</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLineEdit" name="mapbenderCustomAppSlugLineEdit"/>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="layerSetLabel">
+               <property name="text">
+                <string>Layer set (optional)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLineEdit" name="layerSetLineEdit"/>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="7" column="2">
-           <widget class="QDialogButtonBox" name="buttonBoxTab1">
-            <property name="standardButtons">
-             <set>QDialogButtonBox::Cancel</set>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QPushButton" name="publishButton">
-            <property name="text">
-             <string>Publish </string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
-            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -164,24 +163,14 @@
             </attribute>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="serverComboBoxLabel">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+          <item row="1" column="2">
+           <widget class="QRadioButton" name="updateRadioButton">
             <property name="text">
-             <string>Server:</string>
+             <string>Update Mapbender source</string>
             </property>
-           </widget>
-          </item>
-          <item row="8" column="2">
-           <widget class="QPushButton" name="tmpMapbenderConsoleButton">
-            <property name="text">
-             <string>Mapbender console</string>
-            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
            </widget>
           </item>
          </layout>
@@ -219,7 +208,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../resources/icons/mActionAdd.svg</normaloff>../../resources/icons/mActionAdd.svg</iconset>
+             <normaloff>../../../../../resources/icons/mActionAdd.svg</normaloff>../../../../../resources/icons/mActionAdd.svg</iconset>
            </property>
           </widget>
          </item>
@@ -230,7 +219,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../resources/icons/mIconDelete.svg</normaloff>../../resources/icons/mIconDelete.svg</iconset>
+             <normaloff>../../../../../resources/icons/mIconDelete.svg</normaloff>../../../../../resources/icons/mIconDelete.svg</iconset>
            </property>
           </widget>
          </item>
@@ -241,7 +230,7 @@
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../../resources/icons/mActionAllEdits.svg</normaloff>../../resources/icons/mActionAllEdits.svg</iconset>
+             <normaloff>../../../../../resources/icons/mActionAllEdits.svg</normaloff>../../../../../resources/icons/mActionAllEdits.svg</iconset>
            </property>
           </widget>
          </item>
