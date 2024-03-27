@@ -7,6 +7,7 @@ import paramiko
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis._core import QgsProject, Qgis, QgsMessageLog, QgsSettings
+from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
 from mapbender_plugin.settings import SERVER_MB_CD_APPLICATION_PATH
@@ -144,7 +145,7 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
     :param qgis_project_folder_name:
     :return: bool
     """
-    iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=2)
+    #iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=2)
 
     sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
         "password": password})
@@ -197,7 +198,7 @@ def upload_project_zip_file(host: str, username: str, port: str, password: str, 
                     return False
                 else:
                     # Upload was successful: Folder exists now in server
-                    iface.messageBar().pushMessage("", "QGIS-Project folder successfully uploaded", level=Qgis.Info, duration=2)
+                    #iface.messageBar().pushMessage("", "QGIS-Project folder successfully uploaded", level=Qgis.Info, duration=2)
                     return True
                         #self.unzipProjectFolderInServer(server_qgis_projects_folder_rel_path)
             except Exception as e:
@@ -434,4 +435,20 @@ def list_qgs_settings_values(key):
         values_dict[subkey] = value
     s.endGroup()
     return values_dict
+
+def show_new_info_message_bar(text, previous_messagebars):
+    previous_messagebars = delete_previous_messages(previous_messagebars)
+
+    messagebar = iface.messageBar().createMessage(text)
+    #messagebar.setLevel(QgsMessageBar.INFO)
+    iface.messageBar().pushWidget(messagebar)
+    previous_messagebars.append(messagebar)
+    return previous_messagebars
+
+
+def delete_previous_messages(previous_messagebars):
+    for messagebar in previous_messagebars:
+        iface.messageBar().popWidget(messagebar)
+    previous_messagebars = []
+    return previous_messagebars
 

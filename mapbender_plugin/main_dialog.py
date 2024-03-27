@@ -20,7 +20,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
-    list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box
+    list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box, show_new_info_message_bar
 from mapbender_plugin.mapbender import MapbenderUpload
 
 from mapbender_plugin.settings import (
@@ -38,12 +38,15 @@ class MainDialog(BASE, WIDGET):
 
         self.server_qgis_projects_folder_rel_path = SERVER_QGIS_PROJECTS_FOLDER_REL_PATH
 
+        self.previous_messagebars = []
+
         self.plugin_dir = get_plugin_dir()
         self.config_path = self.plugin_dir + "/" + CONFIG_FILE_NAME
-        # check if config file exists
-        if not check_if_config_file_exists(self.config_path):
-            self.iface.messageBar().pushMessage("No config file is available. Failed creating a new"
-                                                "config file", "Please contact", level=Qgis.Critical)
+        # check if config file exists -> REPLACE
+        #if not check_if_config_file_exists(self.config_path):
+
+            #self.iface.messageBar().pushMessage("No config file is available. Failed creating a new"
+                                                #"config file", "Please contact", level=Qgis.Critical)
 
         # tabs
         self.tabWidget.setCurrentIndex(0)
@@ -189,7 +192,8 @@ class MainDialog(BASE, WIDGET):
         self.username = con_params['username']
         self.password = con_params['password']
 
-        iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
+        self.previous_messagebars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_messagebars)
+        #iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
         if check_if_qgis_project(self.plugin_dir):
             paths = get_paths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
             source_project_dir_path = paths.get('source_project_dir_path')
@@ -202,6 +206,8 @@ class MainDialog(BASE, WIDGET):
 
 
             # then check if folder exists on the server:
+            self.previous_messagebars = show_new_info_message_bar("Connecting to server ...",
+                                                                  self.previous_messagebars)
             if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
                                                         self.plugin_dir, source_project_zip_dir_path,
                                                         SERVER_QGIS_PROJECTS_FOLDER_REL_PATH, qgis_project_folder_name):
@@ -216,8 +222,6 @@ class MainDialog(BASE, WIDGET):
                         if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                              self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                              qgis_project_folder_name):
-                            iface.messageBar().pushMessage("", "Uploading QGIS project and data to server ...",
-                                                           level=Qgis.Info, duration=5)
 
                             zip_local_project_folder(self.plugin_dir, source_project_dir_path,
                                                      source_project_zip_dir_path, qgis_project_folder_name)
@@ -225,6 +229,8 @@ class MainDialog(BASE, WIDGET):
                             if upload_project_zip_file(self.host, self.username, self.port, self.password, self.plugin_dir,
                                                        source_project_zip_dir_path, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                        qgis_project_folder_name):
+                                self.previous_messagebars = show_new_info_message_bar("QGIS-Project folder successfully uploaded",
+                                                                                      self.previous_messagebars)
                                 if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
                                                                   qgis_project_folder_name, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH):
                                     # check "http://"
@@ -232,8 +238,11 @@ class MainDialog(BASE, WIDGET):
                                             "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                             + SERVER_QGIS_PROJECTS_FOLDER_REL_PATH + qgis_project_folder_name + '/' + qgis_project_name)
 
-                                    iface.messageBar().pushMessage("", "WMS successfully created. Adding WMS as "
-                                                                       "Mapbender source ...",level=Qgis.Info, duration=5)
+                                    self.previous_messagebars = show_new_info_message_bar(
+                                        "WMS successfully created. Adding WMS as Mapbender source ...",
+                                        self.previous_messagebars)
+                                    # iface.messageBar().pushMessage("", "WMS successfully created. Adding WMS as "
+                                    #                                    "Mapbender source ...",level=Qgis.Info, duration=2)
 
                                     self.mapbender_publish(wms_getcapabilities_url)
                 else:
@@ -242,8 +251,11 @@ class MainDialog(BASE, WIDGET):
                     if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                          self.plugin_dir, SERVER_QGIS_PROJECTS_FOLDER_REL_PATH,
                                                          qgis_project_folder_name):
-                        iface.messageBar().pushMessage("", "Updating QGIS project and data on server ...",
-                                                       level=Qgis.Info, duration=5)
+                        self.previous_messagebars = show_new_info_message_bar(
+                            "Updating QGIS project and data on server ...",
+                            self.previous_messagebars)
+                        # iface.messageBar().pushMessage("", "Updating QGIS project and data on server ...",
+                        #                                level=Qgis.Info, duration=2)
 
                         zip_local_project_folder(self.plugin_dir, source_project_dir_path,
                                                  source_project_zip_dir_path, qgis_project_folder_name)
@@ -265,7 +277,7 @@ class MainDialog(BASE, WIDGET):
                 # if return = False (folder does not exist yet on the server)
                 if self.publishRadioButton.isChecked(): # project is indeed new and will be uploaded to the server
                     iface.messageBar().pushMessage("", "Uploading QGIS project and data to server ...",
-                                                   level=Qgis.Info, duration=5)
+                                                   level=Qgis.Info, duration=2)
                     zip_local_project_folder(self.plugin_dir, source_project_dir_path,
                                              source_project_zip_dir_path, qgis_project_folder_name)
                     if upload_project_zip_file(self.host, self.username, self.port, self.password, self.plugin_dir,
@@ -299,7 +311,7 @@ class MainDialog(BASE, WIDGET):
         # template slug:
         layer_set = self.layerSetLineEdit.text()
 
-        iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=5)
+        iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=2)
 
         mapbender_uploader = MapbenderUpload(self.host, self.username) # other parameters?
         # TEST CONSOLE:
@@ -360,7 +372,10 @@ class MainDialog(BASE, WIDGET):
         print('Mapbender update get capabilitites:')
         print(wms_getcapabilities_url)
         mapbender_uploader = MapbenderUpload(self.host, self.username)
+        print("mapbender_uploader instanziert")
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
+        print("output wms_show")
+        print(exit_status_wms_show, sources_ids)
         if exit_status_wms_show == 0:  # success
             # reload source if it already exists
             if len(sources_ids) > 0:
