@@ -33,7 +33,6 @@ class AddServerSectionDialog(BASE, WIDGET):
         new_password = self.newPasswordLineEdit.text()
 
         try:
-            #test
             s = QgsSettings()
             # setValue: Sets the value of setting key to value. If the key already exists, the previous value is
             # overwritten. An optional Section argument can be used to set a value to a specific Section.

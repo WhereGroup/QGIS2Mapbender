@@ -144,7 +144,11 @@ class MainDialog(BASE, WIDGET):
         self.update_server_table()
 
     def open_dialog_edit_config_section(self):
+        selected_row = self.serverTableWidget.currentRow()
+        selected_section = self.serverTableWidget.item(selected_row, 0).text()
+        print(selected_section)
         edit_server_section_dialog = EditServerSectionDialog()
+        edit_server_section_dialog.setServiceParameters(selected_section)
         edit_server_section_dialog.exec()
         self.update_server_table()
 
@@ -185,12 +189,6 @@ class MainDialog(BASE, WIDGET):
         self.port = con_params['port']
         self.username = con_params['username']
         self.password = con_params['password']
-        print(self.host, self.port, self.username, self.password)
-
-        # self.host = self.config.get(selected_section, 'url')
-        # self.port = self.config.get(selected_section, 'port')
-        # self.username = self.config.get(selected_section, 'username')
-        # self.password = self.config.get(selected_section, 'password')
 
         iface.messageBar().pushMessage("", "Checking QGIS-Project ...", level=Qgis.Info, duration=2)
         if check_if_qgis_project(self.plugin_dir):
