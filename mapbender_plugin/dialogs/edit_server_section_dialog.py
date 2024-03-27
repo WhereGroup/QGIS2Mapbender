@@ -5,7 +5,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis._core import QgsSettings
 
-from mapbender_plugin.helpers import list_qgs_settings_child_groups, list_qgs_settings_values
+from mapbender_plugin.helpers import list_qgs_settings_child_groups, list_qgs_settings_values, show_succes_box_ok, \
+    show_fail_box_ok
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -21,9 +22,6 @@ class EditServerSectionDialog(BASE, WIDGET):
 
         server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         self.editSectionComboBox.addItems(server_config_sections)
-
-        #self.setServiceParameters()
-        #self.editSectionComboBox.currentIndexChanged.connect(self.setServiceParameters)
 
     def setServiceParameters(self, selected_section):
         #self.selected_section = self.editSectionComboBox.currentText()
@@ -48,48 +46,21 @@ class EditServerSectionDialog(BASE, WIDGET):
         edited_password = self.editPasswordLineEdit.text()
 
         s = QgsSettings()
+        try:
+            if edited_section_name != self.selected_section:
+                s.remove(f"mapbender-plugin/connection/{self.selected_section}")
 
-        if edited_section_name != self.selected_section:
-            s.remove(f"mapbender-plugin/connection/{self.selected_section}")
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/url", edited_server_address)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/port", edited_port)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/username", edited_user_name)
+            s.setValue(f"mapbender-plugin/connection/{edited_section_name}/password", edited_password)
 
-        s.setValue(f"mapbender-plugin/connection/{edited_section_name}/url", edited_server_address)
-        s.setValue(f"mapbender-plugin/connection/{edited_section_name}/port", edited_port)
-        s.setValue(f"mapbender-plugin/connection/{edited_section_name}/username", edited_user_name)
-        s.setValue(f"mapbender-plugin/connection/{edited_section_name}/password", edited_password)
-            #
-            # self.config.set(edited_section_name, 'url', edited_server_address)
-            # self.config.set(edited_section_name, 'port', edited_port)
-            # self.config.set(edited_section_name, 'username', edited_user_name)
-            # self.config.set(edited_section_name, 'password', edited_password)
-        # else:
-        #     self.config.remove_section(self.editSectionComboBox.currentText())
-        #     self.config.add_section(edited_section_name)
-        #     self.config.set(edited_section_name, 'url', edited_server_address)
-        #     self.config.set(edited_section_name, 'port', edited_port)
-        #     self.config.set(edited_section_name, 'username', edited_user_name)
-        #     self.config.set(edited_section_name, 'password', edited_password)
+            if (show_succes_box_ok('Success', 'Section successfully updated')) == QMessageBox.Ok:
+                self.close()
+        except:
+            if (show_fail_box_ok('Failed', 'Section could not be successfully updated')) == QMessageBox.Ok:
+                self.close()
 
-        # try:
-        #     with open(self.config_path, 'w') as config_file:
-        #         self.config.write(config_file)
-        #     config_file.close()
-        #     successBox = QMessageBox()
-        #     successBox.setIconPixmap(QPixmap(self.plugin_dir +  '/resources/icons/mIconSuccess.svg'))
-        #     successBox.setWindowTitle("Success")
-        #     successBox.setText("Section successfully updated")
-        #     successBox.setStandardButtons(QMessageBox.Ok)
-        #     result = successBox.exec_()
-        #     if result == QMessageBox.Ok:
-        #         self.close()
-        # except configparser.Error:
-        #     failBox = QMessageBox()
-        #     failBox.setIconPixmap(QPixmap(self.plugin_dir + '/resources/icons/mIconWarning.svg'))
-        #     failBox.setWindowTitle("Failed")
-        #     failBox.setText("Section could not be edited")
-        #     failBox.setStandardButtons(QMessageBox.Ok)
-        #     result = failBox.exec_()
-        #     if result == QMessageBox.Ok:
-        #         self.close()
 
 
 
