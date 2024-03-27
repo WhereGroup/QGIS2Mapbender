@@ -42,12 +42,6 @@ class MainDialog(BASE, WIDGET):
         self.previous_messagebars = []
 
         self.plugin_dir = get_plugin_dir()
-        self.config_path = self.plugin_dir + "/" + CONFIG_FILE_NAME
-        # check if config file exists -> REPLACE
-        #if not check_if_config_file_exists(self.config_path):
-
-            #self.iface.messageBar().pushMessage("No config file is available. Failed creating a new"
-                                                #"config file", "Please contact", level=Qgis.Critical)
 
         # tabs
         self.tabWidget.setCurrentIndex(0)
@@ -72,8 +66,11 @@ class MainDialog(BASE, WIDGET):
         self.serverTableWidget.setHorizontalHeaderLabels(serverTableHeaders)
         self.update_server_table()
         # buttons
+        self.addServerConfigButton.setToolTip("Add server")
         self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
+        self.editServerConfigButton.setToolTip("Edit server")
         self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
+        self.removeServerConfigButton.setToolTip("Remove server")
         self.removeServerConfigButton.clicked.connect(self.remove_config_section)
         self.buttonBoxTab1.rejected.connect(self.reject)
         self.buttonBoxTab2.rejected.connect(self.reject)
