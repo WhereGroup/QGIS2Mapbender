@@ -1,4 +1,5 @@
 import os
+from itertools import count
 
 from PyQt5.QtCore import QSettings
 from fabric2 import Connection
@@ -72,10 +73,10 @@ class MainDialog(BASE, WIDGET):
 
         # tab2
         # server table
-        self.serverTableWidget.setColumnCount(2)
-        self.serverTableWidget.setHorizontalHeaderLabels(["Name", "URL"])
+        serverTableHeaders = ["Name", "URL"]
+        self.serverTableWidget.setColumnCount(len(serverTableHeaders))
+        self.serverTableWidget.setHorizontalHeaderLabels(serverTableHeaders)
         self.update_server_table()
-        #self.serverTableWidget.table.setRowCount
         # buttons
         self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
         self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
@@ -111,12 +112,14 @@ class MainDialog(BASE, WIDGET):
         # read config sections
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
         if len(config_sections) == 0:
+            pass
             #self.warningAddServiceText.show()
-            self.serverComboBoxLabel.hide()
-            self.sectionComboBox.hide()
-            self.publishButton.hide()
-            self.editServerConfigButton.hide()
-            self.removeServerConfigButton.hide()
+
+            # self.serverComboBoxLabel.hide()
+            # self.sectionComboBox.hide()
+            # self.publishButton.hide()
+            # self.editServerConfigButton.hide()
+            # self.removeServerConfigButton.hide()
 
         else:
             # update sections-combobox
@@ -148,24 +151,30 @@ class MainDialog(BASE, WIDGET):
 
     def open_dialog_edit_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
-        selected_section = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_section_dialog = EditServerSectionDialog()
-        edit_server_section_dialog.setServiceParameters(selected_section)
-        edit_server_section_dialog.exec()
-        self.update_server_table()
+        if selected_row != -1:
+            selected_section = self.serverTableWidget.item(selected_row, 0).text()
+            edit_server_section_dialog = EditServerSectionDialog()
+            edit_server_section_dialog.setServiceParameters(selected_section)
+            edit_server_section_dialog.exec()
+            self.update_server_table()
+        else:
+            pass
 
     def remove_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
-        selected_section = self.serverTableWidget.item(selected_row, 0).text()
-        if (
-        show_question_box(f"""Are you sure you want to remove the section '{selected_section}'?""")) == QMessageBox.Yes:
-            try:
-                s = QSettings()
-                s.remove(f"mapbender-plugin/connection/{selected_section}")
-                if (show_succes_box_ok('Success', 'Section successfully removed')) == QMessageBox.Ok:
-                    self.update_server_table()
-            except:
-                show_fail_box_ok('Failed', "Section could not be deleted")
+        if selected_row != -1:
+            selected_section = self.serverTableWidget.item(selected_row, 0).text()
+            if (
+            show_question_box(f"""Are you sure you want to remove the section '{selected_section}'?""")) == QMessageBox.Yes:
+                try:
+                    s = QSettings()
+                    s.remove(f"mapbender-plugin/connection/{selected_section}")
+                    if (show_succes_box_ok('Success', 'Section successfully removed')) == QMessageBox.Ok:
+                        self.update_server_table()
+                except:
+                    show_fail_box_ok('Failed', "Section could not be deleted")
+        else:
+            pass
 
 
     def publish_project(self):
