@@ -380,12 +380,15 @@ class MainDialog(BASE, WIDGET):
             # reload source if it already exists
             if len(sources_ids) > 0:
                 for source_id in sources_ids:
-                    exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
+                    exit_status_wms_reload, output, error_output = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
                     if exit_status_wms_reload == 0:  # success
                         if (show_succes_box_ok("Success report" ,
                                                "WMS succesfully updated:\n \n"+ wms_getcapabilities_url +
                                                "\n \non Mapbender source(s): " + str(sources_ids))) == QMessageBox.Ok:
                             self.close()
+                    else:
+                        show_fail_box_ok("Failed",
+                                         f"WMS could not be reloaded. Reason {output} and {error_output}")
             else:
                 show_fail_box_ok("Failed",
                                  f"WMS is not an existing source in Mapbender and could not be updated")

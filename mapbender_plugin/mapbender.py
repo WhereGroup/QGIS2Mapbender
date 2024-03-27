@@ -74,7 +74,7 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail)
         """
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{url}'")
-        return exit_status
+        return exit_status, output, error_output
 
     def app_clone(self, template_slug):
         """
