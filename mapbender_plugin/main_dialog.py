@@ -224,11 +224,10 @@ class MainDialog(BASE, WIDGET):
             server_project_dir_path = paths.get('server_project_dir_path')
 
             #getProjectLayers
-
-
             # then check if folder exists on the server:
             self.previous_message_bars = show_new_info_message_bar("Connecting to server ...",
                                                                    self.previous_message_bars)
+            # CHECK IF CONNECTION IS SUCCESSFUL AND THEN EXECUTE...
             if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
                                                         self.plugin_dir, source_project_zip_dir_path,
                                                         self.server_qgis_projects_folder_rel_path, qgis_project_folder_name):
