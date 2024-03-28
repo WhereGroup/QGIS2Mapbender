@@ -94,13 +94,13 @@ class MainDialog(BASE, WIDGET):
             item_path_qgis_projects.setText(server_params['projects_path'])
             self.serverTableWidget.setItem(i, 2, item_path_qgis_projects)
 
-            item_mapbender_app_path = QTableWidgetItem()
-            item_mapbender_app_path.setText(server_params['mapbender_app_path'])
-            self.serverTableWidget.setItem(i, 3, item_mapbender_app_path)
+            item_mb_app_path = QTableWidgetItem()
+            item_mb_app_path.setText(server_params['mb_app_path'])
+            self.serverTableWidget.setItem(i, 3, item_mb_app_path)
 
-            item_mapbender_basis_url = QTableWidgetItem()
-            item_mapbender_basis_url.setText(server_params['mapbender_basis_url'])
-            self.serverTableWidget.setItem(i, 4, item_mapbender_basis_url)
+            item_mb_basis_url = QTableWidgetItem()
+            item_mb_basis_url.setText(server_params['mb_basis_url'])
+            self.serverTableWidget.setItem(i, 4, item_mb_basis_url)
 
         self.update_server_combo_box()
 
