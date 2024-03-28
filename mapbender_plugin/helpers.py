@@ -432,17 +432,6 @@ def list_qgs_settings_child_groups(key):
     s.endGroup
     return subkeys
 
-def list_qgs_settings_values(key):
-    s = QgsSettings()
-    s.beginGroup('mapbender-plugin/connection/'+ key)
-    subkeys = s.childKeys()
-    values_dict = {}
-    for subkey in subkeys:
-        value = s.value(subkey)
-        values_dict[subkey] = value
-    s.endGroup()
-    return values_dict
-
 def show_new_info_message_bar(text, previous_messagebars):
     previous_messagebars = delete_previous_messages(previous_messagebars)
     messagebar = iface.messageBar().createMessage(text)
@@ -458,9 +447,13 @@ def delete_previous_messages(previous_messagebars):
     previous_messagebars = []
     return previous_messagebars
 
-def validate_no_spaces(variable):
-    pattern = r"^\S+$"
-    return re.match(pattern, variable) is not None
+
+def validate_no_spaces(*variables):
+    for var in variables:
+        if " " in var:
+            return False
+    return True
+
 
 def update_mb_slug_in_settings(mb_slug, is_mb_slug):
     s = QgsSettings()

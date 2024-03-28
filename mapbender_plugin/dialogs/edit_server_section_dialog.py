@@ -5,8 +5,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis._core import QgsSettings
 
-from mapbender_plugin.helpers import list_qgs_settings_child_groups, list_qgs_settings_values, show_succes_box_ok, \
-    show_fail_box_ok
+from mapbender_plugin.helpers import list_qgs_settings_child_groups, show_succes_box_ok, \
+    show_fail_box_ok, validate_no_spaces
 from mapbender_plugin.server_config import ServerConfig
 
 # Dialog aus .ui-Datei
@@ -54,6 +54,11 @@ class EditServerConfigDialog(BASE, WIDGET):
         if (not edit_section_name or not edit_server_address or not edit_server_qgis_projects_path
                 or not edit_server_mb_app_path or not edit_mb_basis_url):
             show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
+
+        if not validate_no_spaces(edit_section_name, edit_server_address, edit_port, edit_user_name, edit_password,
+                                  edit_server_qgis_projects_path, edit_server_mb_app_path, edit_mb_basis_url):
+            if (show_fail_box_ok('Failed', 'Fields should not have blank spaces')) == QMessageBox.Ok:
+                return
         else:
             ServerConfig.saveToSettings(edit_section_name, edit_server_address, edit_port, edit_user_name, edit_password, edit_server_qgis_projects_path, edit_server_mb_app_path, edit_mb_basis_url)
 

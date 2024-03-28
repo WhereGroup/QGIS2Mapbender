@@ -2,9 +2,6 @@ from dataclasses import dataclass
 
 from qgis._core import QgsSettings
 
-from mapbender_plugin.helpers import list_qgs_settings_values
-
-
 @dataclass
 class ServerConfig:
     name: str
@@ -29,7 +26,6 @@ class ServerConfig:
 
     @staticmethod
     def getParamsFromSettings(name: str):
-        print('function getParamsFromSettings')
         s = QgsSettings()
         url = s.value(f"mapbender-plugin/connection/{name}/url")
         port = s.value(f"mapbender-plugin/connection/{name}/port")

@@ -21,9 +21,10 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
-    list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box, show_new_info_message_bar, \
+    list_qgs_settings_child_groups, show_question_box, show_new_info_message_bar, \
     update_mb_slug_in_settings, delete_local_project_zip_file
 from mapbender_plugin.mapbender import MapbenderUpload
+from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS
 
 # Dialog aus .ui-Datei
@@ -85,22 +86,22 @@ class MainDialog(BASE, WIDGET):
             item_name.setText(server_config_sections[i])
             self.serverTableWidget.setItem(i, 0, item_name)
 
-            server_params = list_qgs_settings_values(server_config_sections[i])
+            server_config = ServerConfig.getParamsFromSettings(name)
 
             item_url = QTableWidgetItem()
-            item_url.setText(server_params['url'])
+            item_url.setText(server_config.url)
             self.serverTableWidget.setItem(i, 1, item_url)
 
             item_path_qgis_projects = QTableWidgetItem()
-            item_path_qgis_projects.setText(server_params['projects_path'])
+            item_path_qgis_projects.setText(server_config.projects_path)
             self.serverTableWidget.setItem(i, 2, item_path_qgis_projects)
 
             item_mb_app_path = QTableWidgetItem()
-            item_mb_app_path.setText(server_params['mb_app_path'])
+            item_mb_app_path.setText(server_config.mb_app_path)
             self.serverTableWidget.setItem(i, 3, item_mb_app_path)
 
             item_mb_basis_url = QTableWidgetItem()
-            item_mb_basis_url.setText(server_params['mb_basis_url'])
+            item_mb_basis_url.setText(server_config.mb_basis_url)
             self.serverTableWidget.setItem(i, 4, item_mb_basis_url)
 
         self.update_server_combo_box()
@@ -204,12 +205,12 @@ class MainDialog(BASE, WIDGET):
         # config params:
         # check config params / check connection
         selected_section = self.sectionComboBox.currentText()
-        server_params = list_qgs_settings_values(selected_section)
-        self.host = server_params['url']
-        self.port = server_params['port']
-        self.username = server_params['username']
-        self.password = server_params['password']
-        self.server_qgis_projects_folder_rel_path = server_params['projects_path']
+        server_config = ServerConfig.getParamsFromSettings(selected_section)
+        self.host = server_config.url
+        self.port = server_config.port
+        self.username = server_config.username
+        self.password = server_config.password
+        self.server_qgis_projects_folder_rel_path = server_config.projects_path
 
         self.previous_message_bars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_message_bars)
         #iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
