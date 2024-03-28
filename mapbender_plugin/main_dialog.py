@@ -9,7 +9,7 @@ from PyQt5 import uic
 import configparser
 
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
 
 from qgis._core import Qgis, QgsProject, QgsSettings
 from qgis.utils import iface
@@ -64,6 +64,7 @@ class MainDialog(BASE, WIDGET):
         serverTableHeaders = SERVER_TABLE_HEADERS
         self.serverTableWidget.setColumnCount(len(serverTableHeaders))
         self.serverTableWidget.setHorizontalHeaderLabels(serverTableHeaders)
+        self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
         # buttons
         self.addServerConfigButton.setToolTip("Add server")
