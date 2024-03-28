@@ -22,7 +22,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box, show_new_info_message_bar, \
-    update_mb_slug_in_settings
+    update_mb_slug_in_settings, delete_local_project_zip_file
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS
 
@@ -250,6 +250,9 @@ class MainDialog(BASE, WIDGET):
                                                        qgis_project_folder_name):
                                 self.previous_message_bars = show_new_info_message_bar("QGIS-Project folder successfully uploaded",
                                                                                        self.previous_message_bars)
+                                # delete local zip folder
+                                delete_local_project_zip_file(source_project_zip_dir_path)
+
                                 if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
                                                                   qgis_project_folder_name, self.server_qgis_projects_folder_rel_path):
                                     # check "http://"

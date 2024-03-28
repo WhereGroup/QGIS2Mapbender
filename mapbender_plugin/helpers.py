@@ -132,6 +132,12 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not copy project folder. Reason: {e}")
 
+def delete_local_project_zip_file(source_project_zip_dir_path):
+    if os.path.isfile(source_project_zip_dir_path):
+        os.remove(source_project_zip_dir_path)
+    else:
+        return
+
 def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                                              server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
     """
