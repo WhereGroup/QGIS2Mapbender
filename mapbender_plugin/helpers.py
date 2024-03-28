@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import re
 
 from fabric2 import Connection
 import paramiko
@@ -450,4 +451,44 @@ def delete_previous_messages(previous_messagebars):
         iface.messageBar().popWidget(messagebar)
     previous_messagebars = []
     return previous_messagebars
+
+def validate_no_spaces(variable):
+    pattern = r"^\S+$"
+    return re.match(pattern, variable) is not None
+
+def update_mb_slug_in_settings(mb_slug, is_mb_slug):
+    s = QgsSettings()
+    if s.contains("mapbender-plugin/mb_templates"):
+        s.beginGroup('mapbender-plugin/')
+        mb_slugs = s.value('mb_templates')
+        s.endGroup()
+        if isinstance(mb_slugs, str):
+            mb_slugs_list = mb_slugs.split(", ")
+        else:
+            mb_slugs_list = mb_slugs
+
+        if is_mb_slug:
+            if mb_slug in mb_slugs_list:
+                return
+            else:
+                mb_slugs_list.append(mb_slug)
+                updated_mb_slugs = ", ".join(mb_slugs_list)
+                s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+        else:
+            if mb_slug in mb_slugs_list:
+                mb_slugs_list.remove(mb_slug)
+                updated_mb_slugs = ", ".join(mb_slugs_list)
+                s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+            else:
+                return
+    else:
+        if is_mb_slug:
+            s.setValue('mapbender-plugin/mb_templates', mb_slug)
+        else:
+            return
+
+
+
+
+
 

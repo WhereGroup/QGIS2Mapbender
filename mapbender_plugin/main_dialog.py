@@ -11,17 +11,18 @@ import configparser
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem
 
-from qgis._core import Qgis, QgsProject
+from qgis._core import Qgis, QgsProject, QgsSettings
 from qgis.utils import iface
 
 from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
-from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerSectionDialog
+from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerConfigDialog
 from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir, get_project_layers, \
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
-    list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box, show_new_info_message_bar
+    list_qgs_settings_child_groups, list_qgs_settings_values, show_question_box, show_new_info_message_bar, \
+    update_mb_slug_in_settings
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS
 
@@ -40,12 +41,14 @@ class MainDialog(BASE, WIDGET):
 
         # tabs
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget.currentChanged.connect(self.update_section_combo_box)
+        self.tabWidget.currentChanged.connect(self.update_server_combo_box)
 
 
         # tab1
-        self.update_section_combo_box()
+        self.update_server_combo_box()
         self.publishRadioButton.setChecked(True)
+        self.update_slug_combo_box()
+        self.mbSlugComboBox.setCurrentIndex(-1)
 
         self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
         self.cloneTemplateRadioButton.setChecked(True)
@@ -81,28 +84,28 @@ class MainDialog(BASE, WIDGET):
             item_name.setText(server_config_sections[i])
             self.serverTableWidget.setItem(i, 0, item_name)
 
-            con_params = list_qgs_settings_values(server_config_sections[i])
+            server_params = list_qgs_settings_values(server_config_sections[i])
 
             item_url = QTableWidgetItem()
-            item_url.setText(con_params['url'])
+            item_url.setText(server_params['url'])
             self.serverTableWidget.setItem(i, 1, item_url)
 
             item_path_qgis_projects = QTableWidgetItem()
-            item_path_qgis_projects.setText(con_params['projects_path'])
+            item_path_qgis_projects.setText(server_params['projects_path'])
             self.serverTableWidget.setItem(i, 2, item_path_qgis_projects)
 
             item_mapbender_app_path = QTableWidgetItem()
-            item_mapbender_app_path.setText(con_params['mapbender_app_path'])
+            item_mapbender_app_path.setText(server_params['mapbender_app_path'])
             self.serverTableWidget.setItem(i, 3, item_mapbender_app_path)
 
             item_mapbender_basis_url = QTableWidgetItem()
-            item_mapbender_basis_url.setText(con_params['mapbender_basis_url'])
+            item_mapbender_basis_url.setText(server_params['mapbender_basis_url'])
             self.serverTableWidget.setItem(i, 4, item_mapbender_basis_url)
 
-        self.update_section_combo_box()
+        self.update_server_combo_box()
 
 
-    def update_section_combo_box(self) -> None:
+    def update_server_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
         # read config sections
         config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
@@ -118,6 +121,25 @@ class MainDialog(BASE, WIDGET):
             self.sectionComboBox.clear()
             self.sectionComboBox.addItems(config_sections)
 
+    def update_slug_combo_box(self):
+        s = QgsSettings()
+        if s.contains("mapbender-plugin/mb_templates"):
+            s.beginGroup('mapbender-plugin/')
+            mb_slugs = s.value('mb_templates')
+            s.endGroup()
+            if isinstance(mb_slugs, str):
+                mb_slugs_list = mb_slugs.split(", ")
+            else:
+                mb_slugs_list = mb_slugs
+            self.mbSlugComboBox.clear()
+            if len(mb_slugs) > 0:
+                self.mbSlugComboBox.addItems(mb_slugs_list)
+                self.mbSlugComboBox.setCurrentIndex(-1)
+
+        else:
+            return
+
+
     def disable_publish_parameters(self):
         self.mbParamsFrame.setEnabled(False)
         self.updateButton.setEnabled(True)
@@ -132,19 +154,18 @@ class MainDialog(BASE, WIDGET):
         new_server_section_dialog = AddServerSectionDialog()
         new_server_section_dialog.exec()
         self.update_server_table()
-        self.update_section_combo_box()
+        self.update_server_combo_box()
 
     def open_dialog_edit_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
-        if selected_row != -1:
-            selected_section = self.serverTableWidget.item(selected_row, 0).text()
-            edit_server_section_dialog = EditServerSectionDialog()
-            edit_server_section_dialog.setServiceParameters(selected_section)
-            edit_server_section_dialog.exec()
-            self.update_server_table()
-            self.update_section_combo_box()
-        else:
-            pass
+        if selected_row == -1:
+            return
+        selected_section = self.serverTableWidget.item(selected_row, 0).text()
+        edit_server_section_dialog = EditServerConfigDialog(selected_section)
+        edit_server_section_dialog.exec()
+        self.update_server_table()
+        self.update_server_combo_box()
+
 
     def remove_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
@@ -157,7 +178,7 @@ class MainDialog(BASE, WIDGET):
                     s.remove(f"mapbender-plugin/connection/{selected_section}")
                     if (show_succes_box_ok('Success', 'Section successfully removed')) == QMessageBox.Ok:
                         self.update_server_table()
-                        self.update_section_combo_box()
+                        self.update_server_combo_box()
                 except:
                     show_fail_box_ok('Failed', "Section could not be deleted")
         else:
@@ -167,7 +188,7 @@ class MainDialog(BASE, WIDGET):
     def publish_project(self):
         # check mapbender params:
         if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
-                self.mapbenderCustomAppSlugLineEdit.text() != ''):
+                self.mbSlugComboBox.currentText() != ''):
             self.upload_project_qgis_server()
         else:
             if (show_fail_box_ok("Please complete Mapbender Parameters",
@@ -182,12 +203,12 @@ class MainDialog(BASE, WIDGET):
         # config params:
         # check config params / check connection
         selected_section = self.sectionComboBox.currentText()
-        con_params = list_qgs_settings_values(selected_section)
-        self.host = con_params['url']
-        self.port = con_params['port']
-        self.username = con_params['username']
-        self.password = con_params['password']
-        self.server_qgis_projects_folder_rel_path = con_params['projects_rel_path']
+        server_params = list_qgs_settings_values(selected_section)
+        self.host = server_params['url']
+        self.port = server_params['port']
+        self.username = server_params['username']
+        self.password = server_params['password']
+        self.server_qgis_projects_folder_rel_path = server_params['projects_path']
 
         self.previous_message_bars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_message_bars)
         #iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
@@ -268,7 +289,7 @@ class MainDialog(BASE, WIDGET):
                                 wms_getcapabilities_url = (
                                         "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                         + self.server_qgis_projects_folder_rel_path + qgis_project_folder_name + '/' + qgis_project_name)
-                                self.mapbender_update(wms_getcapabilities_url)
+                                self.mb_update_wms(wms_getcapabilities_url)
 
 
             else:
@@ -333,19 +354,23 @@ class MainDialog(BASE, WIDGET):
                 # depending on user's input (duplicate template or use existing application):
             #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
             if clone_app:
-                template_slug = self.mapbenderCustomAppSlugLineEdit.text()
+                template_slug = self.mbSlugComboBox.currentText()
                 exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
                     exit_status_wms_assign, output_wms_assign, error_wms_assign = (
                         mapbender_uploader.wms_assign(slug, source_id, layer_set))
                     print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
+                    update_mb_slug_in_settings(template_slug, is_mb_slug=True)
+                    self.update_slug_combo_box()
 
                 else:
                     show_fail_box_ok("Failed",
                                      f"Application could not be cloned.\n \n Error:  {error}")
+                    update_mb_slug_in_settings(template_slug, is_mb_slug=False)
+                    self.update_slug_combo_box()
                     return
             else:
-                slug = self.mapbenderCustomAppSlugLineEdit.text()
+                slug = self.mbSlugComboBox.currentText()
                 exit_status_wms_assign, output_wms_assign, error_wms_assign = (
                     mapbender_uploader.wms_assign(slug, source_id, layer_set))
                 print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
@@ -363,7 +388,7 @@ class MainDialog(BASE, WIDGET):
 
         mapbender_uploader.close_connection()
 
-    def mapbender_update(self, wms_getcapabilities_url):
+    def mb_update_wms(self, wms_getcapabilities_url):
         print('Mapbender update get capabilitites:')
         print(wms_getcapabilities_url)
         mapbender_uploader = MapbenderUpload(self.host, self.username)

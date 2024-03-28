@@ -23,7 +23,19 @@ class AddServerSectionDialog(BASE, WIDGET):
 
     def saveNewConfigSection(self):
         new_section_name = self.newServiceNameLineEdit.text()
-        try:
+        new_server_address = self.newServerAddressLineEdit.text()
+        new_port = self.newServerPortLineEdit.text()
+        new_user_name = self.newUserNameLineEdit.text()
+        new_password = self.newPasswordLineEdit.text()
+        new_server_qgis_projects_path = self.newQgisProjectPathLineEdit.text()
+        new_server_mapbender_app_path = self.newMbPathLineEdit.text()
+        new_mapbender_basis_url = self.newMbBasisUrlLineEdit.text()
+
+        if (not new_section_name or not new_server_address or not new_server_qgis_projects_path
+                or not new_server_mapbender_app_path or not new_mapbender_basis_url):
+            show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
+        #if no spaces...
+        else:
             s = QgsSettings()
             # setValue: Sets the value of setting key to value. If the key already exists, the previous value is
             # overwritten. An optional Section argument can be used to set a value to a specific Section.
@@ -40,9 +52,7 @@ class AddServerSectionDialog(BASE, WIDGET):
 
             if (show_succes_box_ok('Success', 'New section successfully added')) == QMessageBox.Ok:
                 self.close()
-        except:
-            if (show_fail_box_ok('Failed', 'Section could not be added')) == QMessageBox.Ok:
-                self.close()
+
 
         # CHECK IF NAME ALREADY EXISTS!
 
