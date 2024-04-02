@@ -433,7 +433,6 @@ def list_qgs_settings_child_groups(key):
     return subkeys
 
 def show_new_info_message_bar(text, previous_message_bars):
-    return
     previous_message_bars = delete_previous_messages(previous_message_bars)
     message_bar = iface.messageBar().createMessage(text)
     iface.messageBar().pushWidget(message_bar, duration=3)
