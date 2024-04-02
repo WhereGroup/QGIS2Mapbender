@@ -1,7 +1,7 @@
 import os
 from itertools import count
 
-from PyQt5.QtCore import QSettings
+from PyQt5.QtCore import QSettings, Qt
 from fabric2 import Connection
 import paramiko
 
@@ -9,9 +9,11 @@ from PyQt5 import uic
 import configparser
 
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QVBoxLayout, QApplication, QDockWidget, \
+    QLabel
 
 from qgis._core import Qgis, QgsProject, QgsSettings
+from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
 from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
@@ -75,7 +77,6 @@ class MainDialog(BASE, WIDGET):
         self.removeServerConfigButton.setToolTip("Remove server")
         self.removeServerConfigButton.clicked.connect(self.remove_config_section)
         self.buttonBoxTab2.rejected.connect(self.reject)
-
 
 
     def update_server_table(self):

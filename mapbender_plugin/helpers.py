@@ -432,20 +432,20 @@ def list_qgs_settings_child_groups(key):
     s.endGroup
     return subkeys
 
-def show_new_info_message_bar(text, previous_messagebars):
-    previous_messagebars = delete_previous_messages(previous_messagebars)
-    messagebar = iface.messageBar().createMessage(text)
-    #messagebar.setLevel(QgsMessageBar.INFO)
-    iface.messageBar().pushWidget(messagebar)
-    previous_messagebars.append(messagebar)
-    return previous_messagebars
+def show_new_info_message_bar(text, previous_message_bars):
+    return
+    previous_message_bars = delete_previous_messages(previous_message_bars)
+    message_bar = iface.messageBar().createMessage(text)
+    iface.messageBar().pushWidget(message_bar, duration=3)
+    previous_message_bars.append(message_bar)
+    return previous_message_bars
 
 
-def delete_previous_messages(previous_messagebars):
-    for messagebar in previous_messagebars:
-        iface.messageBar().popWidget(messagebar)
-    previous_messagebars = []
-    return previous_messagebars
+def delete_previous_messages(previous_message_bars):
+    for message_bar in previous_message_bars:
+        iface.messageBar().popWidget(message_bar)
+    previous_message_bars = []
+    return previous_message_bars
 
 
 def validate_no_spaces(*variables):
