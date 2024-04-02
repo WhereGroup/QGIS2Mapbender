@@ -117,7 +117,7 @@
         <item row="7" column="0">
          <widget class="QLabel" name="newQgisProjectPathLabel">
           <property name="text">
-           <string>QGIS-Projects relative path</string>
+           <string>QGIS-Projects path</string>
           </property>
          </widget>
         </item>
