@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Mapbender QGIS-Plugin</string>
   </property>
+  <property name="locale">
+   <locale language="English" country="Germany"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -22,7 +25,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="editServiceNameLabel">
           <property name="text">
-           <string>Service name</string>
+           <string>Service name*</string>
           </property>
          </widget>
         </item>
@@ -32,7 +35,7 @@
         <item row="2" column="0">
          <widget class="QLabel" name="editServerAddressLabel">
           <property name="text">
-           <string>Server address</string>
+           <string>Server address*</string>
           </property>
          </widget>
         </item>
@@ -66,13 +69,10 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="editPasswordLineEdit"/>
-        </item>
         <item row="6" column="0">
          <widget class="QLabel" name="editQgisProjectPathLabel">
           <property name="text">
-           <string>QGIS-Projects path</string>
+           <string>QGIS-Projects path*</string>
           </property>
          </widget>
         </item>
@@ -109,7 +109,7 @@
         <item row="8" column="0">
          <widget class="QLabel" name="editMbPathLabel">
           <property name="text">
-           <string>Mapbender application path</string>
+           <string>Mapbender application path*</string>
           </property>
          </widget>
         </item>
@@ -126,12 +126,16 @@
          </widget>
         </item>
         <item row="10" column="1">
-         <widget class="QLineEdit" name="editMbBasisUrlLineEdit"/>
+         <widget class="QLineEdit" name="editMbBasisUrlLineEdit">
+          <property name="inputMethodHints">
+           <set>Qt::ImhUrlCharactersOnly</set>
+          </property>
+         </widget>
         </item>
         <item row="10" column="0">
          <widget class="QLabel" name="editMbBasisUrlLabel">
           <property name="text">
-           <string>Mapbender basis URL</string>
+           <string>Mapbender basis URL*</string>
           </property>
          </widget>
         </item>
@@ -146,6 +150,9 @@
            <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
           </property>
          </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QgsPasswordLineEdit" name="editPasswordLineEdit"/>
         </item>
        </layout>
       </item>
@@ -164,6 +171,9 @@
       </item>
       <item row="6" column="0">
        <widget class="QDialogButtonBox" name="editDialogButtonBox">
+        <property name="locale">
+         <locale language="English" country="Germany"/>
+        </property>
         <property name="standardButtons">
          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
         </property>
@@ -187,6 +197,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsPasswordLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qgspasswordlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
