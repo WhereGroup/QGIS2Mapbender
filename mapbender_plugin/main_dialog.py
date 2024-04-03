@@ -120,14 +120,14 @@ class MainDialog(BASE, WIDGET):
         if len(config_sections) == 0:
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
-            self.sectionComboBox.clear()
+            self.serverConfigComboBox.clear()
 
         else:
             # update sections-combobox
             self.serverComboBoxLabel.setText("Server")
             self.warningFirstServerLabel.hide()
-            self.sectionComboBox.clear()
-            self.sectionComboBox.addItems(config_sections)
+            self.serverConfigComboBox.clear()
+            self.serverConfigComboBox.addItems(config_sections)
 
     def update_slug_combo_box(self):
         s = QgsSettings()
@@ -206,7 +206,7 @@ class MainDialog(BASE, WIDGET):
     def upload_project_qgis_server(self):
         # config params:
         # check config params / check connection
-        selected_section = self.sectionComboBox.currentText()
+        selected_section = self.serverConfigComboBox.currentText()
         server_config = ServerConfig.getParamsFromSettings(selected_section)
         self.host = server_config.url
         self.port = server_config.port

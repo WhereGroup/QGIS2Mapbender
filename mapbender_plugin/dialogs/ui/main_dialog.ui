@@ -66,7 +66,7 @@
            </spacer>
           </item>
           <item row="4" column="2">
-           <widget class="QComboBox" name="sectionComboBox"/>
+           <widget class="QComboBox" name="serverConfigComboBox"/>
           </item>
           <item row="8" column="0">
            <widget class="QRadioButton" name="publishRadioButton">
