@@ -80,16 +80,16 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
         self.buttonBoxTab1.rejected.connect(self.reject)
-        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
-        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
-        self.removeServerConfigButton.clicked.connect(self.remove_config_section)
+        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_server_config)
+        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_server_config)
+        self.removeServerConfigButton.clicked.connect(self.remove_server_config)
 
     def update_server_table(self):
-        server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
-        self.serverTableWidget.setRowCount(len(server_config_sections))
-        for i, (name) in enumerate(server_config_sections):
+        server_config_list = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        self.serverTableWidget.setRowCount(len(server_config_list))
+        for i, (name) in enumerate(server_config_list):
             item_name = QTableWidgetItem(name)
-            item_name.setText(server_config_sections[i])
+            item_name.setText(server_config_list[i])
             self.serverTableWidget.setItem(i, 0, item_name)
 
             server_config = ServerConfig.getParamsFromSettings(name)
@@ -114,20 +114,20 @@ class MainDialog(BASE, WIDGET):
 
 
     def update_server_combo_box(self) -> None:
-        """ Updates the server configuration sections dropdown menu """
-        # read config sections
-        config_sections = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
-        if len(config_sections) == 0:
+        """ Updates the server configuration dropdown menu """
+        # Read server configurations
+        server_config_list = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
+        if len(server_config_list) == 0:
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
             self.serverConfigComboBox.clear()
 
         else:
-            # update sections-combobox
+            # Update server configuration-combobox
             self.serverComboBoxLabel.setText("Server")
             self.warningFirstServerLabel.hide()
             self.serverConfigComboBox.clear()
-            self.serverConfigComboBox.addItems(config_sections)
+            self.serverConfigComboBox.addItems(server_config_list)
 
     def update_slug_combo_box(self):
         s = QgsSettings()
@@ -155,38 +155,38 @@ class MainDialog(BASE, WIDGET):
         self.updateButton.setEnabled(False)
         self.publishButton.setEnabled(True)
 
-    def open_dialog_add_new_config_section(self):
-        new_server_section_dialog = AddServerConfigDialog()
-        new_server_section_dialog.exec()
+    def open_dialog_add_new_server_config(self):
+        new_server_config_dialog = AddServerConfigDialog()
+        new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
-    def open_dialog_edit_config_section(self):
+    def open_dialog_edit_server_config(self):
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
-        selected_section = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_section_dialog = EditServerConfigDialog(selected_section)
-        edit_server_section_dialog.exec()
+        selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
+        edit_server_config_dialog = EditServerConfigDialog(selected_server_config)
+        edit_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
-    def remove_config_section(self):
+    def remove_server_config(self):
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
-        selected_section = self.serverTableWidget.item(selected_row, 0).text()
-        if show_question_box(f"Are you sure you want to remove the section '{selected_section}'?") != QMessageBox.Yes:
+        selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
+        if show_question_box(f"Are you sure you want to remove the server configuration '{selected_server_config}'?") != QMessageBox.Yes:
             return
         try:
             s = QSettings()
-            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_section}")
-            show_succes_box_ok('Success', 'Section successfully removed')
+            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_server_config}")
+            show_succes_box_ok('Success', 'Server configuration successfully removed')
             self.update_server_table()
             self.update_server_combo_box()
         except Exception as e:
-            show_fail_box_ok('Failed', "Section could not be deleted (see log)")
-            QgsMessageLog.logMessage(f"Section could not be deleted ({e})", 'MapbenderPlugin', Qgis.Warning)
+            show_fail_box_ok('Failed', "Server configuration could not be deleted (see log)")
+            QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", 'MapbenderPlugin', Qgis.Warning)
             raise
 
     def publish_project(self):
@@ -206,8 +206,8 @@ class MainDialog(BASE, WIDGET):
     def upload_project_qgis_server(self):
         # config params:
         # check config params / check connection
-        selected_section = self.serverConfigComboBox.currentText()
-        server_config = ServerConfig.getParamsFromSettings(selected_section)
+        selected_server_config = self.serverConfigComboBox.currentText()
+        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
         self.host = server_config.url
         self.port = server_config.port
         self.username = server_config.username

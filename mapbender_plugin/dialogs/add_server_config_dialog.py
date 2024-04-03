@@ -20,11 +20,11 @@ class AddServerConfigDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.addSectionDialogButtonBox.accepted.connect(self.save_new_server_config)
-        self.addSectionDialogButtonBox.rejected.connect(self.reject)
+        self.addServerConfigDialogButtonBox.accepted.connect(self.save_new_server_config)
+        self.addServerConfigDialogButtonBox.rejected.connect(self.reject)
 
     def save_new_server_config(self):
-        new_section_name = self.newServerConfigNameLineEdit.text()
+        new_server_config_name = self.newServerConfigNameLineEdit.text()
         new_server_address = self.newServerAddressLineEdit.text()
         new_port = self.newServerPortLineEdit.text()
         new_user_name = self.newUserNameLineEdit.text()
@@ -33,12 +33,12 @@ class AddServerConfigDialog(BASE, WIDGET):
         new_server_mb_app_path = self.newMbPathLineEdit.text()
         new_mb_basis_url = self.newMbBasisUrlLineEdit.text()
 
-        if (not new_section_name or not new_server_address or not new_server_qgis_projects_path
+        if (not new_server_config_name or not new_server_address or not new_server_qgis_projects_path
                 or not new_server_mb_app_path or not new_mb_basis_url):
             if (show_fail_box_ok('Failed', 'Please fill in the mandatory fields (*)')) == QMessageBox.Ok:
                 return
 
-        if not validate_no_spaces(new_section_name, new_server_address, new_port, new_user_name, new_password,
+        if not validate_no_spaces(new_server_config_name, new_server_address, new_port, new_user_name, new_password,
                                   new_server_qgis_projects_path, new_server_mb_app_path, new_mb_basis_url):
             if (show_fail_box_ok('Failed', 'Fields should not have blank spaces')) == QMessageBox.Ok:
                 return
@@ -48,7 +48,7 @@ class AddServerConfigDialog(BASE, WIDGET):
         #             # # overwritten. An optional Section argument can be used to set a value to a specific Section.)
 
         # else:
-            ServerConfig.saveToSettings(new_section_name, new_server_address, new_port, new_user_name, new_password, new_server_qgis_projects_path, new_server_mb_app_path, new_mb_basis_url)
-            if (show_succes_box_ok('Success', 'New section successfully added')) == QMessageBox.Ok:
+            ServerConfig.saveToSettings(new_server_config_name, new_server_address, new_port, new_user_name, new_password, new_server_qgis_projects_path, new_server_mb_app_path, new_mb_basis_url)
+            if (show_succes_box_ok('Success', 'New server configuration successfully added')) == QMessageBox.Ok:
                 self.close()
 

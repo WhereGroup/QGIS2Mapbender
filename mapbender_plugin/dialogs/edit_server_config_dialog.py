@@ -23,14 +23,14 @@ class EditServerConfigDialog(BASE, WIDGET):
 
         self.getServerConfig(selected_server_config)
 
-        server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        server_config_list = list_qgs_settings_child_groups("mapbender-plugin/connection")
 
     #def get...
-    def getServerConfig(self, selected_section):
-        self.selected_section = selected_section
-        server_config = ServerConfig.getParamsFromSettings(selected_section)
+    def getServerConfig(self, selected_server_config):
+        self.selected_server_config = selected_server_config
+        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
 
-        self.editServerConfigNameLineEdit.setText(selected_section)
+        self.editServerConfigNameLineEdit.setText(selected_server_config)
         self.editPortLineEdit.setText(server_config.port)
         self.editServerAddressLineEdit.setText(server_config.url)
         self.editUserNameLineEdit.setText(server_config.username)
@@ -44,7 +44,7 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.checkConfig(serverConfig)
 
     def getEditedServerConfig(self) -> ServerConfig:
-        edit_section_name = self.editServerConfigNameLineEdit.text()
+        edit_server_config_name = self.editServerConfigNameLineEdit.text()
         edit_server_address = self.editServerAddressLineEdit.text()
         edit_port = self.editPortLineEdit.text()
         edit_user_name = self.editUserNameLineEdit.text()
@@ -53,7 +53,7 @@ class EditServerConfigDialog(BASE, WIDGET):
         edit_server_mb_app_path = self.editMbPathLineEdit.text()
         edit_mb_basis_url = self.editMbBasisUrlLineEdit.text()
         return ServerConfig(
-            name=edit_section_name,
+            name=edit_server_config_name,
             url=edit_server_address,
             port=edit_port,
             username=edit_user_name,
@@ -77,7 +77,7 @@ class EditServerConfigDialog(BASE, WIDGET):
 
         serverConfig.save()
 
-        show_succes_box_ok('Success', 'Section successfully updated')
+        show_succes_box_ok('Success', 'Server configuration successfully updated')
         self.close()
         return
 
