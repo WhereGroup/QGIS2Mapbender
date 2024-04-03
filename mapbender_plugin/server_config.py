@@ -24,6 +24,16 @@ class ServerConfig:
         s.setValue(f"mapbender-plugin/connection/{name}/mb_app_path", mb_app_path)
         s.setValue(f"mapbender-plugin/connection/{name}/mb_basis_url", mb_basis_url)
 
+    def save(self):
+        s = QgsSettings()
+        s.setValue(f"mapbender-plugin/connection/{self.name}/url", self.url)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/port", self.port)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/username", self.username)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/password", self.password)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/projects_path", self.projects_path)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/mb_app_path", self.mb_app_path)
+        s.setValue(f"mapbender-plugin/connection/{self.name}/mb_basis_url", self.mb_basis_url)
+
     @staticmethod
     def getParamsFromSettings(name: str):
         s = QgsSettings()
@@ -36,3 +46,11 @@ class ServerConfig:
         mb_basis_url = s.value(f"mapbender-plugin/connection/{name}/mb_basis_url")
 
         return ServerConfig(name, url, port, username, password, projects_path, mb_app_path, mb_basis_url)
+
+    def isValid(self) -> bool:
+        variables = [self.name, self.url, self.port, self.username, self.password, self.projects_path, self.mb_app_path,
+                     self.mb_basis_url]
+        for var in variables:
+            if " " in var:
+                return False
+        return True

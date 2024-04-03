@@ -40,7 +40,10 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.editMbBasisUrlLineEdit.setText(server_config.mb_basis_url)
 
     def saveEditedServerConfig(self):
-        # get edited values
+        serverConfig = self.getEditedServerConfig()
+        self.checkConfig(serverConfig)
+
+    def getEditedServerConfig(self) -> ServerConfig:
         edit_section_name = self.editServiceNameLineEdit.text()
         edit_server_address = self.editServerAddressLineEdit.text()
         edit_port = self.editPortLineEdit.text()
@@ -49,24 +52,37 @@ class EditServerConfigDialog(BASE, WIDGET):
         edit_server_qgis_projects_path = self.editQgisProjectPathLineEdit.text()
         edit_server_mb_app_path = self.editMbPathLineEdit.text()
         edit_mb_basis_url = self.editMbBasisUrlLineEdit.text()
+        return ServerConfig(
+            name=edit_section_name,
+            url=edit_server_address,
+            port=edit_port,
+            username=edit_user_name,
+            password=edit_password,
+            projects_path=edit_server_qgis_projects_path,
+            mb_app_path=edit_server_mb_app_path,
+            mb_basis_url=edit_mb_basis_url
+        )
 
-        # check mandatory values
-        if (not edit_section_name or not edit_server_address or not edit_server_qgis_projects_path
-                or not edit_server_mb_app_path or not edit_mb_basis_url):
+    def checkConfig(self, serverConfig: ServerConfig) -> None:
+        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path, serverConfig.mb_app_path,
+                           serverConfig.mb_basis_url]
+
+        if not all(mandatoryFields):
             show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
+            return
 
-        if not validate_no_spaces(edit_section_name, edit_server_address, edit_port, edit_user_name, edit_password,
-                                  edit_server_qgis_projects_path, edit_server_mb_app_path, edit_mb_basis_url):
-            if (show_fail_box_ok('Failed', 'Fields should not have blank spaces')) == QMessageBox.Ok:
-                return
-        else:
-            ServerConfig.saveToSettings(edit_section_name, edit_server_address, edit_port, edit_user_name, edit_password, edit_server_qgis_projects_path, edit_server_mb_app_path, edit_mb_basis_url)
+        if not serverConfig.isValid():
+            show_fail_box_ok('Failed', 'Fields should not have blank spaces')
+            return
 
-            if (show_succes_box_ok('Success', 'Section successfully updated')) == QMessageBox.Ok:
-                self.close()
+        serverConfig.save()
 
-            # if (show_fail_box_ok('Failed', 'Section could not be successfully updated')) == QMessageBox.Ok:
-            #     self.close()
+        show_succes_box_ok('Success', 'Section successfully updated')
+        self.close()
+        return
+
+        # if (show_fail_box_ok('Failed', 'Section could not be successfully updated')) == QMessageBox.Ok:
+        #     self.close()
 
 
 

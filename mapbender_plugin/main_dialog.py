@@ -12,7 +12,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QVBoxLayout, QApplication, QDockWidget, \
     QLabel
 
-from qgis._core import Qgis, QgsProject, QgsSettings
+from qgis._core import Qgis, QgsProject, QgsSettings, QgsMessageLog
 from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
@@ -27,11 +27,12 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     update_mb_slug_in_settings, delete_local_project_zip_file
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import SERVER_TABLE_HEADERS
+from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SECTION
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dialogs/ui/main_dialog.ui'))
+
 
 class MainDialog(BASE, WIDGET):
     def __init__(self, parent=None):
@@ -42,42 +43,46 @@ class MainDialog(BASE, WIDGET):
 
         self.plugin_dir = get_plugin_dir()
 
-        # tabs
+        self.setup()
+        self.setupConnections()
+
+    def setup(self):
+        # Tabs
         self.tabWidget.setCurrentIndex(0)
-        self.tabWidget.currentChanged.connect(self.update_server_combo_box)
 
-
-        # tab1
+        # Tab1
         self.update_server_combo_box()
         self.publishRadioButton.setChecked(True)
         self.update_slug_combo_box()
         self.mbSlugComboBox.setCurrentIndex(-1)
 
-        self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
         self.cloneTemplateRadioButton.setChecked(True)
         self.updateButton.setEnabled(False)
-        self.updateRadioButton.clicked.connect(self.disable_publish_parameters)
 
-        self.publishButton.clicked.connect(self.publish_project)
-        self.updateButton.clicked.connect(self.update_project)
-        self.buttonBoxTab1.rejected.connect(self.reject)
-
-        # tab2
-        # server table
+        # Tab2
+        # Server table
         serverTableHeaders = SERVER_TABLE_HEADERS
         self.serverTableWidget.setColumnCount(len(serverTableHeaders))
         self.serverTableWidget.setHorizontalHeaderLabels(serverTableHeaders)
         self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
-        # buttons
+
+        # Buttons
         self.addServerConfigButton.setToolTip("Add server")
-        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
         self.editServerConfigButton.setToolTip("Edit server")
-        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
         self.removeServerConfigButton.setToolTip("Remove server")
-        self.removeServerConfigButton.clicked.connect(self.remove_config_section)
         self.buttonBoxTab2.rejected.connect(self.reject)
 
+    def setupConnections(self):
+        self.tabWidget.currentChanged.connect(self.update_server_combo_box)
+        self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
+        self.updateRadioButton.clicked.connect(self.disable_publish_parameters)
+        self.publishButton.clicked.connect(self.publish_project)
+        self.updateButton.clicked.connect(self.update_project)
+        self.buttonBoxTab1.rejected.connect(self.reject)
+        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_config_section)
+        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_config_section)
+        self.removeServerConfigButton.clicked.connect(self.remove_config_section)
 
     def update_server_table(self):
         server_config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
@@ -111,7 +116,7 @@ class MainDialog(BASE, WIDGET):
     def update_server_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
         # read config sections
-        config_sections = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        config_sections = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SECTION}/connection")
         if len(config_sections) == 0:
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
@@ -126,22 +131,19 @@ class MainDialog(BASE, WIDGET):
 
     def update_slug_combo_box(self):
         s = QgsSettings()
-        if s.contains("mapbender-plugin/mb_templates"):
-            s.beginGroup('mapbender-plugin/')
-            mb_slugs = s.value('mb_templates')
-            s.endGroup()
-            if isinstance(mb_slugs, str):
-                mb_slugs_list = mb_slugs.split(", ")
-            else:
-                mb_slugs_list = mb_slugs
-            self.mbSlugComboBox.clear()
-            if len(mb_slugs) > 0:
-                self.mbSlugComboBox.addItems(mb_slugs_list)
-                self.mbSlugComboBox.setCurrentIndex(-1)
-
-        else:
+        if not s.contains(f"{PLUGIN_SETTINGS_SECTION}/mb_templates"):
             return
-
+        s.beginGroup(PLUGIN_SETTINGS_SECTION)
+        mb_slugs = s.value('mb_templates')
+        s.endGroup()
+        if isinstance(mb_slugs, str):
+            mb_slugs_list = mb_slugs.split(", ")
+        else:
+            mb_slugs_list = mb_slugs
+        self.mbSlugComboBox.clear()
+        if len(mb_slugs) > 0:
+            self.mbSlugComboBox.addItems(mb_slugs_list)
+            self.mbSlugComboBox.setCurrentIndex(-1)
 
     def disable_publish_parameters(self):
         self.mbParamsFrame.setEnabled(False)
@@ -150,8 +152,8 @@ class MainDialog(BASE, WIDGET):
 
     def enable_publish_parameters(self):
         self.mbParamsFrame.setEnabled(True)
-        self.publishButton.setEnabled(True)
         self.updateButton.setEnabled(False)
+        self.publishButton.setEnabled(True)
 
     def open_dialog_add_new_config_section(self):
         new_server_section_dialog = AddServerSectionDialog()
@@ -169,24 +171,23 @@ class MainDialog(BASE, WIDGET):
         self.update_server_table()
         self.update_server_combo_box()
 
-
     def remove_config_section(self):
         selected_row = self.serverTableWidget.currentRow()
-        if selected_row != -1:
-            selected_section = self.serverTableWidget.item(selected_row, 0).text()
-            if (
-            show_question_box(f"""Are you sure you want to remove the section '{selected_section}'?""")) == QMessageBox.Yes:
-                try:
-                    s = QSettings()
-                    s.remove(f"mapbender-plugin/connection/{selected_section}")
-                    if (show_succes_box_ok('Success', 'Section successfully removed')) == QMessageBox.Ok:
-                        self.update_server_table()
-                        self.update_server_combo_box()
-                except:
-                    show_fail_box_ok('Failed', "Section could not be deleted")
-        else:
-            pass
-
+        if selected_row == -1:
+            return
+        selected_section = self.serverTableWidget.item(selected_row, 0).text()
+        if show_question_box(f"Are you sure you want to remove the section '{selected_section}'?") != QMessageBox.Yes:
+            return
+        try:
+            s = QSettings()
+            s.remove(f"{PLUGIN_SETTINGS_SECTION}/connection/{selected_section}")
+            show_succes_box_ok('Success', 'Section successfully removed')
+            self.update_server_table()
+            self.update_server_combo_box()
+        except Exception as e:
+            show_fail_box_ok('Failed', "Section could not be deleted (see log)")
+            QgsMessageLog.logMessage(f"Section could not be deleted ({e})", 'MapbenderPlugin', Qgis.Warning)
+            raise
 
     def publish_project(self):
         # check mapbender params:

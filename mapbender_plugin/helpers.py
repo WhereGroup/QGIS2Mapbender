@@ -5,9 +5,9 @@ from typing import re
 from fabric2 import Connection
 import paramiko
 
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsProject, Qgis, QgsMessageLog, QgsSettings
+from qgis._core import QgsApplication, QgsProject, Qgis, QgsMessageLog, QgsSettings
 from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
@@ -132,11 +132,13 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not copy project folder. Reason: {e}")
 
+
 def delete_local_project_zip_file(source_project_zip_dir_path):
     if os.path.isfile(source_project_zip_dir_path):
         os.remove(source_project_zip_dir_path)
     else:
         return
+
 
 def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                                              server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -174,6 +176,7 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
                                              f"Could not check if project directory exists already on the server. Reason: {e}")
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
+
 
 def upload_project_zip_file(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                             server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -250,6 +253,7 @@ def remove_project_folder_from_server(host: str, username: str, port: str, passw
             show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not connect to server. Reason: {e}")
+
 
 def unzip_project_folder_on_server(host: str, username: str, port: str, password: str, qgis_project_folder_name: str,
                                    server_qgis_projects_folder_rel_path: str) -> bool:
@@ -384,22 +388,20 @@ def get_get_capabilities_url(host: str, plugin_dir, server_project_dir_path, qgi
     print(wms_getcapabilities_url)
     return wms_getcapabilities_url
 
-def create_fail_box(plugin_dir, title, text):
+def create_fail_box(title, text):
     failBox = QMessageBox()
-    failBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconWarning.svg'))
+    failBox.setIconPixmap(QPixmap(":/images/themes/default/mIconWarning.svg"))
     failBox.setWindowTitle(title)
     failBox.setText(text)
     return failBox
 
 def show_fail_box_ok(title, text):
-    plugin_dir = get_plugin_dir()
-    failBox = create_fail_box(plugin_dir, title, text)
+    failBox = create_fail_box(title, text)
     failBox.setStandardButtons(QMessageBox.Ok)
     return failBox.exec_()
 
 def show_fail_box_yes_no(title, text):
-    plugin_dir = get_plugin_dir()
-    failBox = create_fail_box(plugin_dir, title, text)
+    failBox = create_fail_box(title, text)
     failBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     return failBox.exec_()
 
