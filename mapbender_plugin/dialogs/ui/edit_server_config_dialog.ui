@@ -6,18 +6,157 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>870</width>
-    <height>654</height>
+    <width>922</width>
+    <height>592</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Mapbender QGIS-Plugin</string>
   </property>
+  <property name="locale">
+   <locale language="English" country="Germany"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
+      <item row="4" column="0">
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="editServiceNameLabel">
+          <property name="text">
+           <string>Server configuration name*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="editServerConfigNameLineEdit"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="editServerAddressLabel">
+          <property name="text">
+           <string>Server address*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="editServerAddressLineEdit"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="editPortLabel">
+          <property name="text">
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="editPortLineEdit"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="editUserNameLabel">
+          <property name="text">
+           <string>User name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="editUserNameLineEdit"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="editPasswordLabel">
+          <property name="text">
+           <string>Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="editQgisProjectPathLabel">
+          <property name="text">
+           <string>QGIS-Projects path*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="editQgisProjectPathLineEdit"/>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: /data/qgis-projects/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label_3">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Custom server configuration name without blank spaces</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QLineEdit" name="editMbPathLineEdit"/>
+        </item>
+        <item row="8" column="0">
+         <widget class="QLabel" name="editMbPathLabel">
+          <property name="text">
+           <string>Mapbender application path*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="1">
+         <widget class="QLabel" name="label_5">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: /data/mapbender/application/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QLineEdit" name="editMbBasisUrlLineEdit">
+          <property name="inputMethodHints">
+           <set>Qt::ImhUrlCharactersOnly</set>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QLabel" name="editMbBasisUrlLabel">
+          <property name="text">
+           <string>Mapbender basis URL*</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="1">
+         <widget class="QLabel" name="label_6">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QgsPasswordLineEdit" name="editPasswordLineEdit"/>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string/>
@@ -30,8 +169,8 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QDialogButtonBox" name="addSectionDialogButtonBox">
+      <item row="6" column="0">
+       <widget class="QDialogButtonBox" name="editDialogButtonBox">
         <property name="locale">
          <locale language="English" country="Germany"/>
         </property>
@@ -40,159 +179,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="addSectionComboBoxLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Please fill the server configuration fields</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="newServiceNameLabel">
-          <property name="text">
-           <string>Server configuration name*</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="newServiceNameLineEdit"/>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="text">
-           <string>Custom server configuration name without blank spaces</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="newServerAddressLabel">
-          <property name="text">
-           <string>Server address*</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="newServerAddressLineEdit"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="newServerPortLabel">
-          <property name="text">
-           <string>Port</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="newServerPortLineEdit"/>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="newUserNameLabel">
-          <property name="text">
-           <string>User name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="newUserNameLineEdit"/>
-        </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="newPasswordLabel">
-          <property name="text">
-           <string>Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="newQgisProjectPathLabel">
-          <property name="text">
-           <string>QGIS-Projects path*</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QLineEdit" name="newQgisProjectPathLineEdit"/>
-        </item>
-        <item row="8" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="text">
-           <string>Example: /data/qgis-projects/</string>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="1">
-         <widget class="QLineEdit" name="newMbPathLineEdit"/>
-        </item>
-        <item row="9" column="0">
-         <widget class="QLabel" name="newMbPathLabel">
-          <property name="text">
-           <string>Mapbender application path*</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QLabel" name="label_5">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="contextMenuPolicy">
-           <enum>Qt::DefaultContextMenu</enum>
-          </property>
-          <property name="text">
-           <string>Example: /data/mapbender/application/</string>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="1">
-         <widget class="QLineEdit" name="newMbBasisUrlLineEdit">
-          <property name="inputMethodHints">
-           <set>Qt::ImhUrlCharactersOnly</set>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="newMbBasisUrlLabel">
-          <property name="text">
-           <string>Mapbender basis URL*</string>
-          </property>
-         </widget>
-        </item>
-        <item row="12" column="1">
-         <widget class="QLabel" name="label_6">
-          <property name="font">
-           <font>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="text">
-           <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QgsPasswordLineEdit" name="newPasswordLineEdit"/>
-        </item>
-       </layout>
-      </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>

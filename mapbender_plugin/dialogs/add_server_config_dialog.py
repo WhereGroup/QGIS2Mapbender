@@ -12,19 +12,19 @@ from mapbender_plugin.server_config import ServerConfig
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui/add_server_section_dialog.ui'))
+    os.path.dirname(__file__), 'ui/add_server_config_dialog.ui'))
 
 
-class AddServerSectionDialog(BASE, WIDGET):
+class AddServerConfigDialog(BASE, WIDGET):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.addSectionDialogButtonBox.accepted.connect(self.saveNewConfigSection)
+        self.addSectionDialogButtonBox.accepted.connect(self.save_new_server_config)
         self.addSectionDialogButtonBox.rejected.connect(self.reject)
 
-    def saveNewConfigSection(self):
-        new_section_name = self.newServiceNameLineEdit.text()
+    def save_new_server_config(self):
+        new_section_name = self.newServerConfigNameLineEdit.text()
         new_server_address = self.newServerAddressLineEdit.text()
         new_port = self.newServerPortLineEdit.text()
         new_user_name = self.newUserNameLineEdit.text()
@@ -35,7 +35,7 @@ class AddServerSectionDialog(BASE, WIDGET):
 
         if (not new_section_name or not new_server_address or not new_server_qgis_projects_path
                 or not new_server_mb_app_path or not new_mb_basis_url):
-            if (show_fail_box_ok('Failed', 'Please fill in the mandatory fields')) == QMessageBox.Ok:
+            if (show_fail_box_ok('Failed', 'Please fill in the mandatory fields (*)')) == QMessageBox.Ok:
                 return
 
         if not validate_no_spaces(new_section_name, new_server_address, new_port, new_user_name, new_password,

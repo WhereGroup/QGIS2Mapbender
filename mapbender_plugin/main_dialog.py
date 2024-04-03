@@ -16,8 +16,8 @@ from qgis._core import Qgis, QgsProject, QgsSettings, QgsMessageLog
 from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
-from mapbender_plugin.dialogs.add_server_section_dialog import AddServerSectionDialog
-from mapbender_plugin.dialogs.edit_server_section_dialog import EditServerConfigDialog
+from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
+from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
 from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir, get_project_layers, \
     check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
@@ -27,7 +27,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     update_mb_slug_in_settings, delete_local_project_zip_file
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SECTION
+from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -116,7 +116,7 @@ class MainDialog(BASE, WIDGET):
     def update_server_combo_box(self) -> None:
         """ Updates the server configuration sections dropdown menu """
         # read config sections
-        config_sections = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SECTION}/connection")
+        config_sections = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
         if len(config_sections) == 0:
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
@@ -131,9 +131,9 @@ class MainDialog(BASE, WIDGET):
 
     def update_slug_combo_box(self):
         s = QgsSettings()
-        if not s.contains(f"{PLUGIN_SETTINGS_SECTION}/mb_templates"):
+        if not s.contains(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates"):
             return
-        s.beginGroup(PLUGIN_SETTINGS_SECTION)
+        s.beginGroup(PLUGIN_SETTINGS_SERVER_CONFIG_KEY)
         mb_slugs = s.value('mb_templates')
         s.endGroup()
         if isinstance(mb_slugs, str):
@@ -156,7 +156,7 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.setEnabled(True)
 
     def open_dialog_add_new_config_section(self):
-        new_server_section_dialog = AddServerSectionDialog()
+        new_server_section_dialog = AddServerConfigDialog()
         new_server_section_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
@@ -180,7 +180,7 @@ class MainDialog(BASE, WIDGET):
             return
         try:
             s = QSettings()
-            s.remove(f"{PLUGIN_SETTINGS_SECTION}/connection/{selected_section}")
+            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_section}")
             show_succes_box_ok('Success', 'Section successfully removed')
             self.update_server_table()
             self.update_server_combo_box()

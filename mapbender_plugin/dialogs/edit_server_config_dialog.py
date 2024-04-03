@@ -11,7 +11,7 @@ from mapbender_plugin.server_config import ServerConfig
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'ui/edit_server_section_dialog.ui'))
+    os.path.dirname(__file__), 'ui/edit_server_config_dialog.ui'))
 
 class EditServerConfigDialog(BASE, WIDGET):
     def __init__(self, selected_section, parent=None):
@@ -30,7 +30,7 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.selected_section = selected_section
         server_config = ServerConfig.getParamsFromSettings(selected_section)
 
-        self.editServiceNameLineEdit.setText(selected_section)
+        self.editServerConfigNameLineEdit.setText(selected_section)
         self.editPortLineEdit.setText(server_config.port)
         self.editServerAddressLineEdit.setText(server_config.url)
         self.editUserNameLineEdit.setText(server_config.username)
@@ -44,7 +44,7 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.checkConfig(serverConfig)
 
     def getEditedServerConfig(self) -> ServerConfig:
-        edit_section_name = self.editServiceNameLineEdit.text()
+        edit_section_name = self.editServerConfigNameLineEdit.text()
         edit_server_address = self.editServerAddressLineEdit.text()
         edit_port = self.editPortLineEdit.text()
         edit_user_name = self.editUserNameLineEdit.text()
