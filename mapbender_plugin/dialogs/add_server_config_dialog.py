@@ -20,10 +20,14 @@ class AddServerConfigDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
 
-        self.addServerConfigDialogButtonBox.accepted.connect(self.save_new_server_config)
+        self.addServerConfigDialogButtonBox.accepted.connect(self.saveNewServerConfig)
         self.addServerConfigDialogButtonBox.rejected.connect(self.reject)
 
-    def save_new_server_config(self):
+    def saveNewServerConfig(self):
+        serverConfig = self.getNewServerConfig()
+        self.checkConfig(serverConfig)
+
+    def getNewServerConfig(self) -> ServerConfig:
         new_server_config_name = self.newServerConfigNameLineEdit.text()
         new_server_address = self.newServerAddressLineEdit.text()
         new_port = self.newServerPortLineEdit.text()
@@ -32,23 +36,31 @@ class AddServerConfigDialog(BASE, WIDGET):
         new_server_qgis_projects_path = self.newQgisProjectPathLineEdit.text()
         new_server_mb_app_path = self.newMbPathLineEdit.text()
         new_mb_basis_url = self.newMbBasisUrlLineEdit.text()
+        return ServerConfig(
+            name=new_server_config_name,
+            url=new_server_address,
+            port=new_port,
+            username=new_user_name,
+            password=new_password,
+            projects_path=new_server_qgis_projects_path,
+            mb_app_path=new_server_mb_app_path,
+            mb_basis_url=new_mb_basis_url
+        )
 
-        if (not new_server_config_name or not new_server_address or not new_server_qgis_projects_path
-                or not new_server_mb_app_path or not new_mb_basis_url):
-            show_fail_box_ok('Failed', 'Please fill in the mandatory fields (*)')
+    def checkConfig(self, serverConfig: ServerConfig) -> None:
+        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path, serverConfig.mb_app_path,
+                           serverConfig.mb_basis_url]
+
+        if not all(mandatoryFields):
+            show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
             return
 
-        if not validate_no_spaces(new_server_config_name, new_server_address, new_port, new_user_name, new_password,
-                                  new_server_qgis_projects_path, new_server_mb_app_path, new_mb_basis_url):
+        if not serverConfig.isValid():
             show_fail_box_ok('Failed', 'Fields should not have blank spaces')
             return
 
-        else:
-        # check if name already exists and create a yes/no box (if existing: setValue: Sets the value of setting key to value. If the key already exists, the previous value is
-        #             # # overwritten. An optional Section argument can be used to set a value to a specific Section.)
+        serverConfig.save()
 
-        # else:
-            ServerConfig.saveToSettings(new_server_config_name, new_server_address, new_port, new_user_name, new_password, new_server_qgis_projects_path, new_server_mb_app_path, new_mb_basis_url)
-            show_succes_box_ok('Success', 'New server configuration successfully added')
-            self.close()
-
+        show_succes_box_ok('Success', 'Server configuration successfully updated')
+        self.close()
+        return
