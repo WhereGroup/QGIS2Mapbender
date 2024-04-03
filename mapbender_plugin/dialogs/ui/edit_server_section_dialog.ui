@@ -25,7 +25,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="editServiceNameLabel">
           <property name="text">
-           <string>Service name*</string>
+           <string>Server configuration name*</string>
           </property>
          </widget>
         </item>
@@ -99,7 +99,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Service name without blank spaces</string>
+           <string>Custom server configuration name without blank spaces</string>
           </property>
          </widget>
         </item>
@@ -165,7 +165,7 @@
          <pixmap>../../resources/icons/mapbender_ui_icon.png</pixmap>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
