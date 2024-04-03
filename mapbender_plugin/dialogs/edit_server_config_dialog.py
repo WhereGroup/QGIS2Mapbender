@@ -81,8 +81,6 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.close()
         return
 
-        # if (show_fail_box_ok('Failed', 'Section could not be successfully updated')) == QMessageBox.Ok:
-        #     self.close()
 
 
 

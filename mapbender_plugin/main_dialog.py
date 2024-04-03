@@ -189,16 +189,16 @@ class MainDialog(BASE, WIDGET):
             QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", 'MapbenderPlugin', Qgis.Warning)
             raise
 
-    def publish_project(self):
-        # check mapbender params:
+    def publish_project(self) -> None:
+        # Check Mapbender params:
         if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
                 self.mbSlugComboBox.currentText() != ''):
             self.upload_project_qgis_server()
         else:
-            if (show_fail_box_ok("Please complete Mapbender Parameters",
+            show_fail_box_ok("Please complete Mapbender Parameters",
                                          "Please select clone template / add to existing application and enter a "
-                                         "valid URL title")) == QMessageBox.Ok:
-                return
+                                         "valid URL title")
+            return
 
     def update_project(self):
         self.upload_project_qgis_server()
@@ -382,11 +382,11 @@ class MainDialog(BASE, WIDGET):
                 print(exit_status_wms_assign, output_wms_assign, error_wms_assign)
 
             if exit_status_wms_assign == 0:
-                if (show_succes_box_ok("Success report",
+                show_succes_box_ok("Success report",
                                                 "WMS succesfully created:\n \n" + wms_getcapabilities_url +
                                                 "\n \n And added to mapbender application: \n \n" + "http://" +
-                                                self.host + "/mapbender/application/" + slug)) == QMessageBox.Ok:
-                    self.close()
+                                                self.host + "/mapbender/application/" + slug)
+                self.close()
 
             else:
                 show_fail_box_ok("Failed",
@@ -402,23 +402,23 @@ class MainDialog(BASE, WIDGET):
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         print("output wms_show")
         print(exit_status_wms_show, sources_ids)
-        if exit_status_wms_show == 0:  # success
-            # reload source if it already exists
+        if exit_status_wms_show == 0:  # Success
+            # Reload source if it already exists
             if len(sources_ids) > 0:
                 for source_id in sources_ids:
                     exit_status_wms_reload, output, error_output = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
-                    if exit_status_wms_reload == 0:  # success
-                        if (show_succes_box_ok("Success report" ,
+                    if exit_status_wms_reload == 0:  # Success
+                        show_succes_box_ok("Success report" ,
                                                "WMS succesfully updated:\n \n"+ wms_getcapabilities_url +
-                                               "\n \non Mapbender source(s): " + str(sources_ids))) == QMessageBox.Ok:
-                            self.close()
+                                               "\n \non Mapbender source(s): " + str(sources_ids))
+                        self.close()
                     else:
                         show_fail_box_ok("Failed",
                                          f"WMS could not be reloaded. Reason {output} and {error_output}")
             else:
                 show_fail_box_ok("Failed",
                                  f"WMS is not an existing source in Mapbender and could not be updated")
-        else: # failed
+        else:  # Failed
             show_fail_box_ok("Failed",
                              f"No information for the given WMS could be displayed")
         mapbender_uploader.close_connection()
