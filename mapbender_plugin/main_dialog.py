@@ -178,7 +178,7 @@ class MainDialog(BASE, WIDGET):
             self.update_server_combo_box()
         except Exception as e:
             show_fail_box_ok('Failed', "Server configuration could not be deleted (see log)")
-            QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", 'MapbenderPlugin',
+            QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", TAG,
                                      Qgis.Warning)
             raise
 
