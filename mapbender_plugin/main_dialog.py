@@ -24,7 +24,7 @@ from mapbender_plugin.helpers import check_if_config_file_exists, get_plugin_dir
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, show_new_info_message_bar, \
-    update_mb_slug_in_settings, delete_local_project_zip_file
+    update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY
@@ -190,18 +190,20 @@ class MainDialog(BASE, WIDGET):
             raise
 
     def publish_project(self) -> None:
-        # Check Mapbender params:
-        if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
-                self.mbSlugComboBox.currentText() != ''):
-            self.upload_project_qgis_server()
-        else:
-            show_fail_box_ok("Please complete Mapbender Parameters",
-                                         "Please select clone template / add to existing application and enter a "
-                                         "valid URL title")
-            return
+        with waitCursor():
+            # Check Mapbender params:
+            if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
+                    self.mbSlugComboBox.currentText() != ''):
+                self.upload_project_qgis_server()
+            else:
+                show_fail_box_ok("Please complete Mapbender Parameters",
+                                             "Please select clone template / add to existing application and enter a "
+                                             "valid URL title")
+                return
 
     def update_project(self):
-        self.upload_project_qgis_server()
+        with waitCursor():
+            self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
         # Config params:

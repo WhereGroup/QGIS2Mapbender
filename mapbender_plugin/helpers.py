@@ -1,6 +1,8 @@
 import os
 import shutil
 
+from PyQt5.QtCore import Qt
+from decorator import contextmanager
 from fabric2 import Connection
 import paramiko
 
@@ -437,6 +439,16 @@ def show_new_info_message_bar(text, previous_message_bars):
     iface.messageBar().pushWidget(message_bar, duration=3)
     previous_message_bars.append(message_bar)
     return previous_message_bars
+
+@contextmanager
+def waitCursor():
+    try:
+        QgsApplication.setOverrideCursor(Qt.WaitCursor)
+        yield
+    except Exception as ex:
+        raise ex
+    finally:
+        QgsApplication.restoreOverrideCursor()
 
 
 def delete_previous_messages(previous_message_bars):
