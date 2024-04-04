@@ -41,7 +41,9 @@ def check_if_config_file_exists(config_path: str) -> bool:
 
 
 def get_project_layers() -> list:
-    """ Returns project layers"""
+    """ Returns project layers
+        :return: layers_names
+    """
     project = QgsProject.instance()
     project.read()
     layers_names = []
@@ -50,10 +52,9 @@ def get_project_layers() -> list:
     return layers_names
 
 
-def check_if_qgis_project(plugin_dir: str) -> bool:
+def check_if_qgis_project() -> bool:
     """
         Checks if plugin is used within a QGIS-Project
-        :param plugin_dir:
         :return: bool
         """
     # Get and check .qgz project path
@@ -61,11 +62,9 @@ def check_if_qgis_project(plugin_dir: str) -> bool:
     source_project_file_path = QgsProject.instance().fileName()
     if source_project_dir_path == "./" or source_project_file_path == "":
         show_fail_box_ok('Failed',
-                                     "Please use the Mapbender Plugin from a valid QGIS-Project "
-                                     "with QGIS-Server configurations")
+                                     "Please use the Mapbender Plugin from a saved QGIS-Project")
         return False
-    else:
-        return True
+    return True
 
 
 def get_paths(server_qgis_projects_folder_rel_path: str):
