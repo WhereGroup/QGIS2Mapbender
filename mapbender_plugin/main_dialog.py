@@ -204,8 +204,8 @@ class MainDialog(BASE, WIDGET):
         self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
-        # config params:
-        # check config params / check connection
+        # Config params:
+        # Check config params / check connection
         selected_server_config = self.serverConfigComboBox.currentText()
         server_config = ServerConfig.getParamsFromSettings(selected_server_config)
         self.host = server_config.url
@@ -215,9 +215,9 @@ class MainDialog(BASE, WIDGET):
         self.server_qgis_projects_folder_rel_path = server_config.projects_path
 
         self.previous_message_bars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_message_bars)
-        #iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
+        # iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
         if check_if_qgis_project(self.plugin_dir):
-            #paths = get_paths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
+            # paths = get_paths(SERVER_QGIS_PROJECTS_FOLDER_REL_PATH)
             paths = get_paths(self.server_qgis_projects_folder_rel_path)
             source_project_dir_path = paths.get('source_project_dir_path')
             source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
@@ -225,8 +225,8 @@ class MainDialog(BASE, WIDGET):
             qgis_project_name = paths.get('qgis_project_name')
             server_project_dir_path = paths.get('server_project_dir_path')
 
-            #getProjectLayers
-            # then check if folder exists on the server:
+            # getProjectLayers
+            # Then check if folder exists on the server:
             self.previous_message_bars = show_new_info_message_bar("Connecting to server ...",
                                                                    self.previous_message_bars)
             # CHECK IF CONNECTION IS SUCCESSFUL AND THEN EXECUTE...
@@ -271,7 +271,7 @@ class MainDialog(BASE, WIDGET):
 
                                     self.mapbender_publish(wms_getcapabilities_url)
                 else:
-                    # project is supposed to exist on the server and will not be published for the first time,
+                    # Project is supposed to exist on the server and will not be published for the first time,
                     # but reloaded as a source in Mapbender
                     if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
                                                          self.plugin_dir, self.server_qgis_projects_folder_rel_path,
@@ -325,12 +325,12 @@ class MainDialog(BASE, WIDGET):
                                                                          " in Mapbender app'")
 
     def mapbender_publish(self, wms_getcapabilities_url):
-        # mapbender params:
+        # Mapbender params:
         if self.cloneTemplateRadioButton.isChecked():
             clone_app = True
         if self.addToAppRadioButton.isChecked():
             clone_app = False
-        # template slug:
+        # Template slug:
         layer_set = self.layerSetLineEdit.text()
 
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=2)
@@ -348,16 +348,16 @@ class MainDialog(BASE, WIDGET):
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0: # success
-            # reload source if it already exists
+            # Reload source if it already exists
             if len(sources_ids)>0:
                 for source_id in sources_ids:
                     exit_status_wms_reload = mapbender_uploader.wms_reload(source_id, wms_getcapabilities_url)
                 source_id = sources_ids[-1]
             else:
-                # add source to Mapbender if it does not exist
+                # Add source to Mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add(wms_getcapabilities_url)
 
-                # depending on user's input (duplicate template or use existing application):
+                # Depending on user's input (duplicate template or use existing application):
             #if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
             if clone_app:
                 template_slug = self.mbSlugComboBox.currentText()

@@ -30,7 +30,7 @@ def check_if_config_file_exists(config_path: str) -> bool:
             """
     if not os.path.isfile(config_path):
         try:
-            # create the config file if not existing
+            # Create the config file if not existing
             open(config_path, 'a').close()
             return True
         except OSError as e:
@@ -56,7 +56,7 @@ def check_if_qgis_project(plugin_dir: str) -> bool:
         :param plugin_dir:
         :return: bool
         """
-    # get and check .qgz project path
+    # Get and check .qgz project path
     source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
     if source_project_dir_path == "./" or source_project_file_path == "":
@@ -102,7 +102,7 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
     :return:
     """
     try:
-        # copy directory and remove unwanted files
+        # Copy directory and remove unwanted files
         if os.path.isdir(f'{source_project_dir_path}_copy_tmp'):
             print("copy already exists... removing it")
             shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
@@ -116,9 +116,9 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
                     if filename.split(".")[-1] in ('gpkg-wal', 'gpkg-shm'):
                         os.remove(file_path)
             try:
-                # compress tmp copy of project folder
+                # Compress tmp copy of project folder
                 shutil.make_archive(source_project_dir_path, 'zip', f'{source_project_dir_path}_copy_tmp')
-                # check
+                # Check
                 if os.path.isfile(source_project_zip_dir_path):
                     print('Zip-project folder successfully created')
                 # remove tmp copy of project folder
@@ -161,10 +161,10 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
     try:
         with sftpConnection as c:
             try:
-                # check if project folder already exists on the server
+                # Check if project folder already exists on the server
                 if c.run('test -d {}'.format(server_qgis_projects_folder_rel_path + qgis_project_folder_name),
                          warn=True).failed:  # without .zip
-                    # (if exists, is unzipped), -d option to test if the file exist and is a directory
+                    # If it exists, is unzipped, -d option to test if the file exist and is a directory
                     # Folder does not exist yet in server: upload project folder
                     print("Folder does not exist yet in server: upload project folder")
                     return False
@@ -199,10 +199,10 @@ def upload_project_zip_file(host: str, username: str, port: str, password: str, 
         with sftpConnection as c:
             try:
                 c.put(local=source_project_zip_dir_path, remote= server_qgis_projects_folder_rel_path)
-                # check upload success
+                # Check upload success
                 if c.run('test {}'.format(server_qgis_projects_folder_rel_path + qgis_project_folder_name + ".zip"),
                          warn=True).failed:  # with .zip (if exists, is zipped), wihout -d option (to test if
-                    # the file exist, not a directory)
+                    # The file exist, not a directory
                     # Upload not successful:: Folder does not exist in server
                     show_fail_box_ok("Failed", "Project directory could not be uploaded")
                     return False
@@ -231,16 +231,16 @@ def remove_project_folder_from_server(host: str, username: str, port: str, passw
     :return: (True = success, False = failed)
     """
     try:
-        # login
+        # Login
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         #ssh_client.connect(hostname=host, username=username, port=port, password=password) # fails because of "port"
         ssh_client.connect(hostname=host, username=username, password=password)
         try:
-            # remove folder from server
+            # Remove folder from server
             stdin, stdout, stderr = ssh_client.exec_command(
                 f'cd ..; cd {server_qgis_projects_folder_rel_path}; rm -r {qgis_project_folder_name};')
-            #check
+            # Check
             out = stdout.readlines()
             if os.path.isdir(f'{server_qgis_projects_folder_rel_path}{qgis_project_folder_name}'):
                 show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
@@ -268,13 +268,13 @@ def unzip_project_folder_on_server(host: str, username: str, port: str, password
     :return: True if success
     """
     try:
-        # login
+        # Login
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         #ssh_client.connect(hostname=host, username=username, port=port, password=password) # fails because of "port"
         ssh_client.connect(hostname=host, username=username, password=password)
         try:
-            # unzip
+            # Unzip
             stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; '
                                                             f'cd {server_qgis_projects_folder_rel_path}/;'
                                                             f'unzip {qgis_project_folder_name}.zip;')
@@ -285,7 +285,7 @@ def unzip_project_folder_on_server(host: str, username: str, port: str, password
             print('Accessing files on the server...')
             print(stdout.read().decode())
             try:
-                # remove zip file from server
+                # Remove zip file from server
                 stdin, stdout, stderr = ssh_client.exec_command(
                     f'cd ..; cd /data/qgis-projects/; rm {qgis_project_folder_name}.zip;')
                 return True
@@ -377,8 +377,7 @@ def get_get_capabilities_url(host: str, plugin_dir, server_project_dir_path, qgi
     wms_getcapabilities_url = (
             "http://" + host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
             + server_project_dir_path + "/" + qgis_project_name)
-    # 1) test in mapbender console (Step 0)
-    # if succes:
+    # If success:
     successBox = QMessageBox()
     successBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconSuccess.svg'))
     successBox.setWindowTitle("Success")
