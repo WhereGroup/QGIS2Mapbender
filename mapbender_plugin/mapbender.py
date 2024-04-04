@@ -1,17 +1,13 @@
 import json
-from enum import Enum
-from typing import Iterable, Optional
-from fabric2 import Connection
+
 import paramiko
-from qgis._core import Qgis, QgsMessageLog
+from qgis._core import QgsMessageLog, Qgis
 
-from qgis.utils import iface
+from mapbender_plugin.settings import TAG
 
-TAG = 'Mapbender QGIS-Plugin'
 
 class MapbenderUpload():
     def __init__(self, host, user, mb_app_path):
-        #self.connection = Connection(host=host,user=user)
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.WarningPolicy())
         self.client.connect(hostname=host, username=user)
@@ -104,7 +100,7 @@ class MapbenderUpload():
         """
         exit_status, output, error_output = (
             self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
-        print(f"wms:assign '{slug}' '{source_id}' '{layer_set}'")
+        QgsMessageLog.logMessage(f"wms:assign '{slug}' '{source_id}' '{layer_set}'", TAG, level=Qgis.Info)
         return exit_status, output, error_output
 
     def close_connection(self):

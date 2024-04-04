@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from qgis._core import QgsSettings, QgsApplication, QgsAuthMethodConfig
+from qgis._core import QgsSettings, QgsApplication, QgsAuthMethodConfig, QgsMessageLog, Qgis
 
-from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 
 
 @dataclass
@@ -101,7 +101,7 @@ class ServerConfig:
         else:
             username = ''
             password = ''
-            print('no config id')
+            QgsMessageLog.logMessage("No config id...", TAG, level=Qgis.Warning)
             return username, password
 
     def isValid(self) -> bool:

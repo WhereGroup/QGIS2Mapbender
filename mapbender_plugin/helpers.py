@@ -6,13 +6,12 @@ from decorator import contextmanager
 from fabric2 import Connection
 import paramiko
 
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsApplication, QgsProject, Qgis, QgsMessageLog, QgsSettings
-from qgis._gui import QgsMessageBar
+from qgis._core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
 from qgis.utils import iface
 
-from mapbender_plugin.mapbender import TAG
+from mapbender_plugin.settings import TAG
 
 
 def get_plugin_dir() -> str:
@@ -21,28 +20,9 @@ def get_plugin_dir() -> str:
     return plugin_dir
 
 
-def check_if_config_file_exists(config_path: str) -> bool:
-    """Checks if configuration file exists in Plugin folder and creates it if
-    it did not exist
-
-        Args:
-            config_path (str): the path to the config file
-            """
-    if not os.path.isfile(config_path):
-        try:
-            # Create the config file if not existing
-            open(config_path, 'a').close()
-            return True
-        except OSError as e:
-            print(f"Error {e}. Could not create config file. Please contact")
-            return False
-    else:
-        return True
-
-
 def get_project_layers() -> list:
     """ Returns project layers
-        :return: layers_names
+    :return: layers_names
     """
     project = QgsProject.instance()
     project.read()
@@ -103,7 +83,6 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
     try:
         # Copy directory and remove unwanted files
         if os.path.isdir(f'{source_project_dir_path}_copy_tmp'):
-            print("copy already exists... removing it")
             shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
         os.mkdir(f'{source_project_dir_path}_copy_tmp')
         shutil.copytree(source_project_dir_path, f'{source_project_dir_path}_copy_tmp/'
@@ -119,7 +98,7 @@ def zip_local_project_folder(plugin_dir: str, source_project_dir_path: str,
                 shutil.make_archive(source_project_dir_path, 'zip', f'{source_project_dir_path}_copy_tmp')
                 # Check
                 if os.path.isfile(source_project_zip_dir_path):
-                    print('Zip-project folder successfully created')
+                    QgsMessageLog.logMessage("Zip-project folder successfully created", TAG, level=Qgis.Info)
                 # remove tmp copy of project folder
                 shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
                 #uploadProjectZipFile(server_qgis_projects_folder_rel_path)
@@ -138,6 +117,17 @@ def delete_local_project_zip_file(source_project_zip_dir_path):
     else:
         return
 
+def open_connection(host: str, username: str, port: str, password: str) -> bool:
+    sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
+        "password": password})
+    with sftpConnection as c:
+        try:
+            c.open()
+            return True
+        except OSError as e:
+            QgsMessageLog.logMessage("Connection to server failed", TAG, level=Qgis.Warning)
+            show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
+            return False
 
 def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                                              server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -157,24 +147,24 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
 
     sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
         "password": password})
-    try:
-        with sftpConnection as c:
-            try:
-                # Check if project folder already exists on the server
-                if c.run('test -d {}'.format(server_qgis_projects_folder_rel_path + qgis_project_folder_name),
-                         warn=True).failed:  # without .zip
-                    # If it exists, is unzipped, -d option to test if the file exist and is a directory
-                    # Folder does not exist yet in server: upload project folder
-                    print("Folder does not exist yet in server: upload project folder")
-                    return False
-                else:
-                    print('Folder already exists in server')
-                    return True
-            except Exception as e:
-                show_fail_box_ok("Failed",
-                                             f"Could not check if project directory exists already on the server. Reason: {e}")
-    except Exception as e:
-        show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
+    with sftpConnection as c:
+        try:
+            # Check if project folder already exists on the server
+            if c.run('test -d {}'.format(server_qgis_projects_folder_rel_path + qgis_project_folder_name),
+                     warn=True).failed:  # without .zip
+                # If it exists, is unzipped, -d option to test if the file exist and is a directory
+                # Folder does not exist yet in server: upload project folder
+                return False
+            else:
+                return True
+        except OSError as e:
+            show_fail_box_ok("Failed",
+                             f"Reason: {e}")
+            return False
+        except Exception as e:
+            show_fail_box_ok("Failed",
+                                         f"Could not check if project directory exists already on the server. Reason: {e}")
+        #show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
 
 
 def upload_project_zip_file(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
@@ -245,7 +235,7 @@ def remove_project_folder_from_server(host: str, username: str, port: str, passw
                 show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
                 return False
             else:
-                print('Existing project folder successfully removed from server')
+                QgsMessageLog.logMessage("Existing project folder successfully removed from server", TAG, level=Qgis.Info)
                 return True
 
         except Exception as e:
@@ -277,23 +267,22 @@ def unzip_project_folder_on_server(host: str, username: str, port: str, password
             stdin, stdout, stderr = ssh_client.exec_command(f'cd ..; '
                                                             f'cd {server_qgis_projects_folder_rel_path}/;'
                                                             f'unzip {qgis_project_folder_name}.zip;')
-            print('Unzipping files on the server...')
-            print(stdout.read().decode())
-            # access files
+            QgsMessageLog.logMessage("Unzipping files on the server...", TAG, level=Qgis.Info)
+
+            # List files with: stdout.read().decode())
+            # Access files
             stdin, stdout, stderr = ssh_client.exec_command(f'cd {server_qgis_projects_folder_rel_path}/{qgis_project_folder_name}/; ls')
-            print('Accessing files on the server...')
-            print(stdout.read().decode())
             try:
                 # Remove zip file from server
                 stdin, stdout, stderr = ssh_client.exec_command(
                     f'cd ..; cd /data/qgis-projects/; rm {qgis_project_folder_name}.zip;')
                 return True
             except Exception as e:
-                print(f"Could not remove zip file from server. Reason: {e}")
+                QgsMessageLog.logMessage(f"Could not remove zip file from server. Reason: {e}", TAG, level=Qgis.Warning)
         except Exception as e:
-            print(f"Could not unzip file. Reason: {e}")
+            QgsMessageLog.logMessage(f"Could not unzip file. Reason: {e}", TAG, level=Qgis.Warning)
     except Exception as e:
-        print(f"Could not create connection. Reason: {e}")
+        QgsMessageLog.logMessage(f"Could not create connection. Reason: {e}", TAG, level=Qgis.Warning)
 
 
 def check_uploaded_files(host: str, username: str, port: str, password: str, plugin_dir, qgis_project_folder_name,
@@ -383,7 +372,6 @@ def get_get_capabilities_url(host: str, plugin_dir, server_project_dir_path, qgi
     successBox.setText("WMS succesfully created:\n" + wms_getcapabilities_url)
     successBox.setStandardButtons(QMessageBox.Ok)
     successBox.exec_()
-    print(wms_getcapabilities_url)
     return wms_getcapabilities_url
 
 def create_fail_box(title, text):
