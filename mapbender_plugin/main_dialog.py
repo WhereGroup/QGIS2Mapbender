@@ -210,8 +210,7 @@ class MainDialog(BASE, WIDGET):
         self.server_qgis_projects_folder_rel_path = server_config.projects_path
         self.mb_app_path = server_config.mb_app_path
 
-        QgsMessageLog.logMessage("Getting information from QGIS-Project ...", TAG, level=Qgis.Info)
-
+        # Get paths
         paths = get_paths(self.server_qgis_projects_folder_rel_path)
         source_project_dir_path = paths.get('source_project_dir_path')
         source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
@@ -225,9 +224,7 @@ class MainDialog(BASE, WIDGET):
         # Open connection
         if not open_connection(self.host, self.username, self.port, self.password):
             return
-
-        QgsMessageLog.logMessage("Connection to server opened ...", TAG, level=Qgis.Info)
-        # CHECK IF CONNECTION IS SUCCESSFUL AND THEN EXECUTE...
+        # Connection is opened:
         if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
                                                     self.plugin_dir, source_project_zip_dir_path,
                                                     self.server_qgis_projects_folder_rel_path,

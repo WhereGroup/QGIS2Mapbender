@@ -123,6 +123,7 @@ def open_connection(host: str, username: str, port: str, password: str) -> bool:
     with sftpConnection as c:
         try:
             c.open()
+            QgsMessageLog.logMessage("Connection to server opened", TAG, level=Qgis.Info)
             return True
         except OSError as e:
             QgsMessageLog.logMessage("Connection to server failed", TAG, level=Qgis.Warning)
@@ -143,7 +144,6 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
     :param qgis_project_folder_name:
     :return: bool
     """
-    #iface.messageBar().pushMessage("", "Connecting to server ...", level=Qgis.Info, duration=2)
 
     sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
         "password": password})
@@ -164,7 +164,6 @@ def check_if_project_folder_exists_on_server(host: str, username: str, port: str
         except Exception as e:
             show_fail_box_ok("Failed",
                                          f"Could not check if project directory exists already on the server. Reason: {e}")
-        #show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
 
 
 def upload_project_zip_file(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
