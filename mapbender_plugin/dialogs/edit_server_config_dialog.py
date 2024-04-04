@@ -17,13 +17,13 @@ class EditServerConfigDialog(BASE, WIDGET):
     def __init__(self, selected_server_config, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
-        self.editDialogButtonBox.accepted.connect(self.saveEditedServerConfig)
-        self.editDialogButtonBox.rejected.connect(self.reject)
+        self.setupConnections()
 
         self.getServerConfig(selected_server_config)
 
-        server_config_list = list_qgs_settings_child_groups("mapbender-plugin/connection")
+    def setupConnections(self):
+        self.editDialogButtonBox.accepted.connect(self.saveEditedServerConfig)
+        self.editDialogButtonBox.rejected.connect(self.reject)
 
     #def get...
     def getServerConfig(self, selected_server_config):

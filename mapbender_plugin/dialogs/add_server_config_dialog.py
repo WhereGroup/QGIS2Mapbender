@@ -19,7 +19,9 @@ class AddServerConfigDialog(BASE, WIDGET):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.setupConnections()
 
+    def setupConnections(self):
         self.addServerConfigDialogButtonBox.accepted.connect(self.saveNewServerConfig)
         self.addServerConfigDialogButtonBox.rejected.connect(self.reject)
 
