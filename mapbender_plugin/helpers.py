@@ -10,7 +10,6 @@ from qgis._core import QgsApplication, QgsProject, Qgis, QgsMessageLog, QgsSetti
 from qgis._gui import QgsMessageBar
 from qgis.utils import iface
 
-from mapbender_plugin.settings import SERVER_MB_CD_APPLICATION_PATH
 from mapbender_plugin.mapbender import TAG
 
 
