@@ -26,12 +26,15 @@
          <pixmap>../../resources/icons/mapbender_ui_icon.png</pixmap>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QDialogButtonBox" name="addSectionDialogButtonBox">
+       <widget class="QDialogButtonBox" name="addServerConfigDialogButtonBox">
+        <property name="locale">
+         <locale language="English" country="Germany"/>
+        </property>
         <property name="standardButtons">
          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
         </property>
@@ -40,7 +43,7 @@
       <item row="3" column="0">
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
-         <widget class="QLabel" name="addSectionComboBoxLabel">
+         <widget class="QLabel" name="label_4">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -55,12 +58,12 @@
         <item row="1" column="0">
          <widget class="QLabel" name="newServiceNameLabel">
           <property name="text">
-           <string>Service name</string>
+           <string>Server configuration name*</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="newServiceNameLineEdit"/>
+         <widget class="QLineEdit" name="newServerConfigNameLineEdit"/>
         </item>
         <item row="2" column="1">
          <widget class="QLabel" name="label_2">
@@ -70,14 +73,14 @@
            </font>
           </property>
           <property name="text">
-           <string>Service name without blank spaces</string>
+           <string>Custom server configuration name without blank spaces</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="newServerAddressLabel">
           <property name="text">
-           <string>Server address</string>
+           <string>Server address*</string>
           </property>
          </widget>
         </item>
@@ -111,13 +114,10 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QLineEdit" name="newPasswordLineEdit"/>
-        </item>
         <item row="7" column="0">
          <widget class="QLabel" name="newQgisProjectPathLabel">
           <property name="text">
-           <string>QGIS-Projects path</string>
+           <string>QGIS-Projects path*</string>
           </property>
          </widget>
         </item>
@@ -142,7 +142,7 @@
         <item row="9" column="0">
          <widget class="QLabel" name="newMbPathLabel">
           <property name="text">
-           <string>Mapbender application path</string>
+           <string>Mapbender application path*</string>
           </property>
          </widget>
         </item>
@@ -162,12 +162,16 @@
          </widget>
         </item>
         <item row="11" column="1">
-         <widget class="QLineEdit" name="newMbBasisUrlLineEdit"/>
+         <widget class="QLineEdit" name="newMbBasisUrlLineEdit">
+          <property name="inputMethodHints">
+           <set>Qt::ImhUrlCharactersOnly</set>
+          </property>
+         </widget>
         </item>
         <item row="11" column="0">
          <widget class="QLabel" name="newMbBasisUrlLabel">
           <property name="text">
-           <string>Mapbender basis URL</string>
+           <string>Mapbender basis URL*</string>
           </property>
          </widget>
         </item>
@@ -182,6 +186,9 @@
            <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
           </property>
          </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QgsPasswordLineEdit" name="newPasswordLineEdit"/>
         </item>
        </layout>
       </item>
@@ -203,6 +210,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsPasswordLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qgspasswordlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

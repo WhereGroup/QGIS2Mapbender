@@ -1,8 +1,9 @@
 ### PLUGIN
 mapbender_plugin/pb_tool.cfg
 
-# InteliJ IDEA
-.idea/
+
+# IntelliJ IDEA ###
+.idea
 *.iws
 *.iml
 *.ipr
