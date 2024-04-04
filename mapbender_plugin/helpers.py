@@ -117,18 +117,47 @@ def delete_local_project_zip_file(source_project_zip_dir_path):
     else:
         return
 
-def open_connection(host: str, username: str, port: str, password: str) -> bool:
+def open_connection(host: str, username: str, port: str, password: str):
     sftpConnection = Connection(host=host, user=username, port=port, connect_kwargs={
         "password": password})
     with sftpConnection as c:
         try:
             c.open()
             QgsMessageLog.logMessage("Connection to server opened", TAG, level=Qgis.Info)
-            return True
+            return c
         except OSError as e:
             QgsMessageLog.logMessage("Connection to server failed", TAG, level=Qgis.Warning)
             show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
+            return
+
+def check_if_project_folder_exists_on_server_2(c,plugin_dir: str, source_project_zip_dir_path: str,
+                                             server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
+    """
+    Checks if project folder already exists on server
+    :param plugin_dir:
+    :param source_project_zip_dir_path:
+    :param server_qgis_projects_folder_rel_path:
+    :param qgis_project_folder_name:
+    :return: bool
+    """
+
+    try:
+        # Check if project folder already exists on the server
+        if c.run('test -d {}'.format(server_qgis_projects_folder_rel_path + qgis_project_folder_name),
+                 warn=True).failed:  # without .zip
+            # If it exists, is unzipped, -d option to test if the file exist and is a directory
+            # Folder does not exist yet in server: upload project folder
+            print('c run successfully')
             return False
+        else:
+            return True
+    except OSError as e:
+        show_fail_box_ok("Failed",
+                         f"Reason: {e}")
+        return False
+    except Exception as e:
+        show_fail_box_ok("Failed",
+                                     f"Could not check if project directory exists already on the server. Reason: {e}")
 
 def check_if_project_folder_exists_on_server(host: str, username: str, port: str, password: str, plugin_dir: str, source_project_zip_dir_path: str,
                                              server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
@@ -203,6 +232,34 @@ def upload_project_zip_file(host: str, username: str, port: str, password: str, 
                 show_fail_box_ok("Failed", f"Project directory could not be uploaded. Reason: {e}")
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not create connection. Reason: {e}")
+
+def remove_project_folder_from_server_2(c, plugin_dir: str,
+                                      server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str):
+    """
+    Removes a project folder from server
+    :param host:
+    :param username:
+    :param port:
+    :param password:
+    :param plugin_dir:
+    :param server_qgis_projects_folder_rel_path:
+    :param qgis_project_folder_name:
+    :return: (True = success, False = failed)
+    """
+
+    try:
+        c.run(
+            f'cd ..; cd {server_qgis_projects_folder_rel_path}; rm -r {qgis_project_folder_name};')
+        # Check
+        if os.path.isdir(f'{server_qgis_projects_folder_rel_path}{qgis_project_folder_name}'):
+            show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
+            return False
+        else:
+            QgsMessageLog.logMessage("Existing project folder successfully removed from server", TAG, level=Qgis.Info)
+            return True
+
+    except Exception as e:
+        show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
 
 
 def remove_project_folder_from_server(host: str, username: str, port: str, password: str, plugin_dir: str,

@@ -18,7 +18,8 @@ from mapbender_plugin.helpers import get_plugin_dir, get_project_layers, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor, open_connection
+    update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor, open_connection, \
+    check_if_project_folder_exists_on_server_2, remove_project_folder_from_server_2
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
@@ -222,10 +223,33 @@ class MainDialog(BASE, WIDGET):
         # Then check if folder exists on the server:
 
         # Open connection
-        if not open_connection(self.host, self.username, self.port, self.password):
+        # TEST
+        c = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
+        if not c:
             return
-        # Connection is opened:
-        if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
+        with c:
+            if check_if_project_folder_exists_on_server_2(c, self.plugin_dir, source_project_zip_dir_path,
+                                                          self.server_qgis_projects_folder_rel_path,
+                                                          qgis_project_folder_name) and self.publishRadioButton.isChecked():
+                if (show_fail_box_yes_no("Failed",
+                                         f"Project directory already exists on the server. \n \nDo you want to"
+                                         f" overwrite the existing project directory '{qgis_project_folder_name},' "
+                                         f"update the WMS as source in Mapbender and add it to the given "
+                                         f"application?")) == QMessageBox.Yes:
+                    remove_project_folder_from_server_2(self.plugin_dir, self.server_qgis_projects_folder_rel_path, qgis_project_folder_name)
+                    zip_local_project_folder(self.plugin_dir, source_project_dir_path,
+                                             source_project_zip_dir_path, qgis_project_folder_name)
+                    upload_project_zip_file(self.host, self.username, self.port, self.password,
+                                            self.plugin_dir,
+                                            source_project_zip_dir_path,
+                                            self.server_qgis_projects_folder_rel_path,
+                                            qgis_project_folder_name)
+
+                return
+
+        # TEST
+        if check_if_project_folder_exists_on_server(server_config.url, server_config.username, server_config.port,
+                                                    server_config.password,
                                                     self.plugin_dir, source_project_zip_dir_path,
                                                     self.server_qgis_projects_folder_rel_path,
                                                     qgis_project_folder_name):
@@ -263,7 +287,8 @@ class MainDialog(BASE, WIDGET):
                                         "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                                         + self.server_qgis_projects_folder_rel_path + qgis_project_folder_name + '/' + qgis_project_name)
 
-                                QgsMessageLog.logMessage("WMS successfully created. Adding WMS as Mapbender source ...", TAG,
+                                QgsMessageLog.logMessage("WMS successfully created. Adding WMS as Mapbender source ...",
+                                                         TAG,
                                                          level=Qgis.Info)
                                 self.mapbender_publish(wms_getcapabilities_url)
             else:
