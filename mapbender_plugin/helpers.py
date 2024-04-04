@@ -1,6 +1,5 @@
 import os
 import shutil
-from typing import re
 
 from fabric2 import Connection
 import paramiko

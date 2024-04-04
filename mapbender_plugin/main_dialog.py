@@ -213,6 +213,7 @@ class MainDialog(BASE, WIDGET):
         self.username = server_config.username
         self.password = server_config.password
         self.server_qgis_projects_folder_rel_path = server_config.projects_path
+        self.mb_app_path = server_config.mb_app_path
 
         self.previous_message_bars = show_new_info_message_bar("Getting information from QGIS-Project ...", self.previous_message_bars)
         # iface.messageBar().pushMessage("", "Getting information from QGIS-Project ...", level=Qgis.Info, duration=2)
@@ -335,16 +336,7 @@ class MainDialog(BASE, WIDGET):
 
         iface.messageBar().pushMessage("", "Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", level=Qgis.Info, duration=2)
 
-        mapbender_uploader = MapbenderUpload(self.host, self.username) # other parameters?
-        # TEST CONSOLE:
-        #host= "mapbender-qgis.wheregroup.lan"
-        #user = "root"
-        #mapbender_uploader = MapbenderUpload( host, user)
-
-        # Optional
-        # wms_is_valid = mapbender_uploader.wms_parse_url_validate(wms_getcapabilities_url)
-        # if wms_is_valid:
-        #...
+        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path) # other parameters?
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0: # success
@@ -397,7 +389,7 @@ class MainDialog(BASE, WIDGET):
     def mb_update_wms(self, wms_getcapabilities_url):
         print('Mapbender update get capabilitites:')
         print(wms_getcapabilities_url)
-        mapbender_uploader = MapbenderUpload(self.host, self.username)
+        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path)
         print("mapbender_uploader instanziert")
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         print("output wms_show")

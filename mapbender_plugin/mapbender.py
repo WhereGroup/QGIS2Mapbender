@@ -10,15 +10,16 @@ from qgis.utils import iface
 TAG = 'Mapbender QGIS-Plugin'
 
 class MapbenderUpload():
-    def __init__(self, host, user):
+    def __init__(self, host, user, mb_app_path):
         #self.connection = Connection(host=host,user=user)
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.WarningPolicy())
         self.client.connect(hostname=host, username=user)
+        self.mb_app_path = mb_app_path
 
     def run_mapbender_command(self, command: str):
         stdin, stdout, stderr = (
-            self.client.exec_command(f"cd ..; cd /data/mapbender/application/; bin/console mapbender:{command}"))
+            self.client.exec_command(f"cd ..; cd {self.mb_app_path}; bin/console mapbender:{command}"))
         exit_status = stdout.channel.recv_exit_status()
         output = stdout.read().decode("utf-8")
         error_output = stderr.read().decode("utf-8")
