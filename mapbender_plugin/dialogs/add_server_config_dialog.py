@@ -26,10 +26,10 @@ class AddServerConfigDialog(BASE, WIDGET):
         self.addServerConfigDialogButtonBox.rejected.connect(self.reject)
 
     def saveNewServerConfig(self):
-        serverConfig = self.getNewServerConfig()
+        serverConfig = self.getNewServerConfigFromFormular()
         self.checkConfig(serverConfig)
 
-    def getNewServerConfig(self) -> ServerConfig:
+    def getNewServerConfigFromFormular(self) -> ServerConfig:
         new_server_config_name = self.newServerConfigNameLineEdit.text()
         new_server_address = self.newServerAddressLineEdit.text()
         new_port = self.newServerPortLineEdit.text()
@@ -38,6 +38,8 @@ class AddServerConfigDialog(BASE, WIDGET):
         new_server_qgis_projects_path = self.newQgisProjectPathLineEdit.text()
         new_server_mb_app_path = self.newMbPathLineEdit.text()
         new_mb_basis_url = self.newMbBasisUrlLineEdit.text()
+        authcfg = ''
+
         return ServerConfig(
             name=new_server_config_name,
             url=new_server_address,
@@ -46,7 +48,8 @@ class AddServerConfigDialog(BASE, WIDGET):
             password=new_password,
             projects_path=new_server_qgis_projects_path,
             mb_app_path=new_server_mb_app_path,
-            mb_basis_url=new_mb_basis_url
+            mb_basis_url=new_mb_basis_url,
+            authcfg=authcfg
         )
 
     def checkConfig(self, serverConfig: ServerConfig) -> None:

@@ -25,10 +25,10 @@ class EditServerConfigDialog(BASE, WIDGET):
         self.editDialogButtonBox.accepted.connect(self.saveEditedServerConfig)
         self.editDialogButtonBox.rejected.connect(self.reject)
 
-    #def get...
     def getServerConfig(self, selected_server_config):
         self.selected_server_config = selected_server_config
         server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+        self.authcfg = server_config.authcfg
 
         self.editServerConfigNameLineEdit.setText(selected_server_config)
         self.editPortLineEdit.setText(server_config.port)
@@ -60,7 +60,8 @@ class EditServerConfigDialog(BASE, WIDGET):
             password=edit_password,
             projects_path=edit_server_qgis_projects_path,
             mb_app_path=edit_server_mb_app_path,
-            mb_basis_url=edit_mb_basis_url
+            mb_basis_url=edit_mb_basis_url,
+            authcfg=self.authcfg
         )
 
     def checkConfig(self, serverConfig: ServerConfig) -> None:
