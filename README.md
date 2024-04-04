@@ -7,7 +7,10 @@ Prototypical QGIS plugin to populate Mapbender with QGIS-Server WMS from within 
 Prerequisites:
 - QGIS-Server installed on Server
 - Mapbender installed on Server
-- fabric2 locally installed
+- fabric2 locally installed:
+  ```
+  pip install fabric2
+
 - Create at least one template application in Mapbender (that will be cloned and use to publish a new WMS) or an application that will be use to publish a new WMS. These applications shall have at least one layer set: 
     - layer set named "main" (default layerset for adding a new WMS to the application) OR 
     - layer set named with any other name (in this case, the layerset name shall be specified when using the plugin)
