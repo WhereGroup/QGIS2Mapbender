@@ -15,15 +15,11 @@ from mapbender_plugin.settings import TAG
 
 
 def get_plugin_dir() -> str:
-    """Returns the plugin directory"""
     plugin_dir = os.path.dirname(__file__)
     return plugin_dir
 
 
 def get_project_layers() -> list:
-    """ Returns project layers
-    :return: layers_names
-    """
     project = QgsProject.instance()
     project.read()
     layers_names = []
@@ -32,11 +28,7 @@ def get_project_layers() -> list:
     return layers_names
 
 
-def check_if_qgis_project() -> bool:
-    """
-        Checks if plugin is used within a QGIS-Project
-        :return: bool
-        """
+def qgis_project_is_saved() -> bool:
     # Get and check .qgz project path
     source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
@@ -58,15 +50,15 @@ def get_paths(server_qgis_projects_folder_rel_path: str):
     source_project_file_path = QgsProject.instance().fileName()
     qgis_project_name = source_project_file_path.split("/")[-1]
     source_project_dir_path = QgsProject.instance().readPath("./")
-    paths = {'source_project_dir_path': QgsProject.instance().readPath("./"),
-             'source_project_file_path': QgsProject.instance().fileName(),
-             'qgis_project_name': source_project_file_path.split("/")[-1],
-             'source_project_zip_dir_path': source_project_dir_path + '.zip',
-             'qgis_project_folder_name': source_project_dir_path.split("/")[-1],
-             'qgis_project_folder_parent': os.path.abspath(os.path.join(source_project_dir_path, os.pardir)),
-             'server_project_dir_path': server_qgis_projects_folder_rel_path + source_project_dir_path.split("/")[-1]
-             }
-    return (paths)
+    return {
+        'source_project_dir_path': QgsProject.instance().readPath("./"),
+        'source_project_file_path': QgsProject.instance().fileName(),
+        'qgis_project_name': qgis_project_name,
+        'source_project_zip_dir_path': source_project_dir_path + '.zip',
+        'qgis_project_folder_name': source_project_dir_path.split("/")[-1],
+        'qgis_project_folder_parent': os.path.abspath(os.path.join(source_project_dir_path, os.pardir)),
+        'server_project_dir_path': server_qgis_projects_folder_rel_path + source_project_dir_path.split("/")[-1]
+    }
 
 
 def zip_local_project_folder(source_project_dir_path: str,
@@ -130,7 +122,7 @@ def open_connection(host: str, username: str, port: str, password: str):
             return
 
 
-def check_if_project_folder_exists_on_server(c,
+def check_if_project_folder_exists_on_server(connection: Connection,
                                              projects_path: str,
                                              qgis_project_folder_name: str) -> bool:
     """
@@ -142,8 +134,8 @@ def check_if_project_folder_exists_on_server(c,
     print(projects_path)
     try:
         # Check if project folder already exists on the server
-        if c.run('test -d {}'.format(projects_path + qgis_project_folder_name),
-                 warn=True).failed:  # without .zip
+        if connection.run('test -d {}'.format(projects_path + qgis_project_folder_name),
+                          warn=True).failed:  # without .zip
             # If it exists, is unzipped, -d option to test if the file exist and is a directory
             # Folder does not exist yet in server: upload project folder
             print('does not exist')
@@ -224,7 +216,7 @@ def upload_project_zip_file(c, source_project_zip_dir_path: str,
 
 
 def remove_project_folder_from_server(c,
-                                      server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str):
+                                      server_qgis_projects_folder_rel_path: str, qgis_project_folder_name: str) -> bool:
     """
     Removes a project folder from server
     :param host:
@@ -250,6 +242,8 @@ def remove_project_folder_from_server(c,
 
     except Exception as e:
         show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
+        return False
+
 
 
 # def remove_project_folder_from_server(host: str, username: str, port: str, password: str, plugin_dir: str,
@@ -501,25 +495,19 @@ def update_mb_slug_in_settings(mb_slug, is_mb_slug):
         s.endGroup()
         if isinstance(mb_slugs, str):
             mb_slugs_list = mb_slugs.split(", ")
-        else:
+        elif isinstance(mb_slugs, list):
             mb_slugs_list = mb_slugs
+        else:
+            raise TypeError("Konnte MB template nicht lesen")
 
-        if is_mb_slug:
-            if mb_slug in mb_slugs_list:
-                return
-            else:
-                mb_slugs_list.append(mb_slug)
-                updated_mb_slugs = ", ".join(mb_slugs_list)
-                s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
-        else:
-            if mb_slug in mb_slugs_list:
-                mb_slugs_list.remove(mb_slug)
-                updated_mb_slugs = ", ".join(mb_slugs_list)
-                s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
-            else:
-                return
-    else:
-        if is_mb_slug:
-            s.setValue('mapbender-plugin/mb_templates', mb_slug)
-        else:
-            return
+        if is_mb_slug and mb_slug not in mb_slugs_list:
+            mb_slugs_list.append(mb_slug)
+            updated_mb_slugs = ", ".join(mb_slugs_list)
+            s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+        elif mb_slug in mb_slugs_list:
+            mb_slugs_list.remove(mb_slug)
+            updated_mb_slugs = ", ".join(mb_slugs_list)
+            s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+
+    elif is_mb_slug:
+        s.setValue('mapbender-plugin/mb_templates', mb_slug)

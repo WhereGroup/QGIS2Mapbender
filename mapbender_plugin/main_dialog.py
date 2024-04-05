@@ -5,6 +5,7 @@ from PyQt5.QtCore import QSettings, Qt
 from PyQt5 import uic
 
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
+from fabric2 import Connection
 
 from qgis._core import Qgis, QgsSettings, QgsMessageLog
 
@@ -13,7 +14,7 @@ from qgis.utils import iface
 from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
 from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
 from mapbender_plugin.helpers import get_plugin_dir, get_project_layers, \
-    check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
+    qgis_project_is_saved, get_paths, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
     check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
     get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
@@ -183,19 +184,18 @@ class MainDialog(BASE, WIDGET):
             raise
 
     def publish_project(self) -> None:
-        if not check_if_qgis_project():
+        if not qgis_project_is_saved():
             return
         # Check Mapbender params:
         if self.mbSlugComboBox.currentText() == '':
             show_fail_box_ok("Please complete Mapbender parameters",
                              "Please enter a valid Mapbender URL title")
             return
-        with waitCursor():
-            self.upload_project_qgis_server()
 
+        self.upload_project_qgis_server()
 
     def update_project(self):
-        if not check_if_qgis_project():
+        if not qgis_project_is_saved():
             return
         with waitCursor():
             self.upload_project_qgis_server()
@@ -221,19 +221,21 @@ class MainDialog(BASE, WIDGET):
         # getProjectLayers
 
         # Open connection
-        c = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
-        if not c:
-            return
-        with c:
+        # c = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
+        # if not c:
+        #     return
+
+        with Connection(server_config.url, server_config.username, server_config.port, server_config.password) as c:
+
             project_folder_exists_on_server = check_if_project_folder_exists_on_server(c,
                                                           server_config.projects_path,
                                                           qgis_project_folder_name)
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                if (show_fail_box_yes_no("Failed",
+                if show_fail_box_yes_no("Failed",
                                          f"Project directory already exists on the server. \n \nDo you want to"
                                          f" overwrite the existing project directory '{qgis_project_folder_name},' "
                                          f"update the WMS as source in Mapbender and add it to the given "
-                                         f"application?")) == QMessageBox.No:
+                                         f"application?") == QMessageBox.No:
                     return
                 else:
                     remove_project_folder_from_server(c, server_config.projects_path, qgis_project_folder_name)
