@@ -14,13 +14,14 @@ from qgis.utils import iface
 from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
 from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
 from mapbender_plugin.helpers import get_plugin_dir, get_project_layers, \
-    qgis_project_is_saved, get_paths, zip_local_project_folder, upload_project_zip_file, \
+    qgis_project_is_saved, zip_local_project_folder, upload_project_zip_file, \
     remove_project_folder_from_server, \
-    check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
+    check_if_project_folder_exists_on_server, unzip_project_folder_on_server, \
+    show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
     update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor, open_connection, upload
 from mapbender_plugin.mapbender import MapbenderUpload
+from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 
@@ -206,17 +207,17 @@ class MainDialog(BASE, WIDGET):
         server_config = ServerConfig.getParamsFromSettings(selected_server_config)
 
         # Get paths
-        paths = get_paths(server_config.projects_path)
-        source_project_dir_path = paths.get('source_project_dir_path')
-        source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
-        qgis_project_folder_name = paths.get('qgis_project_folder_name')
-        qgis_project_name = paths.get('qgis_project_name')
-        server_project_dir_path = paths.get('server_project_dir_path')
+        paths = Paths.get_paths(server_config.projects_path)
+        # source_project_dir_path = paths.get('source_project_dir_path')
+        # source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
+        # source_project_dir_name = paths.get('source_project_dir_name')
+        # source_project_file_name = paths.get('source_project_file_name')
+        # server_project_dir_path = paths.get('server_project_dir_path')
 
         # Check "http://"
         wms_getcapabilities_url = (
                 "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-                + server_config.projects_path + qgis_project_folder_name + '/' + qgis_project_name)
+                + server_config.projects_path + paths.source_project_dir_name + '/' + paths.source_project_file_name)
 
         # getProjectLayers
 
@@ -229,34 +230,34 @@ class MainDialog(BASE, WIDGET):
 
             project_folder_exists_on_server = check_if_project_folder_exists_on_server(c,
                                                           server_config.projects_path,
-                                                          qgis_project_folder_name)
+                                                          paths.source_project_dir_name)
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
                 if show_fail_box_yes_no("Failed",
                                          f"Project directory already exists on the server. \n \nDo you want to"
-                                         f" overwrite the existing project directory '{qgis_project_folder_name},' "
+                                         f" overwrite the existing project directory '{paths.source_project_dir_name},' "
                                          f"update the WMS as source in Mapbender and add it to the given "
                                          f"application?") == QMessageBox.No:
                     return
                 else:
-                    remove_project_folder_from_server(c, server_config.projects_path, qgis_project_folder_name)
-                    upload(c, server_config.projects_path, qgis_project_folder_name,
-                           source_project_dir_path,
-                           source_project_zip_dir_path)
+                    remove_project_folder_from_server(c, server_config.projects_path, paths.source_project_dir_name)
+                    upload(c, server_config.projects_path, paths.source_project_dir_name,
+                           paths.source_project_dir_path,
+                           paths.source_project_zip_file_path)
                     self.mb_publish(wms_getcapabilities_url)
             if project_folder_exists_on_server and self.updateRadioButton.isChecked():
-                remove_project_folder_from_server(c, server_config.projects_path, qgis_project_folder_name)
-                upload(c, server_config.projects_path, qgis_project_folder_name,
-                       source_project_dir_path,
-                       source_project_zip_dir_path)
+                remove_project_folder_from_server(c, server_config.projects_path, paths.source_project_dir_name)
+                upload(c, server_config.projects_path, paths.source_project_dir_name,
+                       paths.source_project_dir_path,
+                       paths.source_project_zip_file_path)
                 self.mb_update(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                upload(c, server_config.projects_path, qgis_project_folder_name,
-                       source_project_dir_path,
-                       source_project_zip_dir_path)
+                upload(c, server_config.projects_path, paths.source_project_dir_name,
+                       paths.source_project_dir_path,
+                       paths.source_project_zip_file_path)
                 self.mb_publish(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.updateRadioButton.isChecked():
                 show_fail_box_ok("Failed",
-                                 "Project directory " + qgis_project_folder_name + " does not exist on the server and therefore "
+                                 "Project directory " + paths.source_project_dir_name + " does not exist on the server and therefore "
                                                                                    "can not be updated. \n \nIf you want to upload a new"
                                                                                    " QGIS-Project please select the option 'Publish "
                                                                                    " in Mapbender app'")
