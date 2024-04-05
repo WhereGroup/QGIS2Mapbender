@@ -9,17 +9,15 @@ from fabric2 import Connection
 
 from qgis._core import Qgis, QgsSettings, QgsMessageLog
 
-from qgis.utils import iface
-
 from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
 from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
-from mapbender_plugin.helpers import get_plugin_dir, get_project_layers, \
-    qgis_project_is_saved, zip_local_project_folder, upload_project_zip_file, \
+from mapbender_plugin.helpers import get_plugin_dir, \
+    qgis_project_is_saved, \
     remove_project_folder_from_server, \
-    check_if_project_folder_exists_on_server, unzip_project_folder_on_server, \
+    check_if_project_folder_exists_on_server,  \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor, open_connection, upload
+    update_mb_slug_in_settings, waitCursor, upload
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
@@ -202,17 +200,12 @@ class MainDialog(BASE, WIDGET):
             self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
-        # Get config params
+        # Get server config params
         selected_server_config = self.serverConfigComboBox.currentText()
         server_config = ServerConfig.getParamsFromSettings(selected_server_config)
 
         # Get paths
         paths = Paths.get_paths(server_config.projects_path)
-        # source_project_dir_path = paths.get('source_project_dir_path')
-        # source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
-        # source_project_dir_name = paths.get('source_project_dir_name')
-        # source_project_file_name = paths.get('source_project_file_name')
-        # server_project_dir_path = paths.get('server_project_dir_path')
 
         # Check "http://"
         wms_getcapabilities_url = (
@@ -222,13 +215,14 @@ class MainDialog(BASE, WIDGET):
         # getProjectLayers
 
         # Open connection
-        # c = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
-        # if not c:
+        #  = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
+        # if not connection:
         #     return
 
-        with Connection(server_config.url, server_config.username, server_config.port, server_config.password) as c:
+        with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
+                        connect_kwargs={"password": server_config.password}) as connection:
 
-            project_folder_exists_on_server = check_if_project_folder_exists_on_server(c,
+            project_folder_exists_on_server = check_if_project_folder_exists_on_server(connection,
                                                           server_config.projects_path,
                                                           paths.source_project_dir_name)
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
@@ -239,19 +233,19 @@ class MainDialog(BASE, WIDGET):
                                          f"application?") == QMessageBox.No:
                     return
                 else:
-                    remove_project_folder_from_server(c, server_config.projects_path, paths.source_project_dir_name)
-                    upload(c, server_config.projects_path, paths.source_project_dir_name,
+                    remove_project_folder_from_server(connection, server_config.projects_path, paths.source_project_dir_name)
+                    upload(connection, server_config.projects_path, paths.source_project_dir_name,
                            paths.source_project_dir_path,
                            paths.source_project_zip_file_path)
                     self.mb_publish(wms_getcapabilities_url)
             if project_folder_exists_on_server and self.updateRadioButton.isChecked():
-                remove_project_folder_from_server(c, server_config.projects_path, paths.source_project_dir_name)
-                upload(c, server_config.projects_path, paths.source_project_dir_name,
+                remove_project_folder_from_server(connection, server_config.projects_path, paths.source_project_dir_name)
+                upload(connection, server_config.projects_path, paths.source_project_dir_name,
                        paths.source_project_dir_path,
                        paths.source_project_zip_file_path)
                 self.mb_update(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                upload(c, server_config.projects_path, paths.source_project_dir_name,
+                upload(connection, server_config.projects_path, paths.source_project_dir_name,
                        paths.source_project_dir_path,
                        paths.source_project_zip_file_path)
                 self.mb_publish(wms_getcapabilities_url)
@@ -264,6 +258,10 @@ class MainDialog(BASE, WIDGET):
 
     # TEST MB PUBLISH AND UPDATE WITH opened "c"
     def mb_publish(self, wms_getcapabilities_url):
+        # Get server config params
+        selected_server_config = self.serverConfigComboBox.currentText()
+        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+
         # Mapbender params:
         if self.cloneTemplateRadioButton.isChecked():
             clone_app = True
@@ -275,7 +273,7 @@ class MainDialog(BASE, WIDGET):
         QgsMessageLog.logMessage("Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", TAG,
                                  level=Qgis.Info)
 
-        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path)  # other parameters?
+        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username, server_config.mb_app_path)  # other parameters?
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0:  # success
@@ -314,7 +312,7 @@ class MainDialog(BASE, WIDGET):
                 show_succes_box_ok("Success report",
                                    "WMS succesfully created:\n \n" + wms_getcapabilities_url +
                                    "\n \n And added to mapbender application: \n \n" + "http://" +
-                                   self.host + "/mapbender/application/" + slug)
+                                   server_config.url + "/mapbender/application/" + slug)
                 self.close()
 
             else:
@@ -324,9 +322,13 @@ class MainDialog(BASE, WIDGET):
         mapbender_uploader.close_connection()
 
     def mb_update(self, wms_getcapabilities_url):
+        # Get server config params
+        selected_server_config = self.serverConfigComboBox.currentText()
+        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+
         QgsMessageLog.logMessage(f"Mapbender update get capabilitites: {wms_getcapabilities_url}", TAG,
                                  level=Qgis.Info)
-        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path)
+        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username, server_config.mb_app_path)
         QgsMessageLog.logMessage("Mapbender uploader instanced", TAG,
                                  level=Qgis.Info)
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
