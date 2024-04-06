@@ -246,7 +246,6 @@ class MainDialog(BASE, WIDGET):
                                                                                         " QGIS-Project please select the option 'Publish "
                                                                                         " in Mapbender app'")
 
-    # TEST MB PUBLISH AND UPDATE WITH opened "c"
     def mb_publish(self, wms_getcapabilities_url):
         # Get server config params
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
@@ -263,7 +262,7 @@ class MainDialog(BASE, WIDGET):
                                  level=Qgis.Info)
 
         mapbender_uploader = MapbenderUpload(server_config.url, server_config.username,
-                                             server_config.mb_app_path)  # other parameters?
+                                             server_config.mb_app_path)
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0:  # success
