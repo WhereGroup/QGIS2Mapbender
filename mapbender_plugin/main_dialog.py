@@ -195,8 +195,7 @@ class MainDialog(BASE, WIDGET):
     def update_project(self):
         if not qgis_project_is_saved():
             return
-        with waitCursor():
-            self.upload_project_qgis_server()
+        self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
         # Get server config params and paths
@@ -238,8 +237,8 @@ class MainDialog(BASE, WIDGET):
                     upload.zip_upload_unzip_clean(connection)
                     self.mb_update(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                upload.zip_upload_unzip_clean(connection)
-                self.mb_publish(wms_getcapabilities_url)
+                if upload.zip_upload_unzip_clean(connection):
+                    self.mb_publish(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.updateRadioButton.isChecked():
                 show_fail_box_ok("Failed",
                                  "Project directory " + paths.source_project_dir_name + " does not exist on the server and therefore "
