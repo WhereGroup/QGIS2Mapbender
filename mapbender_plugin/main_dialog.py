@@ -205,10 +205,10 @@ class MainDialog(BASE, WIDGET):
 
         # Check "http://"
         wms_getcapabilities_url = (
-                "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
+                "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST"
+                                                "=GetCapabilities&map="
                 + server_config.projects_path + paths.source_project_dir_name + '/' + paths.source_project_file_name)
 
-        # Instantiation imprints the object with its connection parameters (but does not actually initiate the network connection).
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs={"password": server_config.password}) as connection:
             try:
@@ -216,8 +216,11 @@ class MainDialog(BASE, WIDGET):
             except Exception as e:
                 show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
                 return
-            upload = Upload(source_project_dir_path=paths.source_project_dir_path, source_project_dir_name=paths.source_project_dir_name,
-                            source_project_zip_file_path=paths.source_project_zip_file_path, server_projects_dir_path=server_config.projects_path)
+
+            upload = Upload(source_project_dir_path=paths.source_project_dir_path,
+                            source_project_dir_name=paths.source_project_dir_name,
+                            source_project_zip_file_path=paths.source_project_zip_file_path,
+                            server_projects_dir_path=server_config.projects_path)
             project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server(connection)
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
                 if show_fail_box_yes_no("Failed",

@@ -381,15 +381,6 @@ def list_qgs_settings_child_groups(key):
     s.endGroup
     return subkeys
 
-
-def show_new_info_message_bar(text, previous_message_bars):
-    # previous_message_bars = delete_previous_messages(previous_message_bars) # FEHLER
-    message_bar = iface.messageBar().createMessage(text)
-    iface.messageBar().pushWidget(message_bar, duration=3)
-    previous_message_bars.append(message_bar)
-    return previous_message_bars
-
-
 @contextmanager
 def waitCursor():
     try:
@@ -399,13 +390,6 @@ def waitCursor():
         raise ex
     finally:
         QgsApplication.restoreOverrideCursor()
-
-
-def delete_previous_messages(previous_message_bars):
-    for message_bar in previous_message_bars:
-        iface.messageBar().popWidget(message_bar)
-    previous_message_bars = []
-    return previous_message_bars
 
 
 def validate_no_spaces(*variables):
