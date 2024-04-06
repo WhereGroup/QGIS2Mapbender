@@ -215,11 +215,8 @@ class MainDialog(BASE, WIDGET):
                 show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
                 return
 
-            upload = Upload(source_project_dir_path=paths.source_project_dir_path,
-                            source_project_dir_name=paths.source_project_dir_name,
-                            source_project_zip_file_path=paths.source_project_zip_file_path,
-                            server_projects_dir_path=server_config.projects_path)
-            project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server(connection)
+            upload = Upload(connection, paths)
+            project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server()
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
                 if show_fail_box_yes_no("Failed",
                                         f"Project directory already exists on the server. \n \nDo you want to"
@@ -228,15 +225,15 @@ class MainDialog(BASE, WIDGET):
                                         f"application?") == QMessageBox.No:
                     return
                 else:
-                    if upload.remove_project_folder_from_server(connection):
-                        upload.zip_upload_unzip_clean(connection)
+                    if upload.remove_project_folder_from_server():
+                        upload.zip_upload_unzip_clean()
                         self.mb_publish(connection, server_config, wms_url)
             if project_folder_exists_on_server and self.updateRadioButton.isChecked():
-                if upload.remove_project_folder_from_server(connection):
-                    upload.zip_upload_unzip_clean(connection)
+                if upload.remove_project_folder_from_server():
+                    upload.zip_upload_unzip_clean()
                     self.mb_update(connection, server_config, wms_url)
             if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                if upload.zip_upload_unzip_clean(connection):
+                if upload.zip_upload_unzip_clean():
                     self.mb_publish(connection, server_config, wms_url)
             if not project_folder_exists_on_server and self.updateRadioButton.isChecked():
                 show_fail_box_ok("Failed",

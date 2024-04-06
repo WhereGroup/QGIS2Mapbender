@@ -9,23 +9,23 @@ from mapbender_plugin.settings import TAG
 
 
 class Upload:
-    def __init__(self, source_project_dir_path, source_project_dir_name, source_project_zip_file_path,
-                 server_projects_dir_path):
-        self.source_project_dir_path = source_project_dir_path
-        self.source_project_dir_name = source_project_dir_name
-        self.source_project_zip_file_path = source_project_zip_file_path
-        self.server_projects_dir_path = server_projects_dir_path
+    def __init__(self, connection, paths):
+        self.connection = connection
+        self.source_project_dir_path = paths.source_project_dir_path
+        self.source_project_dir_name = paths.source_project_dir_name
+        self.source_project_zip_file_path = paths.source_project_zip_file_path
+        self.server_projects_dir_path = paths.server_projects_dir_path
 
-    def check_if_project_folder_exists_on_server(self, connection) -> bool:
+    def check_if_project_folder_exists_on_server(self) -> bool:
         with waitCursor():
-            if connection.run('test -d {}'.format(self.server_projects_dir_path + self.source_project_dir_name),
+            if self.connection.run('test -d {}'.format(self.server_projects_dir_path + self.source_project_dir_name),
                               warn=True).failed:  # Without .zip (if it exists, is unzipped)
                 return False
         return True
 
-    def remove_project_folder_from_server(self, connection) -> bool:
+    def remove_project_folder_from_server(self) -> bool:
         with waitCursor():
-            result = connection.run(
+            result = self.connection.run(
                 f'cd ..; cd {self.server_projects_dir_path}; rm -r {self.source_project_dir_name};')
             # Check success:
             if os.path.isdir(f'{self.server_projects_dir_path}{self.source_project_dir_name}'):
@@ -36,13 +36,13 @@ class Upload:
                                      level=Qgis.Info)
             return True
 
-    def zip_upload_unzip_clean(self, connection) -> bool:
+    def zip_upload_unzip_clean(self) -> bool:
         QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
         if self.zip_local_project_dir():
-            if self.upload_project_zip_file(connection):
+            if self.upload_project_zip_file():
                 QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
                 self.delete_local_project_zip_file()
-                if self.unzip_and_remove_project_dir_on_server(connection):
+                if self.unzip_and_remove_project_dir_on_server():
                     return True
         return False
 
@@ -74,24 +74,24 @@ class Upload:
             if os.path.isfile(self.source_project_zip_file_path):
                 os.remove(self.source_project_zip_file_path)
 
-    def upload_project_zip_file(self, connection) -> bool:
+    def upload_project_zip_file(self) -> bool:
         with waitCursor():
             try:
-                connection.put(local=self.source_project_zip_file_path, remote=self.server_projects_dir_path)
+                self.connection.put(local=self.source_project_zip_file_path, remote=self.server_projects_dir_path)
                 QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
                 return True
             except Exception as e:
                 show_fail_box_ok("Failed", f"Project directory could not be uploaded. Reason {e}")
                 return False
 
-    def unzip_and_remove_project_dir_on_server(self, connection) -> bool:
+    def unzip_and_remove_project_dir_on_server(self) -> bool:
         with waitCursor():
-            result = connection.run(
+            result = self.connection.run(
                 f'cd ..; cd {self.server_projects_dir_path}/; unzip {self.source_project_dir_name}.zip;',
                 warn=True)
             if result.ok:
                 QgsMessageLog.logMessage("Files unzipped on server", TAG, level=Qgis.Info)
-                connection.run(f'cd ..; cd /data/qgis-projects/; rm {self.source_project_dir_name}.zip;')
+                self.connection.run(f'cd ..; cd /data/qgis-projects/; rm {self.source_project_dir_name}.zip;')
                 return True
             show_fail_box_ok("Failed", f"Could not unzip project directory on server. Reason {result.return_code}")
             return False
