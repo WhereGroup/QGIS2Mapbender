@@ -13,15 +13,14 @@ from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDia
 from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
 from mapbender_plugin.helpers import get_plugin_dir, \
     qgis_project_is_saved, \
-    remove_project_folder_from_server, \
-    check_if_project_folder_exists_on_server,  \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, waitCursor, upload
+    update_mb_slug_in_settings, waitCursor
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from mapbender_plugin.upload import Upload
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -200,11 +199,8 @@ class MainDialog(BASE, WIDGET):
             self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
-        # Get server config params
-        selected_server_config = self.serverConfigComboBox.currentText()
-        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
-
-        # Get paths
+        # Get server config params and paths
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
         # Check "http://"
@@ -212,55 +208,46 @@ class MainDialog(BASE, WIDGET):
                 "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
                 + server_config.projects_path + paths.source_project_dir_name + '/' + paths.source_project_file_name)
 
-        # getProjectLayers
-
-        # Open connection
-        #  = open_connection(server_config.url, server_config.username, server_config.port, server_config.password)
-        # if not connection:
-        #     return
-
+        # Instantiation imprints the object with its connection parameters (but does not actually initiate the network connection).
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs={"password": server_config.password}) as connection:
-
-            project_folder_exists_on_server = check_if_project_folder_exists_on_server(connection,
-                                                          server_config.projects_path,
-                                                          paths.source_project_dir_name)
+            try:
+                connection.open()
+            except Exception as e:
+                show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
+                return
+            upload = Upload(source_project_dir_path=paths.source_project_dir_path, source_project_dir_name=paths.source_project_dir_name,
+                            source_project_zip_file_path=paths.source_project_zip_file_path, server_projects_dir_path=server_config.projects_path)
+            project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server(connection)
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
                 if show_fail_box_yes_no("Failed",
-                                         f"Project directory already exists on the server. \n \nDo you want to"
-                                         f" overwrite the existing project directory '{paths.source_project_dir_name},' "
-                                         f"update the WMS as source in Mapbender and add it to the given "
-                                         f"application?") == QMessageBox.No:
+                                        f"Project directory already exists on the server. \n \nDo you want to"
+                                        f" overwrite the existing project directory '{paths.source_project_dir_name},' "
+                                        f"update the WMS as source in Mapbender and add it to the given "
+                                        f"application?") == QMessageBox.No:
                     return
                 else:
-                    remove_project_folder_from_server(connection, server_config.projects_path, paths.source_project_dir_name)
-                    upload(connection, server_config.projects_path, paths.source_project_dir_name,
-                           paths.source_project_dir_path,
-                           paths.source_project_zip_file_path)
-                    self.mb_publish(wms_getcapabilities_url)
+                    if upload.remove_project_folder_from_server(connection):
+                        upload.zip_upload_unzip_clean(connection)
+                        self.mb_publish(wms_getcapabilities_url)
             if project_folder_exists_on_server and self.updateRadioButton.isChecked():
-                remove_project_folder_from_server(connection, server_config.projects_path, paths.source_project_dir_name)
-                upload(connection, server_config.projects_path, paths.source_project_dir_name,
-                       paths.source_project_dir_path,
-                       paths.source_project_zip_file_path)
-                self.mb_update(wms_getcapabilities_url)
+                if upload.remove_project_folder_from_server(connection):
+                    upload.zip_upload_unzip_clean(connection)
+                    self.mb_update(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
-                upload(connection, server_config.projects_path, paths.source_project_dir_name,
-                       paths.source_project_dir_path,
-                       paths.source_project_zip_file_path)
+                upload.zip_upload_unzip_clean(connection)
                 self.mb_publish(wms_getcapabilities_url)
             if not project_folder_exists_on_server and self.updateRadioButton.isChecked():
                 show_fail_box_ok("Failed",
                                  "Project directory " + paths.source_project_dir_name + " does not exist on the server and therefore "
-                                                                                   "can not be updated. \n \nIf you want to upload a new"
-                                                                                   " QGIS-Project please select the option 'Publish "
-                                                                                   " in Mapbender app'")
+                                                                                        "can not be updated. \n \nIf you want to upload a new"
+                                                                                        " QGIS-Project please select the option 'Publish "
+                                                                                        " in Mapbender app'")
 
     # TEST MB PUBLISH AND UPDATE WITH opened "c"
     def mb_publish(self, wms_getcapabilities_url):
         # Get server config params
-        selected_server_config = self.serverConfigComboBox.currentText()
-        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
 
         # Mapbender params:
         if self.cloneTemplateRadioButton.isChecked():
@@ -273,7 +260,8 @@ class MainDialog(BASE, WIDGET):
         QgsMessageLog.logMessage("Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", TAG,
                                  level=Qgis.Info)
 
-        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username, server_config.mb_app_path)  # other parameters?
+        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username,
+                                             server_config.mb_app_path)  # other parameters?
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0:  # success
@@ -323,8 +311,7 @@ class MainDialog(BASE, WIDGET):
 
     def mb_update(self, wms_getcapabilities_url):
         # Get server config params
-        selected_server_config = self.serverConfigComboBox.currentText()
-        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
 
         QgsMessageLog.logMessage(f"Mapbender update get capabilitites: {wms_getcapabilities_url}", TAG,
                                  level=Qgis.Info)

@@ -39,49 +39,49 @@ def qgis_project_is_saved() -> bool:
     return True
 
 
-def zip_local_project_folder(source_project_dir_path: str,
-                             source_project_zip_file_path: str, source_project_dir_name: str):
-    """
-    Copies project directory and removes unwanted files. Zips local project folder
-    :param source_project_dir_path:
-    :param source_project_zip_file_path:
-    :param source_project_dir_name:
-    :return:
-    """
-    try:
-        # Copy directory and remove unwanted files
-        if os.path.isdir(f'{source_project_dir_path}_copy_tmp'):
-            shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
-        os.mkdir(f'{source_project_dir_path}_copy_tmp')
-        shutil.copytree(source_project_dir_path, f'{source_project_dir_path}_copy_tmp/'
-                                                 f'{source_project_dir_name}')
-        try:
-            for folder_name, subfolders, filenames in os.walk(f'{source_project_dir_path}_copy_tmp'):
-                for filename in filenames:
-                    file_path = os.path.join(folder_name, filename)
-                    if filename.split(".")[-1] in ('gpkg-wal', 'gpkg-shm'):
-                        os.remove(file_path)
-            try:
-                # Compress tmp copy of project folder
-                shutil.make_archive(source_project_dir_path, 'zip', f'{source_project_dir_path}_copy_tmp')
-                # Check
-                if os.path.isfile(source_project_zip_file_path):
-                    QgsMessageLog.logMessage("Zip-project folder successfully created", TAG, level=Qgis.Info)
-                # Remove tmp copy of project folder
-                shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
-            except Exception as e:
-                show_fail_box_ok("Failed", f"Could not compress copy of project folder. Reason: {e}")
-        except Exception as e:
-            show_fail_box_ok("Failed", f"Could not remove unwanted files. Reason: {e}")
-    except Exception as e:
-        show_fail_box_ok("Failed", f"Could not copy project folder. Reason: {e}")
+# def zip_local_project_folder(source_project_dir_path: str,
+#                              source_project_zip_file_path: str, source_project_dir_name: str):
+#     """
+#     Copies project directory and removes unwanted files. Zips local project folder
+#     :param source_project_dir_path:
+#     :param source_project_zip_file_path:
+#     :param source_project_dir_name:
+#     :return:
+#     """
+#     try:
+#         # Copy directory and remove unwanted files
+#         if os.path.isdir(f'{source_project_dir_path}_copy_tmp'):
+#             shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
+#         os.mkdir(f'{source_project_dir_path}_copy_tmp')
+#         shutil.copytree(source_project_dir_path, f'{source_project_dir_path}_copy_tmp/'
+#                                                  f'{source_project_dir_name}')
+#         try:
+#             for folder_name, subfolders, filenames in os.walk(f'{source_project_dir_path}_copy_tmp'):
+#                 for filename in filenames:
+#                     file_path = os.path.join(folder_name, filename)
+#                     if filename.split(".")[-1] in ('gpkg-wal', 'gpkg-shm'):
+#                         os.remove(file_path)
+#             try:
+#                 # Compress tmp copy of project folder
+#                 shutil.make_archive(source_project_dir_path, 'zip', f'{source_project_dir_path}_copy_tmp')
+#                 # Check
+#                 if os.path.isfile(source_project_zip_file_path):
+#                     QgsMessageLog.logMessage("Zip-project folder successfully created", TAG, level=Qgis.Info)
+#                 # Remove tmp copy of project folder
+#                 shutil.rmtree(f'{source_project_dir_path}_copy_tmp')
+#             except Exception as e:
+#                 show_fail_box_ok("Failed", f"Could not compress copy of project folder. Reason: {e}")
+#         except Exception as e:
+#             show_fail_box_ok("Failed", f"Could not remove unwanted files. Reason: {e}")
+#     except Exception as e:
+#         show_fail_box_ok("Failed", f"Could not copy project folder. Reason: {e}")
+#
 
-
-def delete_local_project_zip_file(source_project_zip_dir_path):
-    if os.path.isfile(source_project_zip_dir_path):
-        os.remove(source_project_zip_dir_path)
-    else:
-        return
+# def delete_local_project_zip_file(source_project_zip_dir_path):
+#     if os.path.isfile(source_project_zip_dir_path):
+#         os.remove(source_project_zip_dir_path)
+#     else:
+#         return
 
 
 # def open_connection(host: str, username: str, port: str, password: str):
@@ -98,80 +98,80 @@ def delete_local_project_zip_file(source_project_zip_dir_path):
 #             return
 
 
-def check_if_project_folder_exists_on_server(connection: Connection,
-                                             server_projects_dir_path: str,
-                                             source_project_dir_name: str) -> bool:
-    try:
-        # Check if project folder already exists on the server
-        if connection.run('test -d {}'.format(server_projects_dir_path + source_project_dir_name),
-                          warn=True).failed:  # without .zip
-            # If it exists, is unzipped, -d option to test if the file exist and is a directory
-            # Folder does not exist yet in server: upload project folder
-            return False
-        else:
-            return True
-    except OSError as e:
-        show_fail_box_ok("Failed",
-                         f"Reason: {e}")
-        return False
-    except Exception as e:
-        show_fail_box_ok("Failed",
-                         f"Could not check if project directory exists already on the server. Reason: {e}")
-        return False
+# def check_if_project_folder_exists_on_server(connection: Connection,
+#                                              server_projects_dir_path: str,
+#                                              source_project_dir_name: str) -> bool:
+#     try:
+#         # Check if project folder already exists on the server
+#         if connection.run('test -d {}'.format(server_projects_dir_path + source_project_dir_name),
+#                           warn=True).failed:  # without .zip
+#             # If it exists, is unzipped, -d option to test if the file exist and is a directory
+#             # Folder does not exist yet in server: upload project folder
+#             return False
+#         else:
+#             return True
+#     except OSError as e:
+#         show_fail_box_ok("Failed",
+#                          f"Reason: {e}")
+#         return False
+#     except Exception as e:
+#         show_fail_box_ok("Failed",
+#                          f"Could not check if project directory exists already on the server. Reason: {e}")
+#         return False
 
-def upload_project_zip_file(connection, source_project_zip_file_path: str,
-                            server_projects_dir_path: str, source_project_dir_name: str) -> bool:
-    """
-    Uploads project zip file to the server
-    :param source_project_zip_file_path:
-    :param server_projects_dir_path:
-    :param source_project_dir_name:
-    :return: bool (True = success, False = failed)
-    """
-    try:
-        connection.put(local=source_project_zip_file_path, remote=server_projects_dir_path)
-        # Check upload success
-        if connection.run('test {}'.format(server_projects_dir_path + source_project_dir_name + ".zip"),
-                          warn=True).failed:
-            # Upload not successful: Folder does not exist in server
-            show_fail_box_ok("Failed", "Project directory could not be uploaded")
-            return False
-        else:
-            # Upload successful: Folder exists  in server
-            QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
-            return True
-    except Exception as e:
-        show_fail_box_ok("Failed", f"Project directory could not be uploaded. Reason: {e}")
+# def upload_project_zip_file(connection, source_project_zip_file_path: str,
+#                             server_projects_dir_path: str, source_project_dir_name: str) -> bool:
+#     """
+#     Uploads project zip file to the server
+#     :param source_project_zip_file_path:
+#     :param server_projects_dir_path:
+#     :param source_project_dir_name:
+#     :return: bool (True = success, False = failed)
+#     """
+#     try:
+#         connection.put(local=source_project_zip_file_path, remote=server_projects_dir_path)
+#         # Check upload success
+#         if connection.run('test {}'.format(server_projects_dir_path + source_project_dir_name + ".zip"),
+#                           warn=True).failed:
+#             # Upload not successful: Folder does not exist in server
+#             show_fail_box_ok("Failed", "Project directory could not be uploaded")
+#             return False
+#         else:
+#             # Upload successful: Folder exists  in server
+#             QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
+#             return True
+#     except Exception as e:
+#         show_fail_box_ok("Failed", f"Project directory could not be uploaded. Reason: {e}")
+#
 
-
-def remove_project_folder_from_server(onnection,
-                                      server_projects_dir_path: str, source_project_dir_name: str) -> bool:
-    """
-    Removes a project folder from server
-    :param host:
-    :param username:
-    :param port:
-    :param password:
-    :param plugin_dir:
-    :param server_projects_dir_path:
-    :param source_project_dir_name:
-    :return: (True = success, False = failed)
-    """
-
-    try:
-        onnection.run(
-            f'cd ..; cd {server_projects_dir_path}; rm -r {source_project_dir_name};')
-        # Check
-        if os.path.isdir(f'{server_projects_dir_path}{source_project_dir_name}'):
-            show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
-            return False
-        else:
-            QgsMessageLog.logMessage("Existing project folder successfully removed from server", TAG, level=Qgis.Info)
-            return True
-
-    except Exception as e:
-        show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
-        return False
+# def remove_project_folder_from_server(connection,
+#                                       server_projects_dir_path: str, source_project_dir_name: str) -> bool:
+#     """
+#     Removes a project folder from server
+#     :param host:
+#     :param username:
+#     :param port:
+#     :param password:
+#     :param plugin_dir:
+#     :param server_projects_dir_path:
+#     :param source_project_dir_name:
+#     :return: (True = success, False = failed)
+#     """
+#
+#     try:
+#         onnection.run(
+#             f'cd ..; cd {server_projects_dir_path}; rm -r {source_project_dir_name};')
+#         # Check
+#         if os.path.isdir(f'{server_projects_dir_path}{source_project_dir_name}'):
+#             show_fail_box_ok("Failed", f"Could not remove existing project folder from server.")
+#             return False
+#         else:
+#             QgsMessageLog.logMessage("Existing project folder successfully removed from server", TAG, level=Qgis.Info)
+#             return True
+#
+#     except Exception as e:
+#         show_fail_box_ok("Failed", f"Could not remove existing project folder from server. Reason: {e}")
+#         return False
 
 
 
@@ -213,30 +213,30 @@ def remove_project_folder_from_server(onnection,
 #         show_fail_box_ok("Failed", f"Could not connect to server. Reason: {e}")
 #
 
-def upload(connection, server_projects_dir_path, source_project_dir_name, source_project_dir_path,
-           source_project_zip_file_path):
-    QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
-    zip_local_project_folder(source_project_dir_path,
-                             source_project_zip_file_path, source_project_dir_name)
-    upload_project_zip_file(connection,
-                            source_project_zip_file_path,
-                            server_projects_dir_path,
-                            source_project_dir_name)
-    QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
-    delete_local_project_zip_file(source_project_zip_file_path)
-    unzip_and_remove_project_folder_on_server(connection, source_project_dir_name, server_projects_dir_path)
+# def upload(connection, server_projects_dir_path, source_project_dir_name, source_project_dir_path,
+#            source_project_zip_file_path):
+#     QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
+#     zip_local_project_folder(source_project_dir_path,
+#                              source_project_zip_file_path, source_project_dir_name)
+#     upload_project_zip_file(connection,
+#                             source_project_zip_file_path,
+#                             server_projects_dir_path,
+#                             source_project_dir_name)
+#     QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
+#     delete_local_project_zip_file(source_project_zip_file_path)
+#     unzip_and_remove_project_folder_on_server(connection, source_project_dir_name, server_projects_dir_path)
+#
 
-
-def unzip_and_remove_project_folder_on_server(connection, source_project_dir_name: str,
-                                              server_projects_dir_path: str) -> None:
-    """
-    Unzips project folder on the server
-    :param source_project_dir_name:
-    :param server_qgis_projects_folder_path:
-    """
-    connection.run(f'cd ..; cd {server_projects_dir_path}/; unzip {source_project_dir_name}.zip;')
-    QgsMessageLog.logMessage("Unzipping files on the server...", TAG, level=Qgis.Info)
-    connection.run(f'cd ..; cd /data/qgis-projects/; rm {source_project_dir_name}.zip;')
+# def unzip_and_remove_project_folder_on_server(connection, source_project_dir_name: str,
+#                                               server_projects_dir_path: str) -> None:
+#     """
+#     Unzips project folder on the server
+#     :param source_project_dir_name:
+#     :param server_qgis_projects_folder_path:
+#     """
+#     connection.run(f'cd ..; cd {server_projects_dir_path}/; unzip {source_project_dir_name}.zip;')
+#     QgsMessageLog.logMessage("Unzipping files on the server...", TAG, level=Qgis.Info)
+#     connection.run(f'cd ..; cd /data/qgis-projects/; rm {source_project_dir_name}.zip;')
 
 
 # def check_uploaded_files(host: str, username: str, port: str, password: str, plugin_dir, qgis_project_folder_name,
