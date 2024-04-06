@@ -3,6 +3,7 @@ import json
 import paramiko
 from qgis._core import QgsMessageLog, Qgis
 
+from mapbender_plugin.helpers import waitCursor
 from mapbender_plugin.settings import TAG
 
 
@@ -14,12 +15,13 @@ class MapbenderUpload():
         self.mb_app_path = mb_app_path
 
     def run_mapbender_command(self, command: str):
-        stdin, stdout, stderr = (
-            self.client.exec_command(f"cd ..; cd {self.mb_app_path}; bin/console mapbender:{command}"))
-        exit_status = stdout.channel.recv_exit_status()
-        output = stdout.read().decode("utf-8")
-        error_output = stderr.read().decode("utf-8")
-        return exit_status, output, error_output
+        with waitCursor():
+            stdin, stdout, stderr = (
+                self.client.exec_command(f"cd ..; cd {self.mb_app_path}; bin/console mapbender:{command}"))
+            exit_status = stdout.channel.recv_exit_status()
+            output = stdout.read().decode("utf-8")
+            error_output = stderr.read().decode("utf-8")
+            return exit_status, output, error_output
 
     def wms_parse_url_validate(self, url: str):
         exit_status, output, error_output = self.run_mapbender_command(f"wms:parse:url --validate '{url}'")

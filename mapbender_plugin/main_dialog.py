@@ -5,23 +5,22 @@ from PyQt5.QtCore import QSettings, Qt
 from PyQt5 import uic
 
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
+from fabric2 import Connection
 
 from qgis._core import Qgis, QgsSettings, QgsMessageLog
 
-from qgis.utils import iface
-
 from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
 from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
-from mapbender_plugin.helpers import get_plugin_dir, get_project_layers, \
-    check_if_qgis_project, get_paths, zip_local_project_folder, upload_project_zip_file, \
-    remove_project_folder_from_server, \
-    check_if_project_folder_exists_on_server, unzip_project_folder_on_server, check_uploaded_files, \
-    get_get_capabilities_url, show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
+from mapbender_plugin.helpers import get_plugin_dir, \
+    qgis_project_is_saved, \
+    show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, delete_local_project_zip_file, waitCursor, open_connection
+    update_mb_slug_in_settings, waitCursor
 from mapbender_plugin.mapbender import MapbenderUpload
+from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from mapbender_plugin.upload import Upload
 
 # Dialog aus .ui-Datei
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -183,143 +182,74 @@ class MainDialog(BASE, WIDGET):
             raise
 
     def publish_project(self) -> None:
-        if not check_if_qgis_project():
+        if not qgis_project_is_saved():
             return
         # Check Mapbender params:
-        if ((self.cloneTemplateRadioButton.isChecked() or self.addToAppRadioButton.isChecked()) and
-                self.mbSlugComboBox.currentText() != ''):
-            with waitCursor():
-                self.upload_project_qgis_server()
-        show_fail_box_ok("Please complete Mapbender parameters",
-                         "Please select clone template / add to existing application and enter a valid URL title")
+        if self.mbSlugComboBox.currentText() == '':
+            show_fail_box_ok("Please complete Mapbender parameters",
+                             "Please enter a valid Mapbender URL title")
+            return
+
+        self.upload_project_qgis_server()
 
     def update_project(self):
-        if not check_if_qgis_project():
+        if not qgis_project_is_saved():
             return
-        with waitCursor():
-            self.upload_project_qgis_server()
+        self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self):
-        # Get config params
-        selected_server_config = self.serverConfigComboBox.currentText()
-        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
-        self.host = server_config.url
-        self.port = server_config.port
-        self.username = server_config.username
-        self.password = server_config.password
-        self.server_qgis_projects_folder_rel_path = server_config.projects_path
-        self.mb_app_path = server_config.mb_app_path
+        # Get server config params and paths
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
+        paths = Paths.get_paths(server_config.projects_path)
 
-        # Get paths
-        paths = get_paths(self.server_qgis_projects_folder_rel_path)
-        source_project_dir_path = paths.get('source_project_dir_path')
-        source_project_zip_dir_path = paths.get('source_project_zip_dir_path')
-        qgis_project_folder_name = paths.get('qgis_project_folder_name')
-        qgis_project_name = paths.get('qgis_project_name')
-        server_project_dir_path = paths.get('server_project_dir_path')
+        # Check "http://"
+        wms_getcapabilities_url = (
+                "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST"
+                                                "=GetCapabilities&map="
+                + server_config.projects_path + paths.source_project_dir_name + '/' + paths.source_project_file_name)
 
-        # getProjectLayers
-        # Then check if folder exists on the server:
+        with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
+                        connect_kwargs={"password": server_config.password}) as connection:
+            try:
+                connection.open()
+            except Exception as e:
+                show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
+                return
 
-        # Open connection
-        if not open_connection(self.host, self.username, self.port, self.password):
-            return
-        # Connection is opened:
-        if check_if_project_folder_exists_on_server(self.host, self.username, self.port, self.password,
-                                                    self.plugin_dir, source_project_zip_dir_path,
-                                                    self.server_qgis_projects_folder_rel_path,
-                                                    qgis_project_folder_name):
-            # if return = True (folder already exists on server)
-            if self.publishRadioButton.isChecked():
-                # project is supposed to be new and publish for the first time
-                if (show_fail_box_yes_no("Failed",
-                                         f"Project directory already exists on the server. \n \nDo you want to"
-                                         f" overwrite the existing project directory '{qgis_project_folder_name},' "
-                                         f"update the WMS as source in Mapbender and add it to the given "
-                                         f"application?")) == QMessageBox.Yes:
-                    if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
-                                                         self.plugin_dir, self.server_qgis_projects_folder_rel_path,
-                                                         qgis_project_folder_name):
-
-                        zip_local_project_folder(self.plugin_dir, source_project_dir_path,
-                                                 source_project_zip_dir_path, qgis_project_folder_name)
-
-                        if upload_project_zip_file(self.host, self.username, self.port, self.password,
-                                                   self.plugin_dir,
-                                                   source_project_zip_dir_path,
-                                                   self.server_qgis_projects_folder_rel_path,
-                                                   qgis_project_folder_name):
-                            QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded",
-                                                     TAG,
-                                                     level=Qgis.Info)
-                            # delete local zip folder
-                            delete_local_project_zip_file(source_project_zip_dir_path)
-
-                            if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
-                                                              qgis_project_folder_name,
-                                                              self.server_qgis_projects_folder_rel_path):
-                                # check "http://"
-                                wms_getcapabilities_url = (
-                                        "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-                                        + self.server_qgis_projects_folder_rel_path + qgis_project_folder_name + '/' + qgis_project_name)
-
-                                QgsMessageLog.logMessage("WMS successfully created. Adding WMS as Mapbender source ...", TAG,
-                                                         level=Qgis.Info)
-                                self.mapbender_publish(wms_getcapabilities_url)
-            else:
-                # Project is supposed to exist on the server and will not be published for the first time,
-                # but reloaded as a source in Mapbender
-                if remove_project_folder_from_server(self.host, self.username, self.port, self.password,
-                                                     self.plugin_dir, self.server_qgis_projects_folder_rel_path,
-                                                     qgis_project_folder_name):
-                    QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG,
-                                             level=Qgis.Info)
-
-                    zip_local_project_folder(self.plugin_dir, source_project_dir_path,
-                                             source_project_zip_dir_path, qgis_project_folder_name)
-
-                    if upload_project_zip_file(self.host, self.username, self.port, self.password, self.plugin_dir,
-                                               source_project_zip_dir_path,
-                                               self.server_qgis_projects_folder_rel_path,
-                                               qgis_project_folder_name):
-                        if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
-                                                          qgis_project_folder_name,
-                                                          self.server_qgis_projects_folder_rel_path):
-                            # check "http://"
-                            wms_getcapabilities_url = (
-                                    "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-                                    + self.server_qgis_projects_folder_rel_path + qgis_project_folder_name + '/' + qgis_project_name)
-                            self.mb_update_wms(wms_getcapabilities_url)
-
-
-        else:
-            # if return = False -> folder does not exist yet on the server
-            if self.publishRadioButton.isChecked():  # project is indeed new and will be uploaded to the server
-                QgsMessageLog.logMessage("Uploading QGIS project and data to server ...", TAG,
-                                         level=Qgis.Info)
-                zip_local_project_folder(self.plugin_dir, source_project_dir_path,
-                                         source_project_zip_dir_path, qgis_project_folder_name)
-                if upload_project_zip_file(self.host, self.username, self.port, self.password, self.plugin_dir,
-                                           source_project_zip_dir_path, self.server_qgis_projects_folder_rel_path,
-                                           qgis_project_folder_name):
-                    if unzip_project_folder_on_server(self.host, self.username, self.port, self.password,
-                                                      qgis_project_folder_name,
-                                                      self.server_qgis_projects_folder_rel_path):
-                        wms_getcapabilities_url = (
-                                "http://" + self.host + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-                                + self.server_qgis_projects_folder_rel_path + qgis_project_folder_name + '/' + qgis_project_name)
-                        self.mapbender_publish(wms_getcapabilities_url)
-            # FAILBOX SHOWED NOT ONLY UNDER THIS CONDITION, ALSO IF NO CONNECTION IS SET
-            else:
-                # project is supposed to exist on the server, and it does not -> user must select the option
-                # "Publish in Mapbender app"
+            upload = Upload(source_project_dir_path=paths.source_project_dir_path,
+                            source_project_dir_name=paths.source_project_dir_name,
+                            source_project_zip_file_path=paths.source_project_zip_file_path,
+                            server_projects_dir_path=server_config.projects_path)
+            project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server(connection)
+            if project_folder_exists_on_server and self.publishRadioButton.isChecked():
+                if show_fail_box_yes_no("Failed",
+                                        f"Project directory already exists on the server. \n \nDo you want to"
+                                        f" overwrite the existing project directory '{paths.source_project_dir_name},' "
+                                        f"update the WMS as source in Mapbender and add it to the given "
+                                        f"application?") == QMessageBox.No:
+                    return
+                else:
+                    if upload.remove_project_folder_from_server(connection):
+                        upload.zip_upload_unzip_clean(connection)
+                        self.mb_publish(wms_getcapabilities_url)
+            if project_folder_exists_on_server and self.updateRadioButton.isChecked():
+                if upload.remove_project_folder_from_server(connection):
+                    upload.zip_upload_unzip_clean(connection)
+                    self.mb_update(wms_getcapabilities_url)
+            if not project_folder_exists_on_server and self.publishRadioButton.isChecked():
+                if upload.zip_upload_unzip_clean(connection):
+                    self.mb_publish(wms_getcapabilities_url)
+            if not project_folder_exists_on_server and self.updateRadioButton.isChecked():
                 show_fail_box_ok("Failed",
-                                 "Project directory " + qgis_project_folder_name + " does not exist on the server and therefore "
-                                                                                   "can not be updated. \n \nIf you want to upload a new"
-                                                                                   " QGIS-Project please select the option 'Publish "
-                                                                                   " in Mapbender app'")
+                                 "Project directory " + paths.source_project_dir_name + " does not exist on the server and therefore "
+                                                                                        "can not be updated. \n \nIf you want to upload a new"
+                                                                                        " QGIS-Project please select the option 'Publish "
+                                                                                        " in Mapbender app'")
 
-    def mapbender_publish(self, wms_getcapabilities_url):
+    def mb_publish(self, wms_getcapabilities_url):
+        # Get server config params
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
+
         # Mapbender params:
         if self.cloneTemplateRadioButton.isChecked():
             clone_app = True
@@ -331,7 +261,8 @@ class MainDialog(BASE, WIDGET):
         QgsMessageLog.logMessage("Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", TAG,
                                  level=Qgis.Info)
 
-        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path)  # other parameters?
+        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username,
+                                             server_config.mb_app_path)
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)
         if exit_status_wms_show == 0:  # success
@@ -370,7 +301,7 @@ class MainDialog(BASE, WIDGET):
                 show_succes_box_ok("Success report",
                                    "WMS succesfully created:\n \n" + wms_getcapabilities_url +
                                    "\n \n And added to mapbender application: \n \n" + "http://" +
-                                   self.host + "/mapbender/application/" + slug)
+                                   server_config.url + "/mapbender/application/" + slug)
                 self.close()
 
             else:
@@ -379,10 +310,13 @@ class MainDialog(BASE, WIDGET):
 
         mapbender_uploader.close_connection()
 
-    def mb_update_wms(self, wms_getcapabilities_url):
+    def mb_update(self, wms_getcapabilities_url):
+        # Get server config params
+        server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
+
         QgsMessageLog.logMessage(f"Mapbender update get capabilitites: {wms_getcapabilities_url}", TAG,
                                  level=Qgis.Info)
-        mapbender_uploader = MapbenderUpload(self.host, self.username, self.mb_app_path)
+        mapbender_uploader = MapbenderUpload(server_config.url, server_config.username, server_config.mb_app_path)
         QgsMessageLog.logMessage("Mapbender uploader instanced", TAG,
                                  level=Qgis.Info)
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(wms_getcapabilities_url)

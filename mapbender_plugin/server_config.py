@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from qgis._core import QgsSettings, QgsApplication, QgsAuthMethodConfig, QgsMessageLog, Qgis
+from qgis.core import QgsSettings, QgsApplication, QgsAuthMethodConfig, QgsMessageLog, Qgis
 
 from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 
@@ -15,25 +15,12 @@ class ServerConfig:
     projects_path: str
     mb_app_path: str
     mb_basis_url: str
-    authcfg:str
-
-    # @staticmethod
-    # def saveToSettings(name, url, port, username, password, projects_path, mb_app_path, mb_basis_url):
-    #     s = QgsSettings()
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/url", url)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/port", port)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/username", username)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/password", password)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/projects_path", projects_path)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_app_path", mb_app_path)
-    #     s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_basis_url", mb_basis_url)
+    authcfg: str
 
     def save(self):
         s = QgsSettings()
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/url", self.url)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/port", self.port)
-        # s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", self.username)
-        # s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/password", self.password)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", '')
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/password", '')
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/projects_path", self.projects_path)
@@ -54,17 +41,15 @@ class ServerConfig:
             password (str): User's password.
         """
         auth_manager = QgsApplication.authManager()
-        # set Basic
         conf = QgsAuthMethodConfig()
         conf.setName(server_name)
         conf.setMethod("Basic")
         conf.setConfig("username", username)
         conf.setConfig("password", password)
-        # check if method parameters are correctly set
+        # Check if method parameters are correctly set
         assert conf.isValid()
 
-        # register data in authdb returning the ``authcfg`` of the stored
-        # configuration
+        # Register data in authdb returning the ``authcfg`` of the stored configuration
         auth_manager.storeAuthenticationConfig(conf)
         newAuthCfgId = conf.id()
         assert newAuthCfgId
@@ -75,8 +60,6 @@ class ServerConfig:
         s = QgsSettings()
         url = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/url")
         port = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/port")
-        #username = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/username")
-        #password = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/password")
         projects_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/projects_path")
         mb_app_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_app_path")
         mb_basis_url = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_basis_url")
@@ -88,9 +71,6 @@ class ServerConfig:
 
     @staticmethod
     def get_username_and_password_from_auth_db(authcfg):
-        """ Read connection details from authManager
-        """
-        # password encrypted in AuthManager
         auth_manager = QgsApplication.authManager()
         conf = QgsAuthMethodConfig()
         auth_manager.loadAuthenticationConfig(authcfg, conf, True)
