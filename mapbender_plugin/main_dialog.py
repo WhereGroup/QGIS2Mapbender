@@ -51,10 +51,9 @@ class MainDialog(BASE, WIDGET):
         self.updateButton.setEnabled(False)
 
         # Tab2
-        # Server table
-        serverTableHeaders = SERVER_TABLE_HEADERS
-        self.serverTableWidget.setColumnCount(len(serverTableHeaders))
-        self.serverTableWidget.setHorizontalHeaderLabels(serverTableHeaders)
+        server_table_headers = SERVER_TABLE_HEADERS
+        self.serverTableWidget.setColumnCount(len(server_table_headers))
+        self.serverTableWidget.setHorizontalHeaderLabels(server_table_headers)
         self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
 
@@ -197,7 +196,7 @@ class MainDialog(BASE, WIDGET):
         self.upload_project_qgis_server()
 
     def upload_project_qgis_server(self) -> None:
-        # Get server config params and paths
+        # Get server config params and project paths
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
@@ -257,7 +256,7 @@ class MainDialog(BASE, WIDGET):
         mapbender_uploader = MapbenderUpload(connection, server_config, wms_url)
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show()
-        if exit_status_wms_show == 0:  # success
+        if exit_status_wms_show == 0:  # Success
             # Reload source if it already exists
             if len(sources_ids) > 0:
                 for source_id in sources_ids:
@@ -267,8 +266,6 @@ class MainDialog(BASE, WIDGET):
                 # Add source to Mapbender if it does not exist
                 exit_status_wms_add, source_id = mapbender_uploader.wms_add()
 
-                # Depending on user's input (duplicate template or use existing application):
-            # if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
             if clone_app:
                 template_slug = self.mbSlugComboBox.currentText()
                 exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
