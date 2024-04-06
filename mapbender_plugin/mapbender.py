@@ -1,6 +1,5 @@
 import json
 
-import paramiko
 from qgis._core import QgsMessageLog, Qgis
 
 from mapbender_plugin.helpers import waitCursor

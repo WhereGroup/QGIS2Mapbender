@@ -1,17 +1,12 @@
 import os
-import shutil
 
 from PyQt5.QtCore import Qt
 from decorator import contextmanager
-from fabric2 import Connection
-import paramiko
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis._core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
-from qgis.utils import iface
 
-from mapbender_plugin.settings import TAG
 
 
 def get_plugin_dir() -> str:

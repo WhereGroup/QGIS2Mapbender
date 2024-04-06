@@ -15,7 +15,7 @@ from mapbender_plugin.helpers import get_plugin_dir, \
     qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, waitCursor
+    update_mb_slug_in_settings
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
