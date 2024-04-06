@@ -257,27 +257,27 @@ class MainDialog(BASE, WIDGET):
         QgsMessageLog.logMessage("Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", TAG,
                                  level=Qgis.Info)
 
-        mapbender_uploader = MapbenderUpload(server_config, wms_url)
+        mapbender_uploader = MapbenderUpload(connection, server_config, wms_url)
 
-        exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(connection)
+        exit_status_wms_show, sources_ids = mapbender_uploader.wms_show()
         if exit_status_wms_show == 0:  # success
             # Reload source if it already exists
             if len(sources_ids) > 0:
                 for source_id in sources_ids:
-                    exit_status_wms_reload = mapbender_uploader.wms_reload(connection, source_id)
+                    exit_status_wms_reload = mapbender_uploader.wms_reload(source_id)
                 source_id = sources_ids[-1]
             else:
                 # Add source to Mapbender if it does not exist
-                exit_status_wms_add, source_id = mapbender_uploader.wms_add(connection)
+                exit_status_wms_add, source_id = mapbender_uploader.wms_add()
 
                 # Depending on user's input (duplicate template or use existing application):
             # if exit_status_wms_reload == 0 or exit_status_wms_add == 0:
             if clone_app:
                 template_slug = self.mbSlugComboBox.currentText()
-                exit_status_app_clone, slug, error = mapbender_uploader.app_clone(connection, template_slug)
+                exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
                 if exit_status_app_clone == 0:
                     exit_status_wms_assign, output_wms_assign, error_wms_assign = (
-                        mapbender_uploader.wms_assign(connection, slug, source_id, layer_set))
+                        mapbender_uploader.wms_assign(slug, source_id, layer_set))
                     update_mb_slug_in_settings(template_slug, is_mb_slug=True)
                     self.update_slug_combo_box()
 
@@ -290,7 +290,7 @@ class MainDialog(BASE, WIDGET):
             else:
                 slug = self.mbSlugComboBox.currentText()
                 exit_status_wms_assign, output_wms_assign, error_wms_assign = (
-                    mapbender_uploader.wms_assign(connection, slug, source_id, layer_set))
+                    mapbender_uploader.wms_assign(slug, source_id, layer_set))
 
             if exit_status_wms_assign == 0:
                 show_succes_box_ok("Success report",
@@ -307,17 +307,17 @@ class MainDialog(BASE, WIDGET):
     def mb_update(self, connection, server_config, wms_url):
         QgsMessageLog.logMessage(f"Mapbender update get capabilitites: {wms_url}", TAG,
                                  level=Qgis.Info)
-        mapbender_uploader = MapbenderUpload(server_config, wms_url)
+        mapbender_uploader = MapbenderUpload(connection, server_config, wms_url)
         QgsMessageLog.logMessage("Mapbender uploader instanced", TAG,
                                  level=Qgis.Info)
-        exit_status_wms_show, sources_ids = mapbender_uploader.wms_show(connection)
+        exit_status_wms_show, sources_ids = mapbender_uploader.wms_show()
         QgsMessageLog.logMessage(f"Output wms_show: {exit_status_wms_show}, {sources_ids}", TAG,
                                  level=Qgis.Info)
         if exit_status_wms_show == 0:  # Success
             # Reload source if it already exists
             if len(sources_ids) > 0:
                 for source_id in sources_ids:
-                    exit_status_wms_reload, output, error_output = mapbender_uploader.wms_reload(connection, source_id)
+                    exit_status_wms_reload, output, error_output = mapbender_uploader.wms_reload(source_id)
                     if exit_status_wms_reload == 0:  # Success
                         show_succes_box_ok("Success report",
                                            "WMS succesfully updated:\n \n" + wms_url +

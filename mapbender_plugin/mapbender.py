@@ -7,11 +7,12 @@ from mapbender_plugin.settings import TAG
 
 
 class MapbenderUpload():
-    def __init__(self, server_config, wms_url):
+    def __init__(self, connection, server_config, wms_url):
         self.server_config = server_config
         self.wms_url = wms_url
+        self.connection = connection
 
-    def run_mapbender_command(self, connection, command: str) -> str:
+    def run_mapbender_command(self, command: str) -> str:
         """
             Executes a Mapbender command using the provided connection.
 
@@ -24,14 +25,14 @@ class MapbenderUpload():
                 error_output (str): The standard error output (stderr) from the command.
             """
         with waitCursor():
-            result = connection.run(
+            result = self.connection.run(
                 f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}")
             exit_status = result.exited
             output = result.stdout
             error_output = result.stderr
             return exit_status, output, error_output
 
-    def wms_show(self, connection):
+    def wms_show(self):
         """
         Displays layer information of a persisted WMS source.
         Parses the url of the WMS Source to get the information.
@@ -39,7 +40,7 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail),
         :return: sources_ids (list with sources ids if available)
         """
-        exit_status, output, error_output = self.run_mapbender_command(connection, f"wms:show --json '{self.wms_url}'")
+        exit_status, output, error_output = self.run_mapbender_command(f"wms:show --json '{self.wms_url}'")
         #     if options:
         #         options_string = " ".join(("--{option}" for option in options))
         #     ... = run_app_console_mapbender_command(f"wms:parse:url {options_string if options_string else ''} {wms_id} {file_path}")
@@ -52,14 +53,14 @@ class MapbenderUpload():
             sources_ids = []
             return exit_status,  sources_ids
 
-    def wms_add(self, connection):
+    def wms_add(self):
         """
         Adds a new WMS Source to your Mapbender Service repository.
         :param url: url of the WMS Source
         :return: exit_status (0 = success, 1 = fail),
         :return: source_id (id of the new added source)
         """
-        exit_status, output, error_output = self.run_mapbender_command(connection, f"wms:add '{self.wms_url}'")
+        exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{self.wms_url}'")
         if exit_status == 0 and output:
             spl = 'Saved new source #'
             source_id = output.split(spl,1)[1]
@@ -69,17 +70,17 @@ class MapbenderUpload():
             return exit_status, source_id
 
 
-    def wms_reload(self, connection, id):
+    def wms_reload(self, id):
         """
         Reloads (updates) a WMS source from given url.
         :param id: existing source id
         :param url: url of the WMS Source
         :return: exit_status (0 = success, 1 = fail)
         """
-        exit_status, output, error_output = self.run_mapbender_command(connection, f"wms:reload:url {id} '{self.wms_url}'")
+        exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{self.wms_url}'")
         return exit_status, output, error_output
 
-    def app_clone(self, connection, template_slug):
+    def app_clone(self, template_slug):
         """
         Clones an existing application in the Application backend. This will create a new application with
         a _imp suffix as application name.
@@ -88,7 +89,7 @@ class MapbenderUpload():
         :return:slug of the new clone app
         :return:error_output
         """
-        exit_status, output, error_output = self.run_mapbender_command(connection, f"application:clone '{template_slug}'")
+        exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
         if output != '':
             spl = 'slug'
             slug = (output.split(spl,1)[1]).split(',')[0].strip()
@@ -97,7 +98,7 @@ class MapbenderUpload():
             slug = ''
             return exit_status, slug, error_output
 
-    def wms_assign(self, connection, slug, source_id, layer_set):
+    def wms_assign(self, slug, source_id, layer_set):
         """
         :param slug:
         :param source_id:
@@ -105,7 +106,7 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail), output, error_output
         """
         exit_status, output, error_output = (
-            self.run_mapbender_command(connection, f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
+            self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
         QgsMessageLog.logMessage(f"wms:assign '{slug}' '{source_id}' '{layer_set}'", TAG, level=Qgis.Info)
         return exit_status, output, error_output
 
