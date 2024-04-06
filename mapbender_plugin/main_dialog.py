@@ -323,6 +323,6 @@ class MainDialog(BASE, WIDGET):
             else:
                 show_fail_box_ok("Failed",
                                  f"WMS is not an existing source in Mapbender and could not be updated")
-        else:  # Failed
+        else:
             show_fail_box_ok("Failed",
                              f"No information for the given WMS could be displayed")
