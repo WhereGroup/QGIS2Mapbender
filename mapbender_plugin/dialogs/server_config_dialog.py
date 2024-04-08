@@ -36,6 +36,7 @@ class serverConfigDialog(BASE, WIDGET):
         self.userNameLineEdit.setText(server_config.username)
         self.passwordLineEdit.setText(server_config.password)
         self.qgisProjectPathLineEdit.setText(server_config.projects_path)
+        self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
 
@@ -54,6 +55,7 @@ class serverConfigDialog(BASE, WIDGET):
         new_user_name = self.userNameLineEdit.text()
         new_password = self.passwordLineEdit.text()
         new_server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
+        new_qgis_server_path = self.qgisServerPathLineEdit.text()
         new_server_mb_app_path = self.mbPathLineEdit.text()
         new_mb_basis_url = self.mbBasisUrlLineEdit.text()
         authcfg = ''
@@ -65,6 +67,7 @@ class serverConfigDialog(BASE, WIDGET):
             username=new_user_name,
             password=new_password,
             projects_path=new_server_qgis_projects_path,
+            qgis_server_path=new_qgis_server_path,
             mb_app_path=new_server_mb_app_path,
             mb_basis_url=new_mb_basis_url,
             authcfg=authcfg
@@ -77,6 +80,7 @@ class serverConfigDialog(BASE, WIDGET):
         edit_user_name = self.userNameLineEdit.text()
         edit_password = self.passwordLineEdit.text()
         edit_server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
+        edit_qgis_server_path = self.qgisProjectPathLineEdit.text()
         edit_server_mb_app_path = self.mbPathLineEdit.text()
         edit_mb_basis_url = self.mbBasisUrlLineEdit.text()
         return ServerConfig(
@@ -86,13 +90,14 @@ class serverConfigDialog(BASE, WIDGET):
             username=edit_user_name,
             password=edit_password,
             projects_path=edit_server_qgis_projects_path,
+            qgis_server_path=edit_qgis_server_path,
             mb_app_path=edit_server_mb_app_path,
             mb_basis_url=edit_mb_basis_url,
             authcfg=self.authcfg
         )
 
     def checkConfig(self, serverConfig: ServerConfig) -> None:
-        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path, serverConfig.mb_app_path,
+        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path, serverConfig.qgis_server_path, serverConfig.mb_app_path,
                            serverConfig.mb_basis_url]
 
         if not all(mandatoryFields):

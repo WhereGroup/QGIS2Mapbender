@@ -2,5 +2,5 @@
 
 # General
 PLUGIN_SETTINGS_SERVER_CONFIG_KEY = 'mapbender-plugin'
-SERVER_TABLE_HEADERS = ["Name", "URL", "QGIS-Projects path", "Mapbender app path", "Mapbender basis URL"]
+SERVER_TABLE_HEADERS = ["Name", "URL", "QGIS-Projects path", "QGIS-Server path" , "Mapbender app path", "Mapbender basis URL"]
 TAG = 'Mapbender-Plugin'
