@@ -103,14 +103,16 @@ def validate_no_spaces(*variables):
     return True
 
 
-def update_mb_slug_in_settings(mb_slug, is_mb_slug):
+def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
     s = QgsSettings()
     if s.contains("mapbender-plugin/mb_templates"):
         s.beginGroup('mapbender-plugin/')
         mb_slugs = s.value('mb_templates')
         s.endGroup()
-        if isinstance(mb_slugs, str):
+        if isinstance(mb_slugs, str) and mb_slugs != '':
             mb_slugs_list = mb_slugs.split(", ")
+        elif isinstance(mb_slugs, str) and mb_slugs == '':
+            mb_slugs_list = []
         elif isinstance(mb_slugs, list):
             mb_slugs_list = mb_slugs
         else:
