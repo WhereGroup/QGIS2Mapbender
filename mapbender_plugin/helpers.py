@@ -122,7 +122,7 @@ def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
             mb_slugs_list.append(mb_slug)
             updated_mb_slugs = ", ".join(mb_slugs_list)
             s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
-        elif mb_slug in mb_slugs_list:
+        if not is_mb_slug and mb_slug in mb_slugs_list:
             mb_slugs_list.remove(mb_slug)
             updated_mb_slugs = ", ".join(mb_slugs_list)
             s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
