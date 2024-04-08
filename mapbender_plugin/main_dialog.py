@@ -9,8 +9,7 @@ from fabric2 import Connection
 
 from qgis._core import Qgis, QgsSettings, QgsMessageLog
 
-from mapbender_plugin.dialogs.add_server_config_dialog import AddServerConfigDialog
-from mapbender_plugin.dialogs.edit_server_config_dialog import EditServerConfigDialog
+from mapbender_plugin.dialogs.server_config_dialog import serverConfigDialog
 from mapbender_plugin.helpers import get_plugin_dir, \
     qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
@@ -145,17 +144,19 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.setEnabled(True)
 
     def open_dialog_add_new_server_config(self) -> None:
-        new_server_config_dialog = AddServerConfigDialog()
+        server_config_is_new = True
+        new_server_config_dialog = serverConfigDialog(server_config_is_new, '')
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
     def open_dialog_edit_server_config(self) -> None:
+        server_config_is_new = False
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
         selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_config_dialog = EditServerConfigDialog(selected_server_config)
+        edit_server_config_dialog = serverConfigDialog(server_config_is_new, selected_server_config)
         edit_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
