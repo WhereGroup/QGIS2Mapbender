@@ -25,12 +25,23 @@ class MapbenderUpload():
                 error_output (str): The standard error output (stderr) from the command.
             """
         with waitCursor():
-            result = self.connection.run(
+            result = ''
+            try:
+                result = self.connection.run(
                 f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}")
-            exit_status = result.exited
-            output = result.stdout
-            error_output = result.stderr
-            return exit_status, output, error_output
+            except Exception as e:
+                print(f'exception: {e}')
+
+            if result:
+                exit_status = result.exited
+                output = result.stdout
+                error_output = result.stderr
+                return exit_status, output, error_output
+            else:
+                exit_status = 1
+                output = ''
+                error_output = ''
+                return exit_status, output, error_output
 
     def wms_show(self):
         """
