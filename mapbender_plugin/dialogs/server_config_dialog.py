@@ -65,28 +65,37 @@ class serverConfigDialog(BASE, WIDGET):
         )
 
 
-    def checkConfig(self, serverConfig: ServerConfig) -> None:
+    def isValid(self, serverConfig: ServerConfig) -> None:
         mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path,
                            serverConfig.qgis_server_path, serverConfig.mb_app_path,
                            serverConfig.mb_basis_url]
 
         if not all(mandatoryFields):
             show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
-            return
+            return False
 
-        if not serverConfig.isValid():
-            show_fail_box_ok('Failed', 'Fields should not have blank spaces')
-            return
+        return True
 
-        serverConfig.save()
-
-        show_succes_box_ok('Success', 'Server configuration successfully updated')
-        self.close()
-        return
+        # if not serverConfig.isValid():
+        #     show_fail_box_ok('Failed', 'Fields should not have blank spaces')
+        #     return
+        #
+        # serverConfig.save()
+        #
+        # show_succes_box_ok('Success', 'Server configuration successfully updated')
+        # self.close()
+        # return
 
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()
-        self.checkConfig(serverConfig)
+        if not self.isValid(serverConfig):
+            show_fail_box_ok('Failed', 'Server configuration is not valid')
+            return
+        serverConfig.save()
+        show_succes_box_ok('Success', 'Server configuration successfully saved')
+        self.close()
+        return
+
 
 
 

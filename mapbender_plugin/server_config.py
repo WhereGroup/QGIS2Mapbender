@@ -87,10 +87,10 @@ class ServerConfig:
             QgsMessageLog.logMessage("No config id...", TAG, level=Qgis.Warning)
             return username, password
 
-    def isValid(self) -> bool:
-        variables = [self.name, self.url, self.port, self.username, self.password, self.projects_path, self.mb_app_path,
-                     self.mb_basis_url]
-        for var in variables:
-            if " " in var:
-                return False
-        return True
+    # def isValid(self) -> bool:
+    #     variables = [self.name, self.url, self.port, self.username, self.password, self.projects_path, self.mb_app_path,
+    #                  self.mb_basis_url]
+    #     for var in variables:
+    #         if " " in var:
+    #             return False
+    #     return True
