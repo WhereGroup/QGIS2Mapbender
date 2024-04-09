@@ -1,5 +1,6 @@
 import os
 import shutil
+from urllib.parse import urlparse
 
 from qgis._core import QgsMessageLog, Qgis
 from qgis.utils import iface
@@ -17,20 +18,22 @@ class Upload:
         self.source_project_zip_file_path = paths.source_project_zip_file_path
         self.server_projects_dir_path = paths.server_projects_dir_path
 
+    @staticmethod
+    def get_url_protocol(url):
+        return urlparse(url).scheme
+
     def get_wms_url(self, server_config) -> str:
-        protocol_is_http = True
-        # Check "http://"
-        if protocol_is_http:
-            protocol = 'http://'
-            wms_url = (f'{protocol}{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
-                       f'{server_config.projects_path}{self.source_project_dir_name}/'
-                       f'{self.source_project_file_name}')
-            return wms_url
+        protocol = self.get_url_protocol(server_config.mb_basis_url)
+        print(protocol)
+        wms_url = (f'{protocol}://{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
+                   f'{server_config.projects_path}{self.source_project_dir_name}/'
+                   f'{self.source_project_file_name}')
+        return wms_url
 
     def check_if_project_folder_exists_on_server(self) -> bool:
         with waitCursor():
             if self.connection.run('test -d {}'.format(self.server_projects_dir_path + self.source_project_dir_name),
-                              warn=True).failed:  # Without .zip (if it exists, is unzipped)
+                                   warn=True).failed:  # Without .zip (if it exists, is unzipped)
                 return False
         return True
 

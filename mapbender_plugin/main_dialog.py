@@ -18,8 +18,7 @@ from mapbender_plugin.helpers import get_plugin_dir, \
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG, \
-    WMS_SERVICE_VERSION_REQUEST
+from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 from mapbender_plugin.upload import Upload
 
 # Dialog aus .ui-Datei
