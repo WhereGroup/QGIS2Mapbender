@@ -24,7 +24,6 @@ class Upload:
 
     def get_wms_url(self, server_config) -> str:
         protocol = self.get_url_protocol(server_config.mb_basis_url)
-        print(protocol)
         wms_url = (f'{protocol}://{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
                    f'{server_config.projects_path}{self.source_project_dir_name}/'
                    f'{self.source_project_file_name}')
