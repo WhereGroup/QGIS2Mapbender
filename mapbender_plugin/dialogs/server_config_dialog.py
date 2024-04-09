@@ -1,6 +1,7 @@
 import configparser
 import os
 from PyQt5 import uic
+from PyQt5.QtGui import QIntValidator
 
 from mapbender_plugin.helpers import list_qgs_settings_child_groups, show_succes_box_ok, \
     show_fail_box_ok, validate_no_spaces
@@ -18,6 +19,17 @@ class serverConfigDialog(BASE, WIDGET):
         self.server_config_is_new = server_config_is_new
         if not self.server_config_is_new:
             self.getSavedServerConfig(selected_server_config)
+
+        int_validator = QIntValidator()
+        # self.serverConfigNameLineEdit.setValidator()
+        self.serverPortLineEdit.setValidator(int_validator)
+        # self.serverAddressLineEdit.setValidator()
+        # self.userNameLineEdit.setValidator()
+        # self.passwordLineEdit.setValidator()
+        # self.qgisProjectPathLineEdit.setValidator()
+        # self.qgisServerPathLineEdit.setValidator()
+        # self.mbPathLineEdit.setValidator()
+        # self.mbBasisUrlLineEdit.setValidator()
 
     def setupConnections(self):
         self.dialogButtonBox.accepted.connect(self.saveServerConfig)
@@ -75,16 +87,6 @@ class serverConfigDialog(BASE, WIDGET):
             return False
 
         return True
-
-        # if not serverConfig.isValid():
-        #     show_fail_box_ok('Failed', 'Fields should not have blank spaces')
-        #     return
-        #
-        # serverConfig.save()
-        #
-        # show_succes_box_ok('Success', 'Server configuration successfully updated')
-        # self.close()
-        # return
 
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()
