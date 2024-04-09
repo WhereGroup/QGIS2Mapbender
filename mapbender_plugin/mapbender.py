@@ -6,13 +6,13 @@ from mapbender_plugin.helpers import waitCursor
 from mapbender_plugin.settings import TAG
 
 
-class MapbenderUpload():
+class MapbenderUpload:
     def __init__(self, connection, server_config, wms_url):
         self.server_config = server_config
         self.wms_url = wms_url
         self.connection = connection
 
-    def run_mapbender_command(self, command: str) -> str:
+    def run_mapbender_command(self, command: str) -> tuple:
         """
             Executes a Mapbender command using the provided connection.
 
