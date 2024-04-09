@@ -14,15 +14,13 @@ class serverConfigDialog(BASE, WIDGET):
     def __init__(self, server_config_is_new, selected_server_config, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.setupConnections(server_config_is_new)
-        if not server_config_is_new:
+        self.setupConnections()
+        self.server_config_is_new = server_config_is_new
+        if not self.server_config_is_new:
             self.getSavedServerConfig(selected_server_config)
 
-    def setupConnections(self, server_config_is_new):
-        if not server_config_is_new:
-            self.dialogButtonBox.accepted.connect(self.saveEditedServerConfig)
-        else:
-            self.dialogButtonBox.accepted.connect(self.saveNewServerConfig)
+    def setupConnections(self):
+        self.dialogButtonBox.accepted.connect(self.saveServerConfig)
         self.dialogButtonBox.rejected.connect(self.reject)
 
     def getSavedServerConfig(self, selected_server_config):
@@ -40,64 +38,36 @@ class serverConfigDialog(BASE, WIDGET):
         self.mbPathLineEdit.setText(server_config.mb_app_path)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
 
-    def saveEditedServerConfig(self):
-        serverConfig = self.getEditedServerConfig()
-        self.checkConfig(serverConfig)
-
-    def saveNewServerConfig(self):
-        serverConfig = self.getNewServerConfigFromFormular()
-        self.checkConfig(serverConfig)
-
-    def getNewServerConfigFromFormular(self) -> ServerConfig:
-        new_server_config_name = self.serverConfigNameLineEdit.text()
-        new_server_address = self.serverAddressLineEdit.text()
-        new_port = self.serverPortLineEdit.text()
-        new_user_name = self.userNameLineEdit.text()
-        new_password = self.passwordLineEdit.text()
-        new_server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
-        new_qgis_server_path = self.qgisServerPathLineEdit.text()
-        new_server_mb_app_path = self.mbPathLineEdit.text()
-        new_mb_basis_url = self.mbBasisUrlLineEdit.text()
-        authcfg = ''
-
+    def getServerConfigFromFormular(self) -> ServerConfig:
+        server_config_name = self.serverConfigNameLineEdit.text()
+        server_address = self.serverAddressLineEdit.text()
+        port = self.serverPortLineEdit.text()
+        user_name = self.userNameLineEdit.text()
+        password = self.passwordLineEdit.text()
+        server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
+        qgis_server_path = self.qgisServerPathLineEdit.text()
+        server_mb_app_path = self.mbPathLineEdit.text()
+        mb_basis_url = self.mbBasisUrlLineEdit.text()
+        if self.server_config_is_new:
+            # authcfg will be set after saving the basic auth params in the auth_db
+            self.authcfg = ''
         return ServerConfig(
-            name=new_server_config_name,
-            url=new_server_address,
-            port=new_port,
-            username=new_user_name,
-            password=new_password,
-            projects_path=new_server_qgis_projects_path,
-            qgis_server_path=new_qgis_server_path,
-            mb_app_path=new_server_mb_app_path,
-            mb_basis_url=new_mb_basis_url,
-            authcfg=authcfg
-        )
-
-    def getEditedServerConfig(self) -> ServerConfig:
-        edit_server_config_name = self.serverConfigNameLineEdit.text()
-        edit_server_address = self.serverAddressLineEdit.text()
-        edit_port = self.serverPortLineEdit.text()
-        edit_user_name = self.userNameLineEdit.text()
-        edit_password = self.passwordLineEdit.text()
-        edit_server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
-        edit_qgis_server_path = self.qgisServerPathLineEdit.text()
-        edit_server_mb_app_path = self.mbPathLineEdit.text()
-        edit_mb_basis_url = self.mbBasisUrlLineEdit.text()
-        return ServerConfig(
-            name=edit_server_config_name,
-            url=edit_server_address,
-            port=edit_port,
-            username=edit_user_name,
-            password=edit_password,
-            projects_path=edit_server_qgis_projects_path,
-            qgis_server_path=edit_qgis_server_path,
-            mb_app_path=edit_server_mb_app_path,
-            mb_basis_url=edit_mb_basis_url,
+            name=server_config_name,
+            url=server_address,
+            port=port,
+            username=user_name,
+            password=password,
+            projects_path=server_qgis_projects_path,
+            qgis_server_path=qgis_server_path,
+            mb_app_path=server_mb_app_path,
+            mb_basis_url=mb_basis_url,
             authcfg=self.authcfg
         )
 
+
     def checkConfig(self, serverConfig: ServerConfig) -> None:
-        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path, serverConfig.qgis_server_path, serverConfig.mb_app_path,
+        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path,
+                           serverConfig.qgis_server_path, serverConfig.mb_app_path,
                            serverConfig.mb_basis_url]
 
         if not all(mandatoryFields):
@@ -113,6 +83,10 @@ class serverConfigDialog(BASE, WIDGET):
         show_succes_box_ok('Success', 'Server configuration successfully updated')
         self.close()
         return
+
+    def saveServerConfig(self):
+        serverConfig = self.getServerConfigFromFormular()
+        self.checkConfig(serverConfig)
 
 
 
