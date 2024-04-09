@@ -37,6 +37,7 @@ class serverConfigDialog(BASE, WIDGET):
         self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
+        self.winPKPathLineEdit.setText(server_config.windows_pk_path)
 
     def getServerConfigFromFormular(self) -> ServerConfig:
         server_config_name = self.serverConfigNameLineEdit.text()
@@ -48,6 +49,7 @@ class serverConfigDialog(BASE, WIDGET):
         qgis_server_path = self.qgisServerPathLineEdit.text()
         server_mb_app_path = self.mbPathLineEdit.text()
         mb_basis_url = self.mbBasisUrlLineEdit.text()
+        windows_pk_path = self.winPKPathLineEdit.text()
         if self.server_config_is_new:
             # authcfg will be set after saving the basic auth params in the auth_db
             self.authcfg = ''
@@ -61,7 +63,8 @@ class serverConfigDialog(BASE, WIDGET):
             qgis_server_path=qgis_server_path,
             mb_app_path=server_mb_app_path,
             mb_basis_url=mb_basis_url,
-            authcfg=self.authcfg
+            authcfg=self.authcfg,
+            windows_pk_path=windows_pk_path
         )
 
 

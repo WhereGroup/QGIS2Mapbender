@@ -176,6 +176,28 @@
           </property>
          </widget>
         </item>
+        <item row="14" column="1">
+         <widget class="QLineEdit" name="winPKPathLineEdit"/>
+        </item>
+        <item row="14" column="0">
+         <widget class="QLabel" name="winPKPathLabel">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="15" column="1">
+         <widget class="QLabel" name="winPKPathExampleLabel">
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="text">
+           <string>Example: /home/myuser/.ssh/private.key</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="0" column="0">

@@ -207,7 +207,8 @@ class MainDialog(BASE, WIDGET):
         paths = Paths.get_paths(server_config.projects_path)
 
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
-                        connect_kwargs={"password": server_config.password}) as connection:
+                        connect_kwargs={"password": server_config.password,
+                                        "key_filename": server_config.windows_pk_path}) as connection:
             try:
                 connection.open()
             except Exception as e:
