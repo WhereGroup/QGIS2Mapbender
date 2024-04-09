@@ -80,7 +80,7 @@ class serverConfigDialog(BASE, WIDGET):
         edit_user_name = self.userNameLineEdit.text()
         edit_password = self.passwordLineEdit.text()
         edit_server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
-        edit_qgis_server_path = self.qgisProjectPathLineEdit.text()
+        edit_qgis_server_path = self.qgisServerPathLineEdit.text()
         edit_server_mb_app_path = self.mbPathLineEdit.text()
         edit_mb_basis_url = self.mbBasisUrlLineEdit.text()
         return ServerConfig(

@@ -5,7 +5,7 @@ from qgis._core import QgsMessageLog, Qgis
 from qgis.utils import iface
 
 from mapbender_plugin.helpers import show_fail_box_ok, waitCursor
-from mapbender_plugin.settings import TAG
+from mapbender_plugin.settings import TAG, WMS_SERVICE_VERSION_REQUEST
 
 
 class Upload:
@@ -13,8 +13,19 @@ class Upload:
         self.connection = connection
         self.source_project_dir_path = paths.source_project_dir_path
         self.source_project_dir_name = paths.source_project_dir_name
+        self.source_project_file_name = paths.source_project_file_name
         self.source_project_zip_file_path = paths.source_project_zip_file_path
         self.server_projects_dir_path = paths.server_projects_dir_path
+
+    def get_wms_url(self, server_config) -> str:
+        protocol_is_http = True
+        # Check "http://"
+        if protocol_is_http:
+            protocol = 'http://'
+            wms_url = (f'{protocol}{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
+                       f'{server_config.projects_path}{self.source_project_dir_name}/'
+                       f'{self.source_project_file_name}')
+            return wms_url
 
     def check_if_project_folder_exists_on_server(self) -> bool:
         with waitCursor():

@@ -201,17 +201,11 @@ class MainDialog(BASE, WIDGET):
             return
         self.upload_project_qgis_server()
 
+
     def upload_project_qgis_server(self) -> None:
         # Get server config params and project paths
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
-
-        protocol_is_http = True
-        # Check "http://"
-        if protocol_is_http:
-            protocol = 'http://'
-            wms_url = (f'{protocol}{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
-                       f'{server_config.projects_path}{paths.source_project_dir_name}/{paths.source_project_file_name}')
 
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs={"password": server_config.password}) as connection:
@@ -222,6 +216,7 @@ class MainDialog(BASE, WIDGET):
                 return
 
             upload = Upload(connection, paths)
+            wms_url = upload.get_wms_url(server_config)
             project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server()
             if project_folder_exists_on_server and self.publishRadioButton.isChecked():
                 if show_fail_box_yes_no("Failed",
