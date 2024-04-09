@@ -18,7 +18,8 @@ from mapbender_plugin.helpers import get_plugin_dir, \
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG, \
+    WMS_SERVICE_VERSION_REQUEST
 from mapbender_plugin.upload import Upload
 
 # Dialog aus .ui-Datei
@@ -205,11 +206,12 @@ class MainDialog(BASE, WIDGET):
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
+        protocol_is_http = True
         # Check "http://"
-        wms_url = (
-                "http://" + server_config.url + "/cgi-bin/qgis_mapserv.fcgi?SERVICE=WMS&VERSION=1.3.0&REQUEST"
-                                                "=GetCapabilities&map="
-                + server_config.projects_path + paths.source_project_dir_name + '/' + paths.source_project_file_name)
+        if protocol_is_http:
+            protocol = 'http://'
+            wms_url = (f'{protocol}{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
+                       f'{server_config.projects_path}{paths.source_project_dir_name}/{paths.source_project_file_name}')
 
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs={"password": server_config.password}) as connection:
