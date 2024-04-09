@@ -30,7 +30,7 @@ class ServerConfig:
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/mb_basis_url", self.mb_basis_url)
 
         authCfgId = ServerConfig.save_basic_to_auth_db(self.name, self.username, self.password)
-        s.setValue(f"mapbender-plugin/connection/{self.name}/authcfg", authCfgId)
+        s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/authcfg", authCfgId)
 
     @staticmethod
     def save_basic_to_auth_db(server_name, username, password):
