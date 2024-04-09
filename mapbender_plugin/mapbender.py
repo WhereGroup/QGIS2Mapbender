@@ -1,6 +1,6 @@
 import json
 
-from qgis._core import QgsMessageLog, Qgis
+from qgis.core import QgsMessageLog, Qgis
 
 from mapbender_plugin.helpers import waitCursor
 from mapbender_plugin.settings import TAG

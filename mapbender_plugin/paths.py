@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 
-from qgis._core import QgsProject
+from qgis.core import QgsProject
 
 
 @dataclass

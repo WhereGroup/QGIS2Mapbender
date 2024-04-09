@@ -2,7 +2,7 @@ import os
 import shutil
 from urllib.parse import urlparse
 
-from qgis._core import QgsMessageLog, Qgis
+from qgis.core import QgsMessageLog, Qgis
 
 from mapbender_plugin.helpers import show_fail_box_ok, waitCursor
 from mapbender_plugin.settings import TAG, WMS_SERVICE_VERSION_REQUEST

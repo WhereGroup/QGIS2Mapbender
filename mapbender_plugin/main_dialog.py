@@ -7,7 +7,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
 from fabric2 import Connection
 
-from qgis._core import Qgis, QgsSettings, QgsMessageLog
+from qgis.core import Qgis, QgsSettings, QgsMessageLog
 
 from mapbender_plugin.dialogs.server_config_dialog import serverConfigDialog
 from mapbender_plugin.helpers import get_plugin_dir, \

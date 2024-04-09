@@ -1,11 +1,12 @@
 import os
+from typing import List
 
 from PyQt5.QtCore import Qt
 from decorator import contextmanager
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
+from qgis.core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
 
 
 
