@@ -74,7 +74,7 @@ class MainDialog(BASE, WIDGET):
         self.removeServerConfigButton.clicked.connect(self.remove_server_config)
 
     def update_server_table(self) -> None:
-        server_config_list = list_qgs_settings_child_groups("mapbender-plugin/connection")
+        server_config_list = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
         self.serverTableWidget.setRowCount(len(server_config_list))
         for i, (name) in enumerate(server_config_list):
             item_name = QTableWidgetItem(name)
