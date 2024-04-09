@@ -1,7 +1,9 @@
 import configparser
 import os
 from PyQt5 import uic
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtWidgets import QDialogButtonBox
 
 from mapbender_plugin.helpers import list_qgs_settings_child_groups, show_succes_box_ok, \
     show_fail_box_ok, validate_no_spaces
@@ -20,22 +22,35 @@ class serverConfigDialog(BASE, WIDGET):
         if not self.server_config_is_new:
             self.getSavedServerConfig(selected_server_config)
 
+        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
+
+        # QLineEdit validators
+        regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
+        regex_validattor = QRegExpValidator(regex)
         int_validator = QIntValidator()
-        # self.serverConfigNameLineEdit.setValidator()
+        self.serverConfigNameLineEdit.setValidator(regex_validattor)
         self.serverPortLineEdit.setValidator(int_validator)
-        # self.serverAddressLineEdit.setValidator()
-        # self.userNameLineEdit.setValidator()
-        # self.passwordLineEdit.setValidator()
-        # self.qgisProjectPathLineEdit.setValidator()
-        # self.qgisServerPathLineEdit.setValidator()
-        # self.mbPathLineEdit.setValidator()
-        # self.mbBasisUrlLineEdit.setValidator()
+        self.serverAddressLineEdit.setValidator(regex_validattor)
+        self.userNameLineEdit.setValidator(regex_validattor)
+        self.passwordLineEdit.setValidator(regex_validattor)
+        self.qgisProjectPathLineEdit.setValidator(regex_validattor)
+        self.qgisServerPathLineEdit.setValidator(regex_validattor)
+        self.mbPathLineEdit.setValidator(regex_validattor)
+        self.mbBasisUrlLineEdit.setValidator(regex_validattor)
 
     def setupConnections(self):
         self.dialogButtonBox.accepted.connect(self.saveServerConfig)
         self.dialogButtonBox.rejected.connect(self.reject)
+        self.serverConfigNameLineEdit.textChanged.connect(self.validateFields)
+        self.serverAddressLineEdit.textChanged.connect(self.validateFields)
+        self.qgisProjectPathLineEdit.textChanged.connect(self.validateFields)
+        self.qgisServerPathLineEdit.textChanged.connect(self.validateFields)
+        self.mbPathLineEdit.textChanged.connect(self.validateFields)
+        self.mbBasisUrlLineEdit.textChanged.connect(self.validateFields)
 
     def getSavedServerConfig(self, selected_server_config):
+        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
+
         self.selected_server_config = selected_server_config
         server_config = ServerConfig.getParamsFromSettings(selected_server_config)
         self.authcfg = server_config.authcfg
@@ -77,22 +92,25 @@ class serverConfigDialog(BASE, WIDGET):
         )
 
 
-    def isValid(self, serverConfig: ServerConfig) -> None:
-        mandatoryFields = [serverConfig.name, serverConfig.url, serverConfig.projects_path,
-                           serverConfig.qgis_server_path, serverConfig.mb_app_path,
-                           serverConfig.mb_basis_url]
-
-        if not all(mandatoryFields):
-            show_fail_box_ok('Failed', 'Please fill in the mandatory fields')
-            return False
-
-        return True
+    def validateFields(self) -> None:
+        # Mandatory fields
+        self.mandatoryFields = [
+            self.serverConfigNameLineEdit,
+            self.serverAddressLineEdit,
+            self.qgisProjectPathLineEdit,
+            self.qgisServerPathLineEdit,
+            self.mbPathLineEdit,
+            self.mbBasisUrlLineEdit
+        ]
+        # Enable the save button only if all mandatory fields have a value
+        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
+            all(field.text() for field in self.mandatoryFields))
 
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()
-        if not self.isValid(serverConfig):
-            show_fail_box_ok('Failed', 'Server configuration is not valid')
-            return
+        # if not self.validateFields(serverConfig):
+        #     show_fail_box_ok('Failed', 'Server configuration is not valid')
+        #     return
         serverConfig.save()
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
