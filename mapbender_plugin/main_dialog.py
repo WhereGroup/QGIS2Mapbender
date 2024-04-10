@@ -206,10 +206,16 @@ class MainDialog(BASE, WIDGET):
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
+        if server_config.windows_pk_path == '':
+            connect_kwargs = {"password": server_config.password}
+        else:
+            connect_kwargs = {"password": server_config.password,
+                              "key_filename": server_config.windows_pk_path}
+
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
-                        connect_kwargs={"password": server_config.password,
-                                        "key_filename": server_config.windows_pk_path}) as connection:
+                        connect_kwargs=connect_kwargs) as connection:
             try:
+                print(connection)
                 connection.open()
             except Exception as e:
                 show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
