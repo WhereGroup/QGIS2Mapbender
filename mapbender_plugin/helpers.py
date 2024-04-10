@@ -1,12 +1,14 @@
 import os
+from typing import List
 
 from PyQt5.QtCore import Qt
 from decorator import contextmanager
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis._core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
+from qgis.core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
 
+from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 
 def get_plugin_dir() -> str:
@@ -105,8 +107,8 @@ def validate_no_spaces(*variables):
 
 def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
     s = QgsSettings()
-    if s.contains("mapbender-plugin/mb_templates"):
-        s.beginGroup('mapbender-plugin/')
+    if s.contains(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates"):
+        s.beginGroup(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/")
         mb_slugs = s.value('mb_templates')
         s.endGroup()
         if isinstance(mb_slugs, str) and mb_slugs != '':
@@ -121,11 +123,11 @@ def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
         if is_mb_slug and mb_slug not in mb_slugs_list:
             mb_slugs_list.append(mb_slug)
             updated_mb_slugs = ", ".join(mb_slugs_list)
-            s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+            s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates", updated_mb_slugs)
         if not is_mb_slug and mb_slug in mb_slugs_list:
             mb_slugs_list.remove(mb_slug)
             updated_mb_slugs = ", ".join(mb_slugs_list)
-            s.setValue('mapbender-plugin/mb_templates', updated_mb_slugs)
+            s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates", updated_mb_slugs)
 
     elif is_mb_slug:
-        s.setValue('mapbender-plugin/mb_templates', mb_slug)
+        s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates", mb_slug)
