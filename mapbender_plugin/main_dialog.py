@@ -254,46 +254,50 @@ class MainDialog(BASE, WIDGET):
         mapbender_uploader = MapbenderUpload(connection, server_config, wms_url)
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show()
-        if exit_status_wms_show == 0:  # Success
-            # Reload source if it already exists
-            if len(sources_ids) > 0:
-                for source_id in sources_ids:
-                    exit_status_wms_reload = mapbender_uploader.wms_reload(source_id)
-                source_id = sources_ids[-1]
-            else:
-                # Add source to Mapbender if it does not exist
-                exit_status_wms_add, source_id = mapbender_uploader.wms_add()
+        if exit_status_wms_show == 1:  ## Failed
+            show_fail_box_ok("Failed",
+                             f"WMS layer information could not be displayed.")
+            return
 
-            if clone_app:
-                template_slug = self.mbSlugComboBox.currentText()
-                exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
-                if exit_status_app_clone == 0:
-                    exit_status_wms_assign, output_wms_assign, error_wms_assign = (
-                        mapbender_uploader.wms_assign(slug, source_id, layer_set))
-                    update_mb_slug_in_settings(template_slug, is_mb_slug=True)
-                    self.update_slug_combo_box()
+        # Reload source if it already exists
+        if len(sources_ids) > 0:
+            for source_id in sources_ids:
+                exit_status_wms_reload = mapbender_uploader.wms_reload(source_id)
+            source_id = sources_ids[-1]
+        else:
+            # Add source to Mapbender if it does not exist
+            exit_status_wms_add, source_id = mapbender_uploader.wms_add()
 
-                else:
-                    show_fail_box_ok("Failed",
-                                     f"Application could not be cloned.\n \n Error:  {error}")
-                    update_mb_slug_in_settings(template_slug, is_mb_slug=False)
-                    self.update_slug_combo_box()
-                    return
-            else:
-                slug = self.mbSlugComboBox.currentText()
+        if clone_app:
+            template_slug = self.mbSlugComboBox.currentText()
+            exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
+            if exit_status_app_clone == 0:
                 exit_status_wms_assign, output_wms_assign, error_wms_assign = (
                     mapbender_uploader.wms_assign(slug, source_id, layer_set))
-
-            if exit_status_wms_assign == 0:
-                show_succes_box_ok("Success report",
-                                   "WMS succesfully created:\n \n" + wms_url +
-                                   "\n \n And added to mapbender application: \n \n" + "http://" +
-                                   server_config.url + "/mapbender/application/" + slug)
-                self.close()
+                update_mb_slug_in_settings(template_slug, is_mb_slug=True)
+                self.update_slug_combo_box()
 
             else:
                 show_fail_box_ok("Failed",
-                                 f"WMS could not be assigend to Mapbender application.\n{output_wms_assign}")
+                                 f"Application could not be cloned.\n \n Error:  {error}")
+                update_mb_slug_in_settings(template_slug, is_mb_slug=False)
+                self.update_slug_combo_box()
+                return
+        else:
+            slug = self.mbSlugComboBox.currentText()
+            exit_status_wms_assign, output_wms_assign, error_wms_assign = (
+                mapbender_uploader.wms_assign(slug, source_id, layer_set))
+
+        if exit_status_wms_assign == 0:
+            show_succes_box_ok("Success report",
+                               "WMS succesfully created:\n \n" + wms_url +
+                               "\n \n And added to mapbender application: \n \n" + "http://" +
+                               server_config.url + "/mapbender/application/" + slug)
+            self.close()
+
+        else:
+            show_fail_box_ok("Failed",
+                             f"WMS could not be assigend to Mapbender application.\n{output_wms_assign}")
 
 
     def mb_update(self, connection, server_config, wms_url):
