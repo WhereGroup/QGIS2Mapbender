@@ -13,9 +13,8 @@ Prerequisites on server:
 
 Prerequisites (local):
 - python and fabric2 locally installed:
-   - Ensure you can run Python from the command line
-    Before you go any further, make sure you have Python and that the expected version is available from your command line. You can     
-    check this by running:
+   - Ensure you can run Python from the commandline
+    Before you go any further, make sure you have Python and that the expected version is available from your command line. You can     check this by running:
     ```
     Unix/MacOS: python3 --version
     Windos: py --version
