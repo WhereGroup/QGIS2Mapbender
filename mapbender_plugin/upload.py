@@ -52,7 +52,6 @@ class Upload:
         QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
         if self.zip_local_project_dir():
             if self.upload_project_zip_file():
-                QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
                 self.delete_local_project_zip_file()
                 if self.unzip_and_remove_project_dir_on_server():
                     return True
