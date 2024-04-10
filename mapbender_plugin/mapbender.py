@@ -83,7 +83,7 @@ class MapbenderUpload():
             return exit_status, source_id
         else:
             source_id = ''
-            QgsMessageLog.logMessage(f"Exit status {exit_status}, failed, no new source ID {source_id}'", TAG, level=Qgis.Info)
+            QgsMessageLog.logMessage(f"Exit status: {exit_status}, failed, no new source ID {source_id}'", TAG, level=Qgis.Info)
             return exit_status, source_id
 
 
@@ -96,7 +96,7 @@ class MapbenderUpload():
         """
         QgsMessageLog.logMessage(f"Executing wms:reload:url {id} '{self.wms_url}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{self.wms_url}'")
-        QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG, level=Qgis.Info)
+        QgsMessageLog.logMessage(f"Exit status: {exit_status}, output: {output}, error: {error_output}'", TAG, level=Qgis.Info)
         return exit_status, output, error_output
 
     def app_clone(self, template_slug):
