@@ -13,8 +13,15 @@ Prerequisites on server:
 
 Prerequisites (local):
 - python and fabric2 locally installed:
-  ```
-  pip install fabric2
+   - Ensure you can run pip from the command line (see https://packaging.python.org/en/latest/tutorials/installing-packages/)
+   ```
+   Unix/MacOS: python3 -m pip --version
+   Windos: py -m pip --version
+   ```
+   - install fabric2
+   ```
+   pip install fabric2
+   ```
 - The QGIS project must be saved together with the data sources in the same folder.
 ## Usage
 Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
