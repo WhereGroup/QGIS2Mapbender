@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>922</width>
-    <height>592</height>
+    <height>644</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -182,7 +182,7 @@
         <item row="14" column="0">
          <widget class="QLabel" name="winPKPathLabel">
           <property name="text">
-           <string>TextLabel</string>
+           <string>[WINDOWS ONLY] SSH private key path</string>
           </property>
          </widget>
         </item>
@@ -194,7 +194,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Example: /home/myuser/.ssh/private.key</string>
+           <string>Example: homemyuser.sshprivate.key</string>
           </property>
          </widget>
         </item>
