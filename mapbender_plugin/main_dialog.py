@@ -87,21 +87,22 @@ class MainDialog(BASE, WIDGET):
             item_url.setText(server_config.url)
             self.serverTableWidget.setItem(i, 1, item_url)
 
-            item_path_qgis_projects = QTableWidgetItem()
-            item_path_qgis_projects.setText(server_config.projects_path)
-            self.serverTableWidget.setItem(i, 2, item_path_qgis_projects)
-
-            item_qgis_server_path = QTableWidgetItem()
-            item_qgis_server_path.setText(server_config.qgis_server_path)
-            self.serverTableWidget.setItem(i, 3, item_qgis_server_path)
-
-            item_mb_app_path = QTableWidgetItem()
-            item_mb_app_path.setText(server_config.mb_app_path)
-            self.serverTableWidget.setItem(i, 4, item_mb_app_path)
-
-            item_mb_basis_url = QTableWidgetItem()
-            item_mb_basis_url.setText(server_config.mb_basis_url)
-            self.serverTableWidget.setItem(i, 5, item_mb_basis_url)
+            # Further columns (see settings.py SERVER_TABLE_HEADERS)
+            # item_path_qgis_projects = QTableWidgetItem()
+            # item_path_qgis_projects.setText(server_config.projects_path)
+            # self.serverTableWidget.setItem(i, 2, item_path_qgis_projects)
+            #
+            # item_qgis_server_path = QTableWidgetItem()
+            # item_qgis_server_path.setText(server_config.qgis_server_path)
+            # self.serverTableWidget.setItem(i, 3, item_qgis_server_path)
+            #
+            # item_mb_app_path = QTableWidgetItem()
+            # item_mb_app_path.setText(server_config.mb_app_path)
+            # self.serverTableWidget.setItem(i, 4, item_mb_app_path)
+            #
+            # item_mb_basis_url = QTableWidgetItem()
+            # item_mb_basis_url.setText(server_config.mb_basis_url)
+            # self.serverTableWidget.setItem(i, 5, item_mb_basis_url)
 
         self.update_server_combo_box()
 
