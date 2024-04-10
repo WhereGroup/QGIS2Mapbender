@@ -1,4 +1,5 @@
 import json
+import re
 
 from qgis._core import QgsMessageLog, Qgis
 
@@ -17,7 +18,7 @@ class MapbenderUpload():
             Executes a Mapbender command using the provided connection.
 
             Args:
-                connection: An instance of fabric.connection.Connection.
+                command: a bin/console Mapbender command
 
             Returns:
                 exit_status (int): The exit status of the executed command.
@@ -25,23 +26,19 @@ class MapbenderUpload():
                 error_output (str): The standard error output (stderr) from the command.
             """
         with waitCursor():
-            result = ''
             try:
                 result = self.connection.run(
-                f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}")
+                    f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}")
             except Exception as e:
-                print(f'exception: {e}')
-
-            if result:
-                exit_status = result.exited
-                output = result.stdout
-                error_output = result.stderr
-                return exit_status, output, error_output
-            else:
-                exit_status = 1
+                exit_status = int(re.search(r'Exit code: (\d+)', str(e)).group(1))
                 output = ''
-                error_output = ''
+                error_output = e
                 return exit_status, output, error_output
+
+            exit_status = result.exited
+            output = result.stdout
+            error_output = result.stderr
+            return exit_status, output, error_output
 
     def wms_show(self):
         """
@@ -60,12 +57,14 @@ class MapbenderUpload():
         if exit_status == 0:
             parsed_json = json.loads(output)
             sources_ids = [obj["id"] for obj in parsed_json]
-            QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG, level=Qgis.Info)
+            QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG,
+                                     level=Qgis.Info)
             return exit_status, sources_ids
         else:
             sources_ids = []
-            QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG, level=Qgis.Info)
-            return exit_status,  sources_ids
+            QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG,
+                                     level=Qgis.Info)
+            return exit_status, sources_ids
 
     def wms_add(self):
         """
@@ -78,14 +77,14 @@ class MapbenderUpload():
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{self.wms_url}'")
         if exit_status == 0 and output:
             spl = 'Saved new source #'
-            source_id = output.split(spl,1)[1]
+            source_id = output.split(spl, 1)[1]
             QgsMessageLog.logMessage(f"Exit status {exit_status}, new source ID: {source_id}'", TAG, level=Qgis.Info)
             return exit_status, source_id
         else:
             source_id = ''
-            QgsMessageLog.logMessage(f"Exit status: {exit_status}, failed, no new source ID {source_id}'", TAG, level=Qgis.Info)
-            return exit_status, source_id
-
+            QgsMessageLog.logMessage(f"Exit status: {exit_status}, failed, no new source ID {source_id}'", TAG,
+                                     level=Qgis.Info)
+            return exit_status, source_id, error_output
 
     def wms_reload(self, id):
         """
@@ -96,7 +95,8 @@ class MapbenderUpload():
         """
         QgsMessageLog.logMessage(f"Executing wms:reload:url {id} '{self.wms_url}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{self.wms_url}'")
-        QgsMessageLog.logMessage(f"Exit status: {exit_status}, output: {output}, error: {error_output}'", TAG, level=Qgis.Info)
+        QgsMessageLog.logMessage(f"Exit status: {exit_status}, output: {output}, error: {error_output}'", TAG,
+                                 level=Qgis.Info)
         return exit_status, output, error_output
 
     def app_clone(self, template_slug):
@@ -112,7 +112,7 @@ class MapbenderUpload():
         exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
         if output != '':
             spl = 'slug'
-            slug = (output.split(spl,1)[1]).split(',')[0].strip()
+            slug = (output.split(spl, 1)[1]).split(',')[0].strip()
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
                                      level=Qgis.Info)
             return exit_status, slug, error_output
@@ -132,7 +132,6 @@ class MapbenderUpload():
         QgsMessageLog.logMessage(f"Executing wms:assign '{slug}' '{source_id}' '{layer_set}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = (
             self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
-        QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG, level=Qgis.Info)
+        QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
+                                 level=Qgis.Info)
         return exit_status, output, error_output
-
-
