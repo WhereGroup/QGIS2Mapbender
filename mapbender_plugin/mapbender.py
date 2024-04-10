@@ -71,6 +71,7 @@ class MapbenderUpload():
         :return: exit_status (0 = success, 1 = fail),
         :return: source_id (id of the new added source)
         """
+        QgsMessageLog.logMessage(f"Executing wms:add '{self.wms_url}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = self.run_mapbender_command(f"wms:add '{self.wms_url}'")
         if exit_status == 0 and output:
             spl = 'Saved new source #'
@@ -88,6 +89,7 @@ class MapbenderUpload():
         :param url: url of the WMS Source
         :return: exit_status (0 = success, 1 = fail)
         """
+        QgsMessageLog.logMessage(f"Executing wms:reload:url {id} '{self.wms_url}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = self.run_mapbender_command(f"wms:reload:url {id} '{self.wms_url}'")
         return exit_status, output, error_output
 
@@ -100,6 +102,7 @@ class MapbenderUpload():
         :return:slug of the new clone app
         :return:error_output
         """
+        QgsMessageLog.logMessage(f"Executing application:clone '{template_slug}'", TAG, level=Qgis.Info)
         exit_status, output, error_output = self.run_mapbender_command(f"application:clone '{template_slug}'")
         if output != '':
             spl = 'slug'
@@ -118,7 +121,7 @@ class MapbenderUpload():
         """
         exit_status, output, error_output = (
             self.run_mapbender_command(f"wms:assign '{slug}' '{source_id}' '{layer_set}'"))
-        QgsMessageLog.logMessage(f"wms:assign '{slug}' '{source_id}' '{layer_set}'", TAG, level=Qgis.Info)
+        QgsMessageLog.logMessage(f"Executing wms:assign '{slug}' '{source_id}' '{layer_set}'", TAG, level=Qgis.Info)
         return exit_status, output, error_output
 
 
