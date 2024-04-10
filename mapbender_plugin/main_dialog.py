@@ -251,9 +251,6 @@ class MainDialog(BASE, WIDGET):
         # Template slug:
         layer_set = self.layerSetLineEdit.text()
 
-        QgsMessageLog.logMessage("Validating WMS ULR, checking if WMS URL is already set as Mapbender source, ...", TAG,
-                                 level=Qgis.Info)
-
         mapbender_uploader = MapbenderUpload(connection, server_config, wms_url)
 
         exit_status_wms_show, sources_ids = mapbender_uploader.wms_show()
