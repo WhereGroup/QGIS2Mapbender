@@ -215,7 +215,6 @@ class MainDialog(BASE, WIDGET):
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs=connect_kwargs) as connection:
             try:
-                print(connection)
                 connection.open()
             except Exception as e:
                 show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
