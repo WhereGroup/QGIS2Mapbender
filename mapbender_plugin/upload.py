@@ -50,12 +50,18 @@ class Upload:
 
     def zip_upload_unzip_clean(self) -> bool:
         QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
-        if self.zip_local_project_dir():
-            if self.upload_project_zip_file():
-                self.delete_local_project_zip_file()
-                if self.unzip_and_remove_project_dir_on_server():
-                    return True
-        return False
+        if not self.zip_local_project_dir():
+            show_fail_box_ok("Failed",
+                             "Local project directory could not be compressed. Upload will be interrupted")
+            return False
+        if not self.upload_project_zip_file():
+            show_fail_box_ok("Failed",
+                             "Project directory's upload to server failed. WMS could not be created.")
+            return False
+        QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
+        self.delete_local_project_zip_file()
+        if self.unzip_and_remove_project_dir_on_server():
+            return True
 
     def zip_local_project_dir(self) -> bool:
         # Copy source directory and remove unwanted files
