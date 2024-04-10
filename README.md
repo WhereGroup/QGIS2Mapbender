@@ -12,7 +12,7 @@ Prerequisites on server:
     - layer set named with any other name (in this case, the layerset name shall be specified when using the plugin)
 
 Prerequisites (local):
-- fabric2 locally installed:
+- python and fabric2 locally installed:
   ```
   pip install fabric2
 - The QGIS project must be saved together with the data sources in the same folder.
