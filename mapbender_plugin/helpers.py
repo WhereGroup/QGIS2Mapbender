@@ -15,13 +15,8 @@ def get_plugin_dir() -> str:
     return os.path.dirname(__file__)
 
 
-def get_project_layers() -> list:
-    project = QgsProject.instance()
-    project.read()
-    layers_names = []
-    for layer in project.mapLayers().values():
-        layers_names.append(layer.name())
-    return layers_names
+def get_project_layer_names() -> list:
+    return [layer.name() for layer in QgsProject.instance().mapLayers().values()]
 
 
 def qgis_project_is_saved() -> bool:
