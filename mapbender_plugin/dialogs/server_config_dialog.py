@@ -90,7 +90,7 @@ class ServerConfigDialog(BASE, WIDGET):
 
     def validateFields(self) -> None:
         # Mandatory fields
-        self.mandatoryFields = [
+        mandatoryFields = [
             self.serverConfigNameLineEdit,
             self.serverAddressLineEdit,
             self.qgisProjectPathLineEdit,
@@ -100,7 +100,7 @@ class ServerConfigDialog(BASE, WIDGET):
         ]
         # Enable the save button only if all mandatory fields have a value
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
-            all(field.text() for field in self.mandatoryFields))
+            all(field.text() for field in mandatoryFields))
 
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()
