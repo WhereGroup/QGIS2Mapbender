@@ -12,7 +12,7 @@ Prerequisites on server:
     - layer set named with any other name (in this case, the layerset name shall be specified when using the plugin)
 
 Prerequisites (local):
-- install fabric2 **from QGIS-Console** if not already available:
+- install fabric2 from QGIS-Console if not already available:
     ```
     import pip
     pip.main(['install', 'fabric2'])
