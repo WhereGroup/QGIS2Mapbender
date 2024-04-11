@@ -5,9 +5,9 @@ from fabric2 import Connection
 
 from PyQt5 import uic
 from PyQt5.QtCore import QSettings, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator, QPixmap
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QTabWidget, QRadioButton, QPushButton, \
-    QTableWidget, QComboBox, QDialogButtonBox, QToolButton
+    QTableWidget, QComboBox, QDialogButtonBox, QToolButton, QLabel
 
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 from qgis.utils import iface
@@ -36,6 +36,8 @@ class MainDialog(BASE, WIDGET):
     publishRadioButton: QRadioButton
     cloneTemplateRadioButton: QRadioButton
     serverTableWidget: QTableWidget
+    warningFirstServerLabel: QLabel
+    serverConfigComboBox: QComboBox
     mbSlugComboBox: QComboBox
     buttonBoxTab1: QDialogButtonBox
     publishButton: QPushButton
@@ -52,7 +54,7 @@ class MainDialog(BASE, WIDGET):
 
     def setupUi(self, widget) -> None:
         super().setupUi(widget)
-
+        self.warningFirstServerLabel.setPixmap(QPixmap(':/images/themes/default/mIconWarning.svg'))
         # Tabs
         self.tabWidget.setCurrentWidget(self.serverUploadTab)
 
