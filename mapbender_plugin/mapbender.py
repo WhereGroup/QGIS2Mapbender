@@ -113,7 +113,7 @@ class MapbenderUpload:
             slug = ''
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, slug, error_output
+            return exit_status, output, slug, error_output
 
     def wms_assign(self, slug, source_id, layer_set):
         """

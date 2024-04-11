@@ -313,10 +313,10 @@ class MainDialog(BASE, WIDGET):
         if clone_app:  # The given Mapbender's template app will be cloned and the WMS will be assigned to the cloned
             # app
             template_slug = self.mbSlugComboBox.currentText()
-            exit_status_app_clone, slug, error = mapbender_uploader.app_clone(template_slug)
+            exit_status_app_clone, output, slug, error = mapbender_uploader.app_clone(template_slug)
             if exit_status_app_clone != 0:
                 show_fail_box_ok("Failed",
-                                 f"Application could not be cloned.\n \n Error:  {error}")
+                                 f"Application could not be cloned.\nError: {error}, Output: {output}")
                 update_mb_slug_in_settings(template_slug, is_mb_slug=False)
                 self.update_slug_combo_box()
                 return
