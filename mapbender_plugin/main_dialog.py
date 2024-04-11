@@ -52,9 +52,8 @@ class MainDialog(BASE, WIDGET):
         self.layerSetLineEdit.setValidator(regex_slug_layer_set_validator)
 
         # Tab2
-        server_table_headers = SERVER_TABLE_HEADERS
-        self.serverTableWidget.setColumnCount(len(server_table_headers))
-        self.serverTableWidget.setHorizontalHeaderLabels(server_table_headers)
+        self.serverTableWidget.setColumnCount(len(SERVER_TABLE_HEADERS))
+        self.serverTableWidget.setHorizontalHeaderLabels(SERVER_TABLE_HEADERS)
         self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
 
