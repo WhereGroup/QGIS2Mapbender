@@ -49,8 +49,8 @@ class MainDialog(BASE, WIDGET):
         self.cloneTemplateRadioButton.setChecked(True)
         self.updateButton.setEnabled(False)
         # QLineValidator for slug:
-        regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
-        regex_validator = QRegExpValidator(regex)
+        regex_slug = QRegExp("[^\\s;\\\\/]*")  # regex for blank spaces and semicolon
+        regex_validator = QRegExpValidator(regex_slug)
         self.mbSlugComboBox.setValidator(regex_validator)
         self.publishButton.setEnabled(False)
 
