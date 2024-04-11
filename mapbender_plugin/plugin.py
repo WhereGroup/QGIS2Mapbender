@@ -8,8 +8,9 @@ from qgis.core import (
 
 from mapbender_plugin.main_dialog import MainDialog
 
-class Mapbenderplugin:
-    def __init__(self,iface):
+
+class MapbenderPlugin:
+    def __init__(self, iface):
         """Constructor of the Mapbender plugin."""
         self.iface = iface
         self.project = QgsProject.instance()

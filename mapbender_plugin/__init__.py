@@ -22,6 +22,6 @@
 
 
 def classFactory(iface):
-    from .plugin import Mapbenderplugin
-    return Mapbenderplugin(iface)
+    from .plugin import MapbenderPlugin
+    return MapbenderPlugin(iface)
 
