@@ -4,7 +4,7 @@ from typing import Optional
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
-from PyQt5.QtWidgets import QDialogButtonBox
+from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
 
 from mapbender_plugin.helpers import show_succes_box_ok
 from mapbender_plugin.server_config import ServerConfig
@@ -16,6 +16,14 @@ WIDGET, BASE = uic.loadUiType(os.path.join(
 
 
 class ServerConfigDialog(BASE, WIDGET):
+    dialogButtonBox: QDialogButtonBox
+    serverConfigNameLineEdit: QLineEdit
+    serverAddressLineEdit: QLineEdit
+    qgisProjectPathLineEdit: QLineEdit
+    qgisServerPathLineEdit: QLineEdit
+    mbPathLineEdit: QLineEdit
+    mbBasisUrlLineEdit: QLineEdit
+
     def __init__(self, server_config_name: Optional[str] = None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
