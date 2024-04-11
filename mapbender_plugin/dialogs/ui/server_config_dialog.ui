@@ -248,6 +248,18 @@
    <header>qgspasswordlineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>serverConfigNameLineEdit</tabstop>
+  <tabstop>serverAddressLineEdit</tabstop>
+  <tabstop>serverPortLineEdit</tabstop>
+  <tabstop>userNameLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>qgisProjectPathLineEdit</tabstop>
+  <tabstop>qgisServerPathLineEdit</tabstop>
+  <tabstop>mbPathLineEdit</tabstop>
+  <tabstop>mbBasisUrlLineEdit</tabstop>
+  <tabstop>winPKPathLineEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
