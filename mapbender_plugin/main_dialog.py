@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget,
 
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 
-from mapbender_plugin.dialogs.server_config_dialog import serverConfigDialog
+from mapbender_plugin.dialogs.server_config_dialog import ServerConfigDialog
 from mapbender_plugin.helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
@@ -176,7 +176,7 @@ class MainDialog(BASE, WIDGET):
 
     def open_dialog_add_new_server_config(self) -> None:
         server_config_is_new = True
-        new_server_config_dialog = serverConfigDialog(server_config_is_new, '')
+        new_server_config_dialog = ServerConfigDialog(server_config_is_new, '')
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
@@ -187,7 +187,7 @@ class MainDialog(BASE, WIDGET):
         if selected_row == -1:
             return
         selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_config_dialog = serverConfigDialog(server_config_is_new, selected_server_config)
+        edit_server_config_dialog = ServerConfigDialog(server_config_is_new, selected_server_config)
         edit_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()

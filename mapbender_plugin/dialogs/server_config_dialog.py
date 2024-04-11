@@ -13,7 +13,7 @@ from mapbender_plugin.server_config import ServerConfig
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/server_config_dialog.ui'))
 
-class serverConfigDialog(BASE, WIDGET):
+class ServerConfigDialog(BASE, WIDGET):
     def __init__(self, server_config_is_new, selected_server_config, parent=None):
         super().__init__(parent)
         self.setupUi(self)
