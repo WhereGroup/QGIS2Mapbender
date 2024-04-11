@@ -108,7 +108,7 @@ class MapbenderUpload:
             slug = (output.split(spl, 1)[1]).split(',')[0].strip()
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, slug, error_output
+            return exit_status, output, slug, error_output
         else:
             slug = ''
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
