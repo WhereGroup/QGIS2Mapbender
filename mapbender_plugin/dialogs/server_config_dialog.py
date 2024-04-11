@@ -20,10 +20,11 @@ class ServerConfigDialog(BASE, WIDGET):
         super().__init__(parent)
         self.setupUi(self)
         self.setupConnections()
+        self.authcfg = ''
+        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
         if server_config_name:
             self.getSavedServerConfig(server_config_name)
-
-        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
+            self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
 
         # QLineEdit validators
         regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
@@ -50,8 +51,6 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbBasisUrlLineEdit.textChanged.connect(self.validateFields)
 
     def getSavedServerConfig(self, server_config_name: str):
-        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
-
         server_config = ServerConfig.getParamsFromSettings(server_config_name)
         self.authcfg = server_config.authcfg
 
@@ -77,9 +76,6 @@ class ServerConfigDialog(BASE, WIDGET):
         server_mb_app_path = self.mbPathLineEdit.text()
         mb_basis_url = self.mbBasisUrlLineEdit.text()
         windows_pk_path = self.winPKPathLineEdit.text()
-        if self.server_config_is_new:
-            # authcfg will be set after saving the basic auth params in the auth_db
-            self.authcfg = ''
         return ServerConfig(
             name=server_config_name,
             url=server_address,
