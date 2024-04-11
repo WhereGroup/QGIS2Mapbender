@@ -233,11 +233,9 @@ class MainDialog(BASE, WIDGET):
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
-        if server_config.windows_pk_path == '':
-            connect_kwargs = {"password": server_config.password}
-        else:
-            connect_kwargs = {"password": server_config.password,
-                              "key_filename": server_config.windows_pk_path}
+        connect_kwargs = {"password": server_config.password}
+        if server_config.windows_pk_path:
+            connect_kwargs["key_filename"] = server_config.windows_pk_path
 
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs=connect_kwargs) as connection:
