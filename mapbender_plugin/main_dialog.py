@@ -4,7 +4,8 @@ from fabric2 import Connection
 from PyQt5 import uic
 from PyQt5.QtCore import QSettings, QRegExp
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QTabWidget, QRadioButton, QPushButton, \
+    QTableWidget, QComboBox, QDialogButtonBox, QToolButton
 
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 
@@ -26,6 +27,21 @@ WIDGET, BASE = uic.loadUiType(os.path.join(
 
 
 class MainDialog(BASE, WIDGET):
+    tabWidget: QTabWidget
+    serverUploadTab: QWidget
+    serverConfigTab: QWidget
+    publishRadioButton: QRadioButton
+    cloneTemplateRadioButton: QRadioButton
+    serverTableWidget: QTableWidget
+    mbSlugComboBox: QComboBox
+    buttonBoxTab1: QDialogButtonBox
+    publishButton: QPushButton
+    updateButton: QPushButton
+    addServerConfigButton: QToolButton
+    editServerConfigButton: QToolButton
+    removeServerConfigButton: QToolButton
+    buttonBoxTab2: QDialogButtonBox
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
