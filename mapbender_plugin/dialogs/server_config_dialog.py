@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp
@@ -15,13 +16,12 @@ WIDGET, BASE = uic.loadUiType(os.path.join(
 
 
 class ServerConfigDialog(BASE, WIDGET):
-    def __init__(self, server_config_is_new, selected_server_config, parent=None):
+    def __init__(self, server_config_name: Optional[str] = None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.setupConnections()
-        self.server_config_is_new = server_config_is_new
-        if not self.server_config_is_new:
-            self.getSavedServerConfig(selected_server_config)
+        if server_config_name:
+            self.getSavedServerConfig(server_config_name)
 
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
 
@@ -49,14 +49,13 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbPathLineEdit.textChanged.connect(self.validateFields)
         self.mbBasisUrlLineEdit.textChanged.connect(self.validateFields)
 
-    def getSavedServerConfig(self, selected_server_config):
+    def getSavedServerConfig(self, server_config_name: str):
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
 
-        self.selected_server_config = selected_server_config
-        server_config = ServerConfig.getParamsFromSettings(selected_server_config)
+        server_config = ServerConfig.getParamsFromSettings(server_config_name)
         self.authcfg = server_config.authcfg
 
-        self.serverConfigNameLineEdit.setText(selected_server_config)
+        self.serverConfigNameLineEdit.setText(server_config_name)
         self.serverPortLineEdit.setText(server_config.port)
         self.serverAddressLineEdit.setText(server_config.url)
         self.userNameLineEdit.setText(server_config.username)

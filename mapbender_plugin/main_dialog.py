@@ -175,19 +175,17 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
 
     def open_dialog_add_new_server_config(self) -> None:
-        server_config_is_new = True
-        new_server_config_dialog = ServerConfigDialog(server_config_is_new, '')
+        new_server_config_dialog = ServerConfigDialog()
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
     def open_dialog_edit_server_config(self) -> None:
-        server_config_is_new = False
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
         selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_config_dialog = ServerConfigDialog(server_config_is_new, selected_server_config)
+        edit_server_config_dialog = ServerConfigDialog(selected_server_config)
         edit_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
