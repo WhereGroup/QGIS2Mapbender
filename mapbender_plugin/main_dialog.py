@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 from fabric2 import Connection
 
 from PyQt5 import uic
@@ -8,6 +10,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget,
     QTableWidget, QComboBox, QDialogButtonBox, QToolButton
 
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
+from qgis.utils import iface
 
 from mapbender_plugin.dialogs.server_config_dialog import ServerConfigDialog
 from mapbender_plugin.helpers import qgis_project_is_saved, \
@@ -88,9 +91,9 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
         self.buttonBoxTab1.rejected.connect(self.reject)
-        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_server_config)
-        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_server_config)
-        self.removeServerConfigButton.clicked.connect(self.remove_server_config)
+        self.addServerConfigButton.clicked.connect(self.on_add_server_config_clicked)
+        self.editServerConfigButton.clicked.connect(self.on_edit_server_config_clicked)
+        self.removeServerConfigButton.clicked.connect(self.on_remove_server_config_clicked)
 
     def update_server_table(self) -> None:
         server_config_list = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
@@ -174,23 +177,23 @@ class MainDialog(BASE, WIDGET):
         """
         self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
 
-    def open_dialog_add_new_server_config(self) -> None:
-        new_server_config_dialog = ServerConfigDialog()
+    def open_server_config_dialog(self, config_name: Optional[str] = None) -> None:
+        new_server_config_dialog = ServerConfigDialog(server_config_name=config_name, parent=iface.mainWindow())
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
-    def open_dialog_edit_server_config(self) -> None:
+    def on_add_server_config_clicked(self) -> None:
+        self.open_server_config_dialog()
+
+    def on_edit_server_config_clicked(self) -> None:
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
         selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_config_dialog = ServerConfigDialog(selected_server_config)
-        edit_server_config_dialog.exec()
-        self.update_server_table()
-        self.update_server_combo_box()
+        self.open_server_config_dialog(selected_server_config)
 
-    def remove_server_config(self) -> None:
+    def on_remove_server_config_clicked(self) -> None:
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
