@@ -104,7 +104,7 @@ class Upload:
     def unzip_and_remove_project_dir_on_server(self) -> bool:
         with waitCursor():
             result = self.connection.run(
-                f'cd ..; cd {self.server_projects_dir_path}/; unzip {self.source_project_dir_name}.zip;',
+                f'cd ..; cd {self.server_projects_dir_path}/; unzip -q {self.source_project_dir_name}.zip;',
                 warn=True)
             if result.ok:
                 QgsMessageLog.logMessage("Files unzipped on server", TAG, level=Qgis.Info)
