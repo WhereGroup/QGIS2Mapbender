@@ -103,9 +103,3 @@ class ServerConfigDialog(BASE, WIDGET):
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
-
-
-
-
-
-
