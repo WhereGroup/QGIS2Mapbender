@@ -8,9 +8,11 @@ from PyQt5.QtWidgets import QDialogButtonBox
 from mapbender_plugin.helpers import show_succes_box_ok
 from mapbender_plugin.server_config import ServerConfig
 
-# Dialog aus .ui-Datei
+
+# Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/server_config_dialog.ui'))
+
 
 class ServerConfigDialog(BASE, WIDGET):
     def __init__(self, server_config_is_new, selected_server_config, parent=None):
