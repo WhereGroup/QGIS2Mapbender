@@ -22,7 +22,8 @@ from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 from mapbender_plugin.upload import Upload
 
-# Dialog aus .ui-Datei
+
+# Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dialogs/ui/main_dialog.ui'))
 
