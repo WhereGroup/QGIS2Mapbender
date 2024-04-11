@@ -353,6 +353,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>serverConfigComboBox</tabstop>
+  <tabstop>publishRadioButton</tabstop>
+  <tabstop>updateRadioButton</tabstop>
+  <tabstop>cloneTemplateRadioButton</tabstop>
+  <tabstop>addToAppRadioButton</tabstop>
+  <tabstop>mbSlugComboBox</tabstop>
+  <tabstop>layerSetLineEdit</tabstop>
+  <tabstop>publishButton</tabstop>
+  <tabstop>updateButton</tabstop>
+  <tabstop>serverTableWidget</tabstop>
+  <tabstop>addServerConfigButton</tabstop>
+  <tabstop>removeServerConfigButton</tabstop>
+  <tabstop>editServerConfigButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>
