@@ -1,12 +1,10 @@
 import os
-
-from PyQt5.QtCore import QSettings, Qt, QRegExp
+from fabric2 import Connection
 
 from PyQt5 import uic
+from PyQt5.QtCore import QSettings, QRegExp
 from PyQt5.QtGui import QRegExpValidator
-
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
-from fabric2 import Connection
 
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 
@@ -32,13 +30,11 @@ class MainDialog(BASE, WIDGET):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
-        self.plugin_dir = get_plugin_dir()
-
-        self.setup()
         self.setupConnections()
 
-    def setup(self) -> None:
+    def setupUi(self, widget) -> None:
+        super().setupUi(widget)
+
         # Tabs
         self.tabWidget.setCurrentIndex(0)
 
