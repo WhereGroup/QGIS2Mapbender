@@ -1,12 +1,11 @@
-import configparser
 import os
+
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox
 
-from mapbender_plugin.helpers import list_qgs_settings_child_groups, show_succes_box_ok, \
-    show_fail_box_ok, validate_no_spaces
+from mapbender_plugin.helpers import show_succes_box_ok
 from mapbender_plugin.server_config import ServerConfig
 
 # Dialog aus .ui-Datei
