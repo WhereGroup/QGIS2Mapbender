@@ -18,7 +18,7 @@ class MapbenderPlugin:
         self.iface.addPluginToMenu("&Mapbender plugin", self.action)
         self.iface.addToolBarIcon(self.action)
 
-        # connect the action to the run method
+        # Connect the action to the run method
         self.action.triggered.connect(self.run)
 
     def unload(self):
@@ -27,13 +27,5 @@ class MapbenderPlugin:
 
     def run(self):
         """Plugin run method : launch the GUI."""
-        self.dlg = MainDialog()
-        self.dlg.exec()
-
-
-
-
-
-
-
-
+        dlg = MainDialog()
+        dlg.exec()
