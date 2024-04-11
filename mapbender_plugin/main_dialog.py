@@ -119,13 +119,13 @@ class MainDialog(BASE, WIDGET):
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
             self.serverConfigComboBox.clear()
+            return
 
-        else:
-            # Update server configuration-combobox
-            self.serverComboBoxLabel.setText("Server")
-            self.warningFirstServerLabel.hide()
-            self.serverConfigComboBox.clear()
-            self.serverConfigComboBox.addItems(server_config_list)
+        # Update server configuration-combobox
+        self.serverComboBoxLabel.setText("Server")
+        self.warningFirstServerLabel.hide()
+        self.serverConfigComboBox.clear()
+        self.serverConfigComboBox.addItems(server_config_list)
 
     def update_slug_combo_box(self) -> None:
         s = QgsSettings()
