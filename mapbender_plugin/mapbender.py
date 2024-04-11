@@ -26,15 +26,8 @@ class MapbenderUpload:
                 error_output (str): The standard error output (stderr) from the command.
             """
         with waitCursor():
-            try:
-                result = self.connection.run(
-                    f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}")
-            except Exception as e:
-                exit_status = int(re.search(r'Exit code: (\d+)', str(e)).group(1))
-                output = ''
-                error_output = e
-                return exit_status, output, error_output
-
+            result = self.connection.run(
+                f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}", warn=True)
             exit_status = result.exited
             output = result.stdout
             error_output = result.stderr

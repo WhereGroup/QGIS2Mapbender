@@ -333,8 +333,7 @@ class MainDialog(BASE, WIDGET):
 
         if exit_status_wms_assign != 0:
             show_fail_box_ok("Failed",
-                             f"WMS could not be assigned to Mapbender application.\nReason: Exit status: {exit_status_wms_assign} \n"
-                             f"Output: {output_wms_assign}.\n Error: {error_wms_assign}")
+                             f"WMS could not be assigned to Mapbender application.\n{output_wms_assign}")
             return
 
         show_succes_box_ok("Success report",
