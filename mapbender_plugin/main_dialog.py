@@ -9,8 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 
 from mapbender_plugin.dialogs.server_config_dialog import serverConfigDialog
-from mapbender_plugin.helpers import get_plugin_dir, \
-    qgis_project_is_saved, \
+from mapbender_plugin.helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
     update_mb_slug_in_settings
@@ -159,6 +158,7 @@ class MainDialog(BASE, WIDGET):
         :return:
         """
         self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
+
     def open_dialog_add_new_server_config(self) -> None:
         server_config_is_new = True
         new_server_config_dialog = serverConfigDialog(server_config_is_new, '')
