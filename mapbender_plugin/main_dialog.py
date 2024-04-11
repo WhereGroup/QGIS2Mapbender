@@ -1,8 +1,9 @@
 import os
 
-from PyQt5.QtCore import QSettings, Qt
+from PyQt5.QtCore import QSettings, Qt, QRegExp
 
 from PyQt5 import uic
+from PyQt5.QtGui import QRegExpValidator
 
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
 from fabric2 import Connection
@@ -45,9 +46,14 @@ class MainDialog(BASE, WIDGET):
         self.publishRadioButton.setChecked(True)
         self.update_slug_combo_box()
         self.mbSlugComboBox.setCurrentIndex(-1)
-
         self.cloneTemplateRadioButton.setChecked(True)
         self.updateButton.setEnabled(False)
+        # QLineValidator for slug:
+        regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
+        regex_validator = QRegExpValidator(regex)
+        self.mbSlugComboBox.setValidator(regex_validator)
+        self.publishButton.setEnabled(False)
+
 
         # Tab2
         server_table_headers = SERVER_TABLE_HEADERS
@@ -66,6 +72,8 @@ class MainDialog(BASE, WIDGET):
         self.tabWidget.currentChanged.connect(self.update_server_combo_box)
         self.publishRadioButton.clicked.connect(self.enable_publish_parameters)
         self.updateRadioButton.clicked.connect(self.disable_publish_parameters)
+        self.mbSlugComboBox.lineEdit().textChanged.connect(self.validate_slug_not_empty)
+        self.mbSlugComboBox.currentIndexChanged.connect(self.validate_slug_not_empty)
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
         self.buttonBoxTab1.rejected.connect(self.reject)
@@ -148,6 +156,12 @@ class MainDialog(BASE, WIDGET):
         self.updateButton.setEnabled(False)
         self.publishButton.setEnabled(True)
 
+    def validate_slug_not_empty(self) -> None:
+        """
+        Enable the publish button only "URL Title" has a value
+        :return:
+        """
+        self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
     def open_dialog_add_new_server_config(self) -> None:
         server_config_is_new = True
         new_server_config_dialog = serverConfigDialog(server_config_is_new, '')

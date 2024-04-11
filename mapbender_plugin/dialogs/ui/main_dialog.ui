@@ -39,7 +39,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="serverUploadTab">
       <property name="accessibleName">
@@ -159,7 +159,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="mapbenderAppSlugLabel">
                <property name="text">
-                <string>URL title</string>
+                <string>URL title*</string>
                </property>
               </widget>
              </item>
