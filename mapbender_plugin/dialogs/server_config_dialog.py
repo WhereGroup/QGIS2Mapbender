@@ -66,30 +66,19 @@ class ServerConfigDialog(BASE, WIDGET):
         self.winPKPathLineEdit.setText(server_config.windows_pk_path)
 
     def getServerConfigFromFormular(self) -> ServerConfig:
-        server_config_name = self.serverConfigNameLineEdit.text()
-        server_address = self.serverAddressLineEdit.text()
-        port = self.serverPortLineEdit.text()
-        user_name = self.userNameLineEdit.text()
-        password = self.passwordLineEdit.text()
-        server_qgis_projects_path = self.qgisProjectPathLineEdit.text()
-        qgis_server_path = self.qgisServerPathLineEdit.text()
-        server_mb_app_path = self.mbPathLineEdit.text()
-        mb_basis_url = self.mbBasisUrlLineEdit.text()
-        windows_pk_path = self.winPKPathLineEdit.text()
         return ServerConfig(
-            name=server_config_name,
-            url=server_address,
-            port=port,
-            username=user_name,
-            password=password,
-            projects_path=server_qgis_projects_path,
-            qgis_server_path=qgis_server_path,
-            mb_app_path=server_mb_app_path,
-            mb_basis_url=mb_basis_url,
+            name=self.serverConfigNameLineEdit.text(),
+            url=self.serverAddressLineEdit.text(),
+            port=self.serverPortLineEdit.text(),
+            username=self.userNameLineEdit.text(),
+            password=self.passwordLineEdit.text(),
+            projects_path=self.qgisProjectPathLineEdit.text(),
+            qgis_server_path=self.qgisServerPathLineEdit.text(),
+            mb_app_path=self.mbPathLineEdit.text(),
+            mb_basis_url=self.mbBasisUrlLineEdit.text(),
             authcfg=self.authcfg,
-            windows_pk_path=windows_pk_path
+            windows_pk_path=self.winPKPathLineEdit.text()
         )
-
 
     def validateFields(self) -> None:
         # Mandatory fields
