@@ -2,9 +2,6 @@
 import os
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
-from qgis.core import (
-    QgsProject,
-)
 
 from mapbender_plugin.main_dialog import MainDialog
 
@@ -13,7 +10,6 @@ class MapbenderPlugin:
     def __init__(self, iface):
         """Constructor of the Mapbender plugin."""
         self.iface = iface
-        self.project = QgsProject.instance()
 
     def initGui(self):
         """Create action that will start plugin configuration"""
