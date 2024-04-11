@@ -26,17 +26,17 @@ class serverConfigDialog(BASE, WIDGET):
 
         # QLineEdit validators
         regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
-        regex_validattor = QRegExpValidator(regex)
+        regex_validator = QRegExpValidator(regex)
         int_validator = QIntValidator()
-        self.serverConfigNameLineEdit.setValidator(regex_validattor)
+        self.serverConfigNameLineEdit.setValidator(regex_validator)
         self.serverPortLineEdit.setValidator(int_validator)
-        self.serverAddressLineEdit.setValidator(regex_validattor)
-        self.userNameLineEdit.setValidator(regex_validattor)
-        self.passwordLineEdit.setValidator(regex_validattor)
-        self.qgisProjectPathLineEdit.setValidator(regex_validattor)
-        self.qgisServerPathLineEdit.setValidator(regex_validattor)
-        self.mbPathLineEdit.setValidator(regex_validattor)
-        self.mbBasisUrlLineEdit.setValidator(regex_validattor)
+        self.serverAddressLineEdit.setValidator(regex_validator)
+        self.userNameLineEdit.setValidator(regex_validator)
+        self.passwordLineEdit.setValidator(regex_validator)
+        self.qgisProjectPathLineEdit.setValidator(regex_validator)
+        self.qgisServerPathLineEdit.setValidator(regex_validator)
+        self.mbPathLineEdit.setValidator(regex_validator)
+        self.mbBasisUrlLineEdit.setValidator(regex_validator)
 
     def setupConnections(self):
         self.dialogButtonBox.accepted.connect(self.saveServerConfig)
