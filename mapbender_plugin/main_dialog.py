@@ -51,7 +51,7 @@ class MainDialog(BASE, WIDGET):
         super().setupUi(widget)
 
         # Tabs
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentWidget(self.serverUploadTab)
 
         # Tab1
         self.update_server_combo_box()
