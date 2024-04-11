@@ -47,13 +47,13 @@ class MainDialog(BASE, WIDGET):
         self.update_slug_combo_box()
         self.mbSlugComboBox.setCurrentIndex(-1)
         self.cloneTemplateRadioButton.setChecked(True)
+        self.publishButton.setEnabled(False)  # Enabled only if mbSlugComboBox has a value
         self.updateButton.setEnabled(False)
         # QLineValidator for slug:
-        regex_slug = QRegExp("[^\\s;\\\\/]*")  # regex for blank spaces and semicolon
-        regex_validator = QRegExpValidator(regex_slug)
-        self.mbSlugComboBox.setValidator(regex_validator)
-        self.publishButton.setEnabled(False)
-
+        regex_slug_layer_set = QRegExp("[^\\s;\\\\/]*")
+        regex_slug_layer_set_validator = QRegExpValidator(regex_slug_layer_set)
+        self.mbSlugComboBox.setValidator(regex_slug_layer_set_validator)
+        self.layerSetLineEdit.setValidator(regex_slug_layer_set_validator)
 
         # Tab2
         server_table_headers = SERVER_TABLE_HEADERS
