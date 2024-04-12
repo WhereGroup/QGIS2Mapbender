@@ -30,7 +30,7 @@ class Mapbenderplugin:
 
     def run(self):
         """Plugin run method : launch the GUI."""
-        self.dlg = MainDialog()
+        self.dlg = MainDialog(parent=self.iface.mainWindow())
         self.dlg.exec()
 
 
