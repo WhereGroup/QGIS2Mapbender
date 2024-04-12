@@ -22,7 +22,7 @@ class serverConfigDialog(BASE, WIDGET):
         if not self.server_config_is_new:
             self.getSavedServerConfig(selected_server_config)
 
-        self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
+        self.validateFields()
 
         # QLineEdit validators
         regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
