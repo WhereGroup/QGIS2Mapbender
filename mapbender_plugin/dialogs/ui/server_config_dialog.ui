@@ -157,7 +157,7 @@
         <item row="8" column="0">
          <widget class="QLabel" name="qgisServerPathLabel">
           <property name="text">
-           <string>QGIS-Serrver path*</string>
+           <string>QGIS-Server path*</string>
           </property>
          </widget>
         </item>
@@ -194,7 +194,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Example: homemyuser.sshprivate.key</string>
+           <string>Example: C:/Users/user/Documents/ED25519-Key_private_key.ppk</string>
           </property>
          </widget>
         </item>
