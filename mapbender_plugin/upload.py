@@ -62,6 +62,7 @@ class Upload:
         self.delete_local_project_zip_file()
         if self.unzip_and_remove_project_dir_on_server():
             return True
+        return False
 
     def zip_local_project_dir(self) -> bool:
         # Copy source directory and remove unwanted files
