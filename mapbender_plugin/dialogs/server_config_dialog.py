@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
+from qgis._gui import QgsFileWidget
 
 from mapbender_plugin.helpers import show_succes_box_ok
 from mapbender_plugin.server_config import ServerConfig
@@ -23,10 +24,19 @@ class ServerConfigDialog(BASE, WIDGET):
     qgisServerPathLineEdit: QLineEdit
     mbPathLineEdit: QLineEdit
     mbBasisUrlLineEdit: QLineEdit
+    winPKFileWidget: QgsFileWidget
 
     def __init__(self, server_config_name: Optional[str] = None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.mandatoryFields = [
+            self.serverConfigNameLineEdit,
+            self.serverAddressLineEdit,
+            self.qgisProjectPathLineEdit,
+            self.qgisServerPathLineEdit,
+            self.mbPathLineEdit,
+            self.mbBasisUrlLineEdit
+        ]
         self.setupConnections()
         self.authcfg = ''
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
@@ -85,22 +95,12 @@ class ServerConfigDialog(BASE, WIDGET):
             mb_app_path=self.mbPathLineEdit.text(),
             mb_basis_url=self.mbBasisUrlLineEdit.text(),
             authcfg=self.authcfg,
-            windows_pk_path=self.winPKPathLineEdit.text()
+            windows_pk_path=self.winPKFileWidget.lineEdit().text()
         )
 
     def validateFields(self) -> None:
-        # Mandatory fields
-        mandatoryFields = [
-            self.serverConfigNameLineEdit,
-            self.serverAddressLineEdit,
-            self.qgisProjectPathLineEdit,
-            self.qgisServerPathLineEdit,
-            self.mbPathLineEdit,
-            self.mbBasisUrlLineEdit
-        ]
-        # Enable the save button only if all mandatory fields have a value
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
-            all(field.text() for field in mandatoryFields))
+            all(field.text() for field in self.mandatoryFields))
 
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()

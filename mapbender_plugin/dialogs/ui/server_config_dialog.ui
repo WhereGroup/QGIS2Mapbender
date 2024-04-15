@@ -263,7 +263,7 @@
   <tabstop>qgisServerPathLineEdit</tabstop>
   <tabstop>mbPathLineEdit</tabstop>
   <tabstop>mbBasisUrlLineEdit</tabstop>
-  <tabstop>winPKPathLineEdit</tabstop>
+  <tabstop>winPKFileWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>
