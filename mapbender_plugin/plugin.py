@@ -2,17 +2,14 @@
 import os
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
-from qgis.core import (
-    QgsProject,
-)
 
 from mapbender_plugin.main_dialog import MainDialog
 
-class Mapbenderplugin:
-    def __init__(self,iface):
+
+class MapbenderPlugin:
+    def __init__(self, iface):
         """Constructor of the Mapbender plugin."""
         self.iface = iface
-        self.project = QgsProject.instance()
 
     def initGui(self):
         """Create action that will start plugin configuration"""
@@ -21,7 +18,7 @@ class Mapbenderplugin:
         self.iface.addPluginToMenu("&Mapbender plugin", self.action)
         self.iface.addToolBarIcon(self.action)
 
-        # connect the action to the run method
+        # Connect the action to the run method
         self.action.triggered.connect(self.run)
 
     def unload(self):
@@ -30,13 +27,5 @@ class Mapbenderplugin:
 
     def run(self):
         """Plugin run method : launch the GUI."""
-        self.dlg = MainDialog(parent=self.iface.mainWindow())
-        self.dlg.exec()
-
-
-
-
-
-
-
-
+        dlg = MainDialog()
+        dlg.exec()
