@@ -188,9 +188,6 @@
             <property name="text">
              <string/>
             </property>
-            <property name="pixmap">
-             <pixmap>../../resources/icons/mIconWarning.svg</pixmap>
-            </property>
            </widget>
           </item>
           <item row="13" column="2">
@@ -339,6 +336,9 @@
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>
             </property>
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
            </widget>
           </item>
          </layout>
@@ -350,6 +350,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>serverConfigComboBox</tabstop>
+  <tabstop>publishRadioButton</tabstop>
+  <tabstop>updateRadioButton</tabstop>
+  <tabstop>cloneTemplateRadioButton</tabstop>
+  <tabstop>addToAppRadioButton</tabstop>
+  <tabstop>mbSlugComboBox</tabstop>
+  <tabstop>layerSetLineEdit</tabstop>
+  <tabstop>publishButton</tabstop>
+  <tabstop>updateButton</tabstop>
+  <tabstop>serverTableWidget</tabstop>
+  <tabstop>addServerConfigButton</tabstop>
+  <tabstop>removeServerConfigButton</tabstop>
+  <tabstop>editServerConfigButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <buttongroups>

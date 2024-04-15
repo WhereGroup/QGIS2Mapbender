@@ -7,7 +7,7 @@ about=lange Beschreibung
 homepage=https://wheregroup.com/
 tags=mapbender
 
-version=0.0.1
+version=0.1.0
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 

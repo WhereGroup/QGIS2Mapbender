@@ -19,17 +19,11 @@ def get_os():
     else:
         return "Unknown OS"
 def get_plugin_dir() -> str:
-    plugin_dir = os.path.dirname(__file__)
-    return plugin_dir
+    return os.path.dirname(__file__)
 
 
-def get_project_layers() -> list:
-    project = QgsProject.instance()
-    project.read()
-    layers_names = []
-    for layer in project.mapLayers().values():
-        layers_names.append(layer.name())
-    return layers_names
+def get_project_layer_names() -> list:
+    return [layer.name() for layer in QgsProject.instance().mapLayers().values()]
 
 
 def qgis_project_is_saved() -> bool:
@@ -46,7 +40,7 @@ def qgis_project_is_saved() -> bool:
 
 def create_fail_box(title, text):
     failBox = QMessageBox()
-    failBox.setIconPixmap(QPixmap(":/images/themes/default/mIconWarning.svg"))
+    failBox.setIconPixmap(QPixmap(':/images/themes/default/mIconWarning.svg'))
     failBox.setWindowTitle(title)
     failBox.setText(text)
     return failBox
@@ -65,9 +59,8 @@ def show_fail_box_yes_no(title, text):
 
 
 def show_succes_box_ok(title, text):
-    plugin_dir = get_plugin_dir()
     successBox = QMessageBox()
-    successBox.setIconPixmap(QPixmap(plugin_dir + '/resources/icons/mIconSuccess.svg'))
+    successBox.setIconPixmap(QPixmap(':/images/themes/default/mIconSuccess.svg'))
     successBox.setWindowTitle(title)
     successBox.setText(text)
     successBox.setStandardButtons(QMessageBox.Ok)
@@ -80,12 +73,6 @@ def show_question_box(text):
     questionBox.setText(text)
     questionBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
     return questionBox.exec_()
-
-
-def get_plugin_dir():
-    file = os.path.dirname(__file__)
-    plugin_dir = os.path.dirname(file) + '/mapbender_plugin'
-    return plugin_dir
 
 
 def list_qgs_settings_child_groups(key):

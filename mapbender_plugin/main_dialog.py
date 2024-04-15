@@ -1,18 +1,19 @@
 import os
+from typing import Optional
 
-from PyQt5.QtCore import QSettings, Qt, QRegExp
-
-from PyQt5 import uic
-from PyQt5.QtGui import QRegExpValidator
-
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView
 from fabric2 import Connection
 
-from qgis.core import Qgis, QgsSettings, QgsMessageLog
+from PyQt5 import uic
+from PyQt5.QtCore import QSettings, QRegExp
+from PyQt5.QtGui import QRegExpValidator, QPixmap
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QTabWidget, QRadioButton, QPushButton, \
+    QTableWidget, QComboBox, QDialogButtonBox, QToolButton, QLabel
 
-from mapbender_plugin.dialogs.server_config_dialog import serverConfigDialog
-from mapbender_plugin.helpers import get_plugin_dir, \
-    qgis_project_is_saved, \
+from qgis.core import Qgis, QgsSettings, QgsMessageLog
+from qgis.utils import iface
+
+from mapbender_plugin.dialogs.server_config_dialog import ServerConfigDialog
+from mapbender_plugin.helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
     update_mb_slug_in_settings
@@ -22,24 +23,40 @@ from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 from mapbender_plugin.upload import Upload
 
-# Dialog aus .ui-Datei
+
+# Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dialogs/ui/main_dialog.ui'))
 
 
 class MainDialog(BASE, WIDGET):
+    tabWidget: QTabWidget
+    serverUploadTab: QWidget
+    serverConfigTab: QWidget
+    publishRadioButton: QRadioButton
+    cloneTemplateRadioButton: QRadioButton
+    serverTableWidget: QTableWidget
+    warningFirstServerLabel: QLabel
+    serverConfigComboBox: QComboBox
+    mbSlugComboBox: QComboBox
+    buttonBoxTab1: QDialogButtonBox
+    publishButton: QPushButton
+    updateButton: QPushButton
+    addServerConfigButton: QToolButton
+    editServerConfigButton: QToolButton
+    removeServerConfigButton: QToolButton
+    buttonBoxTab2: QDialogButtonBox
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
-        self.plugin_dir = get_plugin_dir()
-
-        self.setup()
         self.setupConnections()
 
-    def setup(self) -> None:
+    def setupUi(self, widget) -> None:
+        super().setupUi(widget)
+        self.warningFirstServerLabel.setPixmap(QPixmap(':/images/themes/default/mIconWarning.svg'))
         # Tabs
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentWidget(self.serverUploadTab)
 
         # Tab1
         self.update_server_combo_box()
@@ -56,9 +73,8 @@ class MainDialog(BASE, WIDGET):
         self.layerSetLineEdit.setValidator(regex_slug_layer_set_validator)
 
         # Tab2
-        server_table_headers = SERVER_TABLE_HEADERS
-        self.serverTableWidget.setColumnCount(len(server_table_headers))
-        self.serverTableWidget.setHorizontalHeaderLabels(server_table_headers)
+        self.serverTableWidget.setColumnCount(len(SERVER_TABLE_HEADERS))
+        self.serverTableWidget.setHorizontalHeaderLabels(SERVER_TABLE_HEADERS)
         self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
 
@@ -77,9 +93,9 @@ class MainDialog(BASE, WIDGET):
         self.publishButton.clicked.connect(self.publish_project)
         self.updateButton.clicked.connect(self.update_project)
         self.buttonBoxTab1.rejected.connect(self.reject)
-        self.addServerConfigButton.clicked.connect(self.open_dialog_add_new_server_config)
-        self.editServerConfigButton.clicked.connect(self.open_dialog_edit_server_config)
-        self.removeServerConfigButton.clicked.connect(self.remove_server_config)
+        self.addServerConfigButton.clicked.connect(self.on_add_server_config_clicked)
+        self.editServerConfigButton.clicked.connect(self.on_edit_server_config_clicked)
+        self.removeServerConfigButton.clicked.connect(self.on_remove_server_config_clicked)
 
     def update_server_table(self) -> None:
         server_config_list = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
@@ -122,13 +138,13 @@ class MainDialog(BASE, WIDGET):
             self.warningFirstServerLabel.show()
             self.serverComboBoxLabel.setText("Please add a server")
             self.serverConfigComboBox.clear()
+            return
 
-        else:
-            # Update server configuration-combobox
-            self.serverComboBoxLabel.setText("Server")
-            self.warningFirstServerLabel.hide()
-            self.serverConfigComboBox.clear()
-            self.serverConfigComboBox.addItems(server_config_list)
+        # Update server configuration-combobox
+        self.serverComboBoxLabel.setText("Server")
+        self.warningFirstServerLabel.hide()
+        self.serverConfigComboBox.clear()
+        self.serverConfigComboBox.addItems(server_config_list)
 
     def update_slug_combo_box(self) -> None:
         s = QgsSettings()
@@ -162,25 +178,24 @@ class MainDialog(BASE, WIDGET):
         :return:
         """
         self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
-    def open_dialog_add_new_server_config(self) -> None:
-        server_config_is_new = True
-        new_server_config_dialog = serverConfigDialog(server_config_is_new, '')
+
+    def open_server_config_dialog(self, config_name: Optional[str] = None) -> None:
+        new_server_config_dialog = ServerConfigDialog(server_config_name=config_name, parent=iface.mainWindow())
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
 
-    def open_dialog_edit_server_config(self) -> None:
-        server_config_is_new = False
+    def on_add_server_config_clicked(self) -> None:
+        self.open_server_config_dialog()
+
+    def on_edit_server_config_clicked(self) -> None:
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
         selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        edit_server_config_dialog = serverConfigDialog(server_config_is_new, selected_server_config)
-        edit_server_config_dialog.exec()
-        self.update_server_table()
-        self.update_server_combo_box()
+        self.open_server_config_dialog(selected_server_config)
 
-    def remove_server_config(self) -> None:
+    def on_remove_server_config_clicked(self) -> None:
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
@@ -220,12 +235,9 @@ class MainDialog(BASE, WIDGET):
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
 
-
-        if server_config.windows_pk_path == '':
-            connect_kwargs = {"password": server_config.password}
-        else:
-            connect_kwargs = {"password": server_config.password,
-                              "key_filename": server_config.windows_pk_path}
+        connect_kwargs = {"password": server_config.password}
+        if server_config.windows_pk_path:
+            connect_kwargs["key_filename"] = server_config.windows_pk_path
 
         with Connection(host=server_config.url, user=server_config.username, port=server_config.port,
                         connect_kwargs=connect_kwargs) as connection:
