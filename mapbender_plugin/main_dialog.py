@@ -20,9 +20,8 @@ from mapbender_plugin.helpers import qgis_project_is_saved, \
 from mapbender_plugin.mapbender import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import SERVER_TABLE_HEADERS, PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 from mapbender_plugin.upload import Upload
-
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -73,8 +72,10 @@ class MainDialog(BASE, WIDGET):
         self.layerSetLineEdit.setValidator(regex_slug_layer_set_validator)
 
         # Tab2
-        self.serverTableWidget.setColumnCount(len(SERVER_TABLE_HEADERS))
-        self.serverTableWidget.setHorizontalHeaderLabels(SERVER_TABLE_HEADERS)
+        server_table_headers = ["Name",
+                                "URL"]  # , "QGIS-Projects path", "QGIS-Server path" , "Mapbender app path", "Mapbender basis URL"
+        self.serverTableWidget.setColumnCount(len(server_table_headers))
+        self.serverTableWidget.setHorizontalHeaderLabels(server_table_headers)
         self.serverTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.update_server_table()
 
@@ -383,5 +384,3 @@ class MainDialog(BASE, WIDGET):
                            "WMS succesfully updated:\n \n" + wms_url +
                            "\n \non Mapbender source(s): " + str(sources_ids))
         self.close()
-
-

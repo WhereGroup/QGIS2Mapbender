@@ -5,8 +5,7 @@ from urllib.parse import urlparse
 from qgis.core import QgsMessageLog, Qgis
 
 from mapbender_plugin.helpers import show_fail_box_ok, waitCursor
-from mapbender_plugin.settings import TAG, WMS_SERVICE_VERSION_REQUEST
-
+from mapbender_plugin.settings import TAG
 
 class Upload:
     def __init__(self, connection, paths):
@@ -22,8 +21,9 @@ class Upload:
         return urlparse(url).scheme
 
     def get_wms_url(self, server_config) -> str:
+        wms_service_version_request = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
         protocol = self.get_url_protocol(server_config.mb_basis_url)
-        wms_url = (f'{protocol}://{server_config.url}{server_config.qgis_server_path}{WMS_SERVICE_VERSION_REQUEST}'
+        wms_url = (f'{protocol}://{server_config.url}{server_config.qgis_server_path}{wms_service_version_request}'
                    f'{server_config.projects_path}{self.source_project_dir_name}/'
                    f'{self.source_project_file_name}')
         return wms_url
