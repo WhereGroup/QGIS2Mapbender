@@ -31,6 +31,18 @@ def get_project_layers() -> list:
         layers_names.append(layer.name())
     return layers_names
 
+def check_if_qgis_project_is_dirty_and_save() -> None:
+    if QgsProject.instance().isDirty():
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle("")
+        msgBox.setText("The project has been modified.")
+        msgBox.setInformativeText("Do you want to save your changes?")
+        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        msgBox.setDefaultButton(QMessageBox.Save)
+        ret = msgBox.exec_()
+        if ret == QMessageBox.Save:
+            QgsProject.instance().write()
+        return ret
 
 def qgis_project_is_saved() -> bool:
     # Get and check .qgz project path
