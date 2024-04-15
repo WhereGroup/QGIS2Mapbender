@@ -71,7 +71,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
-        self.winPKPathLineEdit.setText(server_config.windows_pk_path)
+        self.winPKFileWidget.lineEdit().setText(server_config.windows_pk_path)
 
     def getServerConfigFromFormular(self) -> ServerConfig:
         return ServerConfig(

@@ -52,12 +52,11 @@ class MapbenderUpload:
             sources_ids = [obj["id"] for obj in parsed_json]
             QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, sources_ids
         else:
             sources_ids = []
             QgsMessageLog.logMessage(f"Exit status {exit_status}, source(s) ID(s): {sources_ids}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, sources_ids
+        return exit_status, sources_ids
 
     def wms_add(self):
         """
@@ -72,12 +71,11 @@ class MapbenderUpload:
             spl = 'Saved new source #'
             source_id = output.split(spl, 1)[1]
             QgsMessageLog.logMessage(f"Exit status {exit_status}, new source ID: {source_id}'", TAG, level=Qgis.Info)
-            return exit_status, source_id
         else:
             source_id = ''
             QgsMessageLog.logMessage(f"Exit status: {exit_status}, failed, no new source ID {source_id}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, source_id, error_output
+        return exit_status, source_id, error_output
 
     def wms_reload(self, id):
         """
@@ -108,12 +106,11 @@ class MapbenderUpload:
             slug = (output.split(spl, 1)[1]).split(',')[0].strip()
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, output, slug, error_output
         else:
             slug = ''
             QgsMessageLog.logMessage(f"Exit status {exit_status}, output: {output}, error: {error_output}'", TAG,
                                      level=Qgis.Info)
-            return exit_status, output, slug, error_output
+        return exit_status, output, slug, error_output
 
     def wms_assign(self, slug, source_id, layer_set):
         """

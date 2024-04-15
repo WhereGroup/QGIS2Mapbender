@@ -1,5 +1,5 @@
 import os
-from typing import List
+import platform
 
 from PyQt5.QtCore import Qt
 from decorator import contextmanager
@@ -10,7 +10,14 @@ from qgis.core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qg
 
 from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
-
+def get_os():
+    os = platform.system()
+    if os == "Windows":
+        return "Windows"
+    elif os == "Linux":
+        return "Linux"
+    else:
+        return "Unknown OS"
 def get_plugin_dir() -> str:
     return os.path.dirname(__file__)
 
@@ -21,9 +28,10 @@ def get_project_layer_names() -> list:
 
 def qgis_project_is_saved() -> bool:
     # Get and check .qgz project path
-    source_project_dir_path = QgsProject.instance().readPath("./")
+    #source_project_dir_path = QgsProject.instance().readPath("./")
     source_project_file_path = QgsProject.instance().fileName()
-    if source_project_dir_path == "./" or source_project_file_path == "":
+    #if source_project_dir_path == "./" or source_project_file_path == "":
+    if not source_project_file_path:
         show_fail_box_ok('Failed',
                          "Please use the Mapbender Plugin from a saved QGIS-Project")
         return False
