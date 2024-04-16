@@ -42,6 +42,7 @@ class MainDialog(BASE, WIDGET):
     publishButton: QPushButton
     updateButton: QPushButton
     addServerConfigButton: QToolButton
+    duplicateServerConfigButton: QToolButton
     editServerConfigButton: QToolButton
     removeServerConfigButton: QToolButton
     buttonBoxTab2: QDialogButtonBox
@@ -75,6 +76,7 @@ class MainDialog(BASE, WIDGET):
 
         # Tab2
         self.addServerConfigButton.setIcon(QIcon(':/images/themes/default/mActionAdd.svg'))
+        self.duplicateServerConfigButton.setIcon(QIcon(':/images/themes/default/mActionEditCopy.svg'))
         self.removeServerConfigButton.setIcon(QIcon(':/images/themes/default/mIconDelete.svg'))
         self.editServerConfigButton.setIcon(QIcon(':/images/themes/default/mActionAllEdits.svg'))
         server_table_headers = ["Name",
@@ -85,9 +87,10 @@ class MainDialog(BASE, WIDGET):
         self.update_server_table()
 
         # Buttons
-        self.addServerConfigButton.setToolTip("Add server")
-        self.editServerConfigButton.setToolTip("Edit server")
-        self.removeServerConfigButton.setToolTip("Remove server")
+        self.addServerConfigButton.setToolTip("Add server configuration")
+        self.duplicateServerConfigButton.setToolTip("Duplicate selected server configuration")
+        self.editServerConfigButton.setToolTip("Edit selected server configuration")
+        self.removeServerConfigButton.setToolTip("Remove selected server configuration")
         self.buttonBoxTab2.rejected.connect(self.reject)
 
     def setupConnections(self) -> None:
@@ -100,6 +103,7 @@ class MainDialog(BASE, WIDGET):
         self.updateButton.clicked.connect(self.update_project)
         self.buttonBoxTab1.rejected.connect(self.reject)
         self.addServerConfigButton.clicked.connect(self.on_add_server_config_clicked)
+        self.duplicateServerConfigButton.clicked.connect(self.on_duplicate_server_config_clicked)
         self.editServerConfigButton.clicked.connect(self.on_edit_server_config_clicked)
         self.removeServerConfigButton.clicked.connect(self.on_remove_server_config_clicked)
 
@@ -185,8 +189,8 @@ class MainDialog(BASE, WIDGET):
         """
         self.publishButton.setEnabled(self.mbSlugComboBox.currentText() != '')
 
-    def open_server_config_dialog(self, config_name: Optional[str] = None) -> None:
-        new_server_config_dialog = ServerConfigDialog(server_config_name=config_name, parent=iface.mainWindow())
+    def open_server_config_dialog(self, config_name: Optional[str] = None, mode: Optional[str] = None) -> None:
+        new_server_config_dialog = ServerConfigDialog(server_config_name=config_name, mode=mode, parent=iface.mainWindow())
         new_server_config_dialog.exec()
         self.update_server_table()
         self.update_server_combo_box()
@@ -194,12 +198,19 @@ class MainDialog(BASE, WIDGET):
     def on_add_server_config_clicked(self) -> None:
         self.open_server_config_dialog()
 
-    def on_edit_server_config_clicked(self) -> None:
+    def get_selected_server_config(self) -> str:
         selected_row = self.serverTableWidget.currentRow()
         if selected_row == -1:
             return
-        selected_server_config = self.serverTableWidget.item(selected_row, 0).text()
-        self.open_server_config_dialog(selected_server_config)
+        return self.serverTableWidget.item(selected_row, 0).text()
+
+    def on_duplicate_server_config_clicked(self) -> None:
+        selected_server_config = self.get_selected_server_config()
+        self.open_server_config_dialog(selected_server_config, mode='duplicate')
+
+    def on_edit_server_config_clicked(self) -> None:
+        selected_server_config = self.get_selected_server_config()
+        self.open_server_config_dialog(selected_server_config, mode='edit')
 
     def on_remove_server_config_clicked(self) -> None:
         selected_row = self.serverTableWidget.currentRow()
@@ -209,17 +220,12 @@ class MainDialog(BASE, WIDGET):
         if show_question_box(
                 f"Are you sure you want to remove the server configuration '{selected_server_config}'?") != QMessageBox.Yes:
             return
-        try:
-            s = QSettings()
-            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_server_config}")
-            show_succes_box_ok('Success', 'Server configuration successfully removed')
-            self.update_server_table()
-            self.update_server_combo_box()
-        except Exception as e:
-            show_fail_box_ok('Failed', "Server configuration could not be deleted (see log)")
-            QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", TAG,
-                                     Qgis.Warning)
-            raise
+        s = QSettings()
+        s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_server_config}")
+        show_succes_box_ok('Success', 'Server configuration successfully removed')
+        self.update_server_table()
+        self.update_server_combo_box()
+
 
     def publish_project(self) -> None:
         if not qgis_project_is_saved():

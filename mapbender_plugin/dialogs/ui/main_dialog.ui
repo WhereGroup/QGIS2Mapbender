@@ -254,7 +254,13 @@
              </widget>
             </item>
             <item>
-             <widget class="QToolButton" name="removeServerConfigButton">
+             <widget class="QToolButton" name="duplicateServerConfigButton">
+              <property name="maximumSize">
+               <size>
+                <width>29</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -262,6 +268,13 @@
             </item>
             <item>
              <widget class="QToolButton" name="editServerConfigButton">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="removeServerConfigButton">
               <property name="text">
                <string/>
               </property>
@@ -342,7 +355,6 @@
   <tabstop>updateButton</tabstop>
   <tabstop>serverTableWidget</tabstop>
   <tabstop>addServerConfigButton</tabstop>
-  <tabstop>removeServerConfigButton</tabstop>
   <tabstop>editServerConfigButton</tabstop>
  </tabstops>
  <resources/>
