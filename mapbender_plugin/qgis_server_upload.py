@@ -14,7 +14,7 @@ class QgisServerUpload:
         self.source_project_dir_name = paths.source_project_dir_name
         self.source_project_file_name = paths.source_project_file_name
         self.source_project_zip_file_path = paths.source_project_zip_file_path
-        self.server_projects_dir_path = paths.server_projects_dir_path
+        self.server_project_parent_dir_path = paths.server_project_parent_dir_path
 
     @staticmethod
     def get_url_protocol(url):
@@ -30,7 +30,7 @@ class QgisServerUpload:
 
     def check_if_project_folder_exists_on_server(self) -> bool:
         with waitCursor():
-            if self.connection.run('test -d {}'.format(self.server_projects_dir_path + self.source_project_dir_name),
+            if self.connection.run('test -d {}'.format(self.server_project_parent_dir_path + self.source_project_dir_name),
                                    warn=True).failed:  # Without .zip (if it exists, is unzipped)
                 return False
         return True
@@ -38,9 +38,9 @@ class QgisServerUpload:
     def remove_project_folder_from_server(self) -> bool:
         with waitCursor():
             result = self.connection.run(
-                f'cd ..; cd {self.server_projects_dir_path}; rm -r {self.source_project_dir_name};')
+                f'cd ..; cd {self.server_project_parent_dir_path}; rm -r {self.source_project_dir_name};')
             # Check success:
-            if os.path.isdir(f'{self.server_projects_dir_path}{self.source_project_dir_name}'):
+            if os.path.isdir(f'{self.server_project_parent_dir_path}{self.source_project_dir_name}'):
                 show_fail_box_ok("Failed",
                                  f"Could not remove existing project folder from server. Reason {result.return_code}.")
                 return False
@@ -95,7 +95,7 @@ class QgisServerUpload:
     def upload_project_zip_file(self) -> bool:
         with waitCursor():
             try:
-                self.connection.put(local=self.source_project_zip_file_path, remote=self.server_projects_dir_path)
+                self.connection.put(local=self.source_project_zip_file_path, remote=self.server_project_parent_dir_path)
                 QgsMessageLog.logMessage("QGIS-Project folder successfully uploaded", TAG, level=Qgis.Info)
                 return True
             except Exception as e:
@@ -105,7 +105,7 @@ class QgisServerUpload:
     def unzip_and_remove_project_dir_on_server(self) -> bool:
         with waitCursor():
             result = self.connection.run(
-                f'cd ..; cd {self.server_projects_dir_path}/; unzip -q {self.source_project_dir_name}.zip;',
+                f'cd ..; cd {self.server_project_parent_dir_path}/; unzip -q {self.source_project_dir_name}.zip;',
                 warn=True)
             if result.ok:
                 QgsMessageLog.logMessage("Files unzipped on server", TAG, level=Qgis.Info)
