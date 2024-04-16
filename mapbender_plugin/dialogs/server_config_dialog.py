@@ -2,7 +2,7 @@ import os
 from typing import Optional
 
 from PyQt5 import uic
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
 from qgis._gui import QgsFileWidget
@@ -39,6 +39,7 @@ class ServerConfigDialog(BASE, WIDGET):
         ]
         self.setupConnections()
         self.authcfg = ''
+        self.selected_server_config_name = server_config_name
         self.mode = mode
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
         if server_config_name:
@@ -104,21 +105,23 @@ class ServerConfigDialog(BASE, WIDGET):
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
             all(field.text() for field in self.mandatoryFields))
 
-    def checkConfigName(self, config_name) -> bool:
+    def checkConfigName(self, config_name_from_formular) -> bool:
         saved_config_names = list_qgs_settings_child_groups(f'{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection')
-        if config_name in saved_config_names and self.mode != 'edit':
+        if self.mode == 'edit' and config_name_from_formular not in saved_config_names:
+            s = QSettings()
+            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.selected_server_config_name}")
+            return True
+        if config_name_from_formular in saved_config_names and self.mode != 'edit':
             show_fail_box_ok('Failed', 'Server configuration name already exists')
             return False
         return True
 
     def saveServerConfig(self):
-        serverConfig = self.getServerConfigFromFormular()
-        if not self.checkConfigName(serverConfig.name):
+        serverConfigFromFormular = self.getServerConfigFromFormular()
+        if not self.checkConfigName(serverConfigFromFormular.name):
             return
-        # if not self.validateFields(serverConfig):
-        #     show_fail_box_ok('Failed', 'Server configuration is not valid')
-        #     return
-        serverConfig.save()
+        serverConfigFromFormular.save()
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
+

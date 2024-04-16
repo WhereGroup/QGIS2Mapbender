@@ -220,17 +220,12 @@ class MainDialog(BASE, WIDGET):
         if show_question_box(
                 f"Are you sure you want to remove the server configuration '{selected_server_config}'?") != QMessageBox.Yes:
             return
-        try:
-            s = QSettings()
-            s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_server_config}")
-            show_succes_box_ok('Success', 'Server configuration successfully removed')
-            self.update_server_table()
-            self.update_server_combo_box()
-        except Exception as e:
-            show_fail_box_ok('Failed', "Server configuration could not be deleted (see log)")
-            QgsMessageLog.logMessage(f"Server configuration could not be deleted ({e})", TAG,
-                                     Qgis.Warning)
-            raise
+        s = QSettings()
+        s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{selected_server_config}")
+        show_succes_box_ok('Success', 'Server configuration successfully removed')
+        self.update_server_table()
+        self.update_server_combo_box()
+
 
     def publish_project(self) -> None:
         if not qgis_project_is_saved():
