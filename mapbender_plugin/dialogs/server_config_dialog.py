@@ -7,8 +7,9 @@ from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
 from qgis._gui import QgsFileWidget
 
-from mapbender_plugin.helpers import show_succes_box_ok
+from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok
 from mapbender_plugin.server_config import ServerConfig
+from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -38,10 +39,11 @@ class ServerConfigDialog(BASE, WIDGET):
         ]
         self.setupConnections()
         self.authcfg = ''
+        self.mode = mode
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
         if server_config_name:
             self.getSavedServerConfig(server_config_name, mode)
-        if mode == 'edit':
+        if self.mode == 'edit':
             self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
 
         # QLineEdit validators
@@ -102,8 +104,17 @@ class ServerConfigDialog(BASE, WIDGET):
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
             all(field.text() for field in self.mandatoryFields))
 
+    def checkConfigName(self, config_name) -> bool:
+        saved_config_names = list_qgs_settings_child_groups(f'{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection')
+        if config_name in saved_config_names and self.mode != 'edit':
+            show_fail_box_ok('Failed', 'Server configuration name already exists')
+            return False
+        return True
+
     def saveServerConfig(self):
         serverConfig = self.getServerConfigFromFormular()
+        if not self.checkConfigName(serverConfig.name):
+            return
         # if not self.validateFields(serverConfig):
         #     show_fail_box_ok('Failed', 'Server configuration is not valid')
         #     return
