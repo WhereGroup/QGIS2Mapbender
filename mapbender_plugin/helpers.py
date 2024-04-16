@@ -124,8 +124,6 @@ def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
             mb_slugs_list = []
         elif isinstance(mb_slugs, list):
             mb_slugs_list = mb_slugs
-        else:
-            raise TypeError("Konnte MB template nicht lesen")
 
         if is_mb_slug and mb_slug not in mb_slugs_list:
             mb_slugs_list.append(mb_slug)
