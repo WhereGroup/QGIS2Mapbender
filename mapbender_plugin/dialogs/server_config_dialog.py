@@ -10,7 +10,6 @@ from qgis._gui import QgsFileWidget
 from mapbender_plugin.helpers import show_succes_box_ok
 from mapbender_plugin.server_config import ServerConfig
 
-
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'ui/server_config_dialog.ui'))
@@ -26,7 +25,7 @@ class ServerConfigDialog(BASE, WIDGET):
     mbBasisUrlLineEdit: QLineEdit
     winPKFileWidget: QgsFileWidget
 
-    def __init__(self, server_config_name: Optional[str] = None, parent=None):
+    def __init__(self, server_config_name: Optional[str] = None, mode: Optional[str] = None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.mandatoryFields = [
@@ -41,7 +40,8 @@ class ServerConfigDialog(BASE, WIDGET):
         self.authcfg = ''
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
         if server_config_name:
-            self.getSavedServerConfig(server_config_name)
+            self.getSavedServerConfig(server_config_name, mode)
+        if mode == 'edit':
             self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
 
         # QLineEdit validators
@@ -68,11 +68,11 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbPathLineEdit.textChanged.connect(self.validateFields)
         self.mbBasisUrlLineEdit.textChanged.connect(self.validateFields)
 
-    def getSavedServerConfig(self, server_config_name: str):
+    def getSavedServerConfig(self, server_config_name: str, mode: str):
         server_config = ServerConfig.getParamsFromSettings(server_config_name)
         self.authcfg = server_config.authcfg
-
-        self.serverConfigNameLineEdit.setText(server_config_name)
+        if mode == 'edit':
+            self.serverConfigNameLineEdit.setText(server_config_name)
         self.serverPortLineEdit.setText(server_config.port)
         self.serverAddressLineEdit.setText(server_config.url)
         self.userNameLineEdit.setText(server_config.username)
