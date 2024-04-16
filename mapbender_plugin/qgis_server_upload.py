@@ -7,7 +7,7 @@ from qgis.core import QgsMessageLog, Qgis
 from mapbender_plugin.helpers import show_fail_box_ok, waitCursor
 from mapbender_plugin.settings import TAG
 
-class Upload:
+class QgisServerUpload:
     def __init__(self, connection, paths):
         self.connection = connection
         self.source_project_dir_path = paths.source_project_dir_path

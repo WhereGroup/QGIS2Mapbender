@@ -17,11 +17,11 @@ from mapbender_plugin.helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
     update_mb_slug_in_settings
-from mapbender_plugin.mapbender import MapbenderUpload
+from mapbender_plugin.mapbender_upload import MapbenderUpload
 from mapbender_plugin.paths import Paths
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
-from mapbender_plugin.upload import Upload
+from mapbender_plugin.qgis_server_upload import QgisServerUpload
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -248,7 +248,7 @@ class MainDialog(BASE, WIDGET):
                 show_fail_box_ok("Connection failed", f"Connection failed. Reason: {e}")
                 return
 
-            upload = Upload(connection, paths)
+            upload = QgisServerUpload(connection, paths)
             wms_url = upload.get_wms_url(server_config)
             project_folder_exists_on_server = upload.check_if_project_folder_exists_on_server()
             # User's input = publish
