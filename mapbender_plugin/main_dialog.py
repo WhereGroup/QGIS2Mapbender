@@ -5,7 +5,7 @@ from fabric2 import Connection
 
 from PyQt5 import uic
 from PyQt5.QtCore import QSettings, QRegExp
-from PyQt5.QtGui import QRegExpValidator, QPixmap
+from PyQt5.QtGui import QRegExpValidator, QPixmap, QIcon
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget, QTabWidget, QRadioButton, QPushButton, \
     QTableWidget, QComboBox, QDialogButtonBox, QToolButton, QLabel
 
@@ -57,7 +57,9 @@ class MainDialog(BASE, WIDGET):
         # Tabs
         self.tabWidget.setCurrentWidget(self.serverUploadTab)
 
-        # Tab1
+        # Tab
+        self.publishButton.setIcon(QIcon(':/images/themes/default/mActionSharingExport.svg'))
+        self.updateButton.setIcon(QIcon(':/images/themes/default/mActionRefresh.svg'))
         self.update_server_combo_box()
         self.publishRadioButton.setChecked(True)
         self.update_slug_combo_box()
@@ -72,6 +74,9 @@ class MainDialog(BASE, WIDGET):
         self.layerSetLineEdit.setValidator(regex_slug_layer_set_validator)
 
         # Tab2
+        self.addServerConfigButton.setIcon(QIcon(':/images/themes/default/mActionAdd.svg'))
+        self.removeServerConfigButton.setIcon(QIcon(':/images/themes/default/mIconDelete.svg'))
+        self.editServerConfigButton.setIcon(QIcon(':/images/themes/default/mActionAllEdits.svg'))
         server_table_headers = ["Name",
                                 "URL"]  # , "QGIS-Projects path", "QGIS-Server path" , "Mapbender app path", "Mapbender basis URL"
         self.serverTableWidget.setColumnCount(len(server_table_headers))

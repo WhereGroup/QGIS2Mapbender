@@ -39,7 +39,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="serverUploadTab">
       <property name="accessibleName">
@@ -101,20 +101,12 @@
               <property name="text">
                <string>Publish </string>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../resources/icons/mActionSharingExport.svg</normaloff>../../resources/icons/mActionSharingExport.svg</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="updateButton">
               <property name="text">
                <string>Update</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../resources/icons/mActionRefresh.svg</normaloff>../../resources/icons/mActionRefresh.svg</iconset>
               </property>
              </widget>
             </item>
@@ -259,10 +251,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../resources/icons/mActionAdd.svg</normaloff>../../resources/icons/mActionAdd.svg</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -270,20 +258,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../resources/icons/mIconDelete.svg</normaloff>../../resources/icons/mIconDelete.svg</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QToolButton" name="editServerConfigButton">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../resources/icons/mActionAllEdits.svg</normaloff>../../resources/icons/mActionAllEdits.svg</iconset>
               </property>
              </widget>
             </item>
