@@ -80,6 +80,8 @@ class ServerConfigDialog(BASE, WIDGET):
     def getSavedServerConfig(self, server_config_name: str, mode: str):
         server_config = ServerConfig.getParamsFromSettings(server_config_name)
         self.authcfg = server_config.authcfg
+        if not server_config.username or not server_config.password:
+            self.credentialsAuthDbRadioButton.setChecked(True)
         if mode == 'edit':
             self.serverConfigNameLineEdit.setText(server_config_name)
         self.serverPortLineEdit.setText(server_config.port)
