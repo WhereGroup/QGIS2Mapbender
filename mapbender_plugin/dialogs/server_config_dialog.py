@@ -53,6 +53,13 @@ class ServerConfigDialog(BASE, WIDGET):
         if self.mode == 'edit':
             self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
 
+        self.serverConfigNameLineEdit.setToolTip('Custom server configuration name without blank spaces')
+        self.qgisProjectPathLineEdit.setToolTip('Example: /data/qgis-projects/')
+        self.qgisServerPathLineEdit.setToolTip('Example: /cgi-bin/qgis_mapserv.fcgi')
+        self.mbPathLineEdit.setToolTip('Example: /data/mapbender/application/')
+        self.mbBasisUrlLineEdit.setToolTip('Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/')
+        self.winPKFileWidget.setToolTip('Example: C:/Users/user/Documents/ED25519-Key_private_key.ppk')
+
         # QLineEdit validators
         regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
         regex_validator = QRegExpValidator(regex)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>852</width>
-    <height>757</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,7 +42,7 @@
       <property name="geometry">
        <rect>
         <x>610</x>
-        <y>700</y>
+        <y>580</y>
         <width>210</width>
         <height>30</height>
        </rect>
@@ -124,7 +124,7 @@
         <x>9</x>
         <y>51</y>
         <width>811</width>
-        <height>160</height>
+        <height>141</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout_2">
@@ -138,39 +138,27 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="serverConfigNameLineEdit"/>
        </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="serviceNameExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Custom server configuration name without blank spaces</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="serverAddressLabel">
          <property name="text">
           <string>Server address*</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="1" column="1">
         <widget class="QLineEdit" name="serverAddressLineEdit"/>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="portLabel">
          <property name="text">
           <string>Port</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="2" column="1">
         <widget class="QLineEdit" name="serverPortLineEdit"/>
        </item>
-       <item row="4" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Authentication</string>
@@ -185,7 +173,7 @@
         <x>9</x>
         <y>360</y>
         <width>811</width>
-        <height>316</height>
+        <height>191</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout">
@@ -199,109 +187,49 @@
        <item row="0" column="1">
         <widget class="QLineEdit" name="qgisProjectPathLineEdit"/>
        </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="qgisProjectPathExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Example: /data/qgis-projects/</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="qgisServerPathLabel">
          <property name="text">
           <string>QGIS-Server path*</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="1" column="1">
         <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
        </item>
-       <item row="3" column="1">
-        <widget class="QLabel" name="qgisServerPathExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Example: /cgi-bin/qgis_mapserv.fcgi</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="mbPathLabel">
          <property name="text">
           <string>Mapbender application path*</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="2" column="1">
         <widget class="QLineEdit" name="mbPathLineEdit"/>
        </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="mbPathExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Example: /data/mapbender/application/</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="mbBasisUrlLabel">
          <property name="text">
           <string>Mapbender basis URL*</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="3" column="1">
         <widget class="QLineEdit" name="mbBasisUrlLineEdit">
          <property name="inputMethodHints">
           <set>Qt::ImhUrlCharactersOnly</set>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
-        <widget class="QLabel" name="mbBasisUrlExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="winPKPathLabel">
          <property name="text">
           <string>[WINDOWS ONLY] SSH private key path</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="4" column="1">
         <widget class="QgsFileWidget" name="winPKFileWidget"/>
-       </item>
-       <item row="9" column="1">
-        <widget class="QLabel" name="winPKPathExampleLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Example: C:/Users/user/Documents/ED25519-Key_private_key.ppk</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
