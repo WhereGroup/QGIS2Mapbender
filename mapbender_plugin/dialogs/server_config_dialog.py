@@ -4,7 +4,7 @@ from typing import Optional
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
-from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
+from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton, QLabel
 from qgis._gui import QgsFileWidget
 
 from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os
@@ -25,6 +25,10 @@ class ServerConfigDialog(BASE, WIDGET):
     mbPathLineEdit: QLineEdit
     mbBasisUrlLineEdit: QLineEdit
     winPKFileWidget: QgsFileWidget
+    credentialsPlainTextRadioButton: QRadioButton
+    credentialsAuthDbRadioButton: QRadioButton
+    authLabel: QLabel
+
 
     def __init__(self, server_config_name: Optional[str] = None, mode: Optional[str] = None, parent=None):
         super().__init__(parent)
@@ -82,6 +86,13 @@ class ServerConfigDialog(BASE, WIDGET):
         self.serverAddressLineEdit.setText(server_config.url)
         self.userNameLineEdit.setText(server_config.username)
         self.passwordLineEdit.setText(server_config.password)
+        if server_config.authcfg:
+            self.authLabel.setText(f'Authentication saved in database. Configuration: {server_config.authcfg}')
+            self.credentialsAuthDbRadioButton.setChecked(True)
+            self.userNameLineEdit.setText('')
+            self.passwordLineEdit.setText('')
+        else:
+            self.credentialsPlainTextRadioButton.setChecked(True)
         self.qgisProjectPathLineEdit.setText(server_config.projects_path)
         self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
@@ -122,7 +133,10 @@ class ServerConfigDialog(BASE, WIDGET):
         serverConfigFromFormular = self.getServerConfigFromFormular()
         if not self.checkConfigName(serverConfigFromFormular.name):
             return
-        serverConfigFromFormular.save()
+        if self.credentialsPlainTextRadioButton.isChecked():
+            serverConfigFromFormular.save(encrypted=False)
+        else:
+            serverConfigFromFormular.save(encrypted=True)
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
