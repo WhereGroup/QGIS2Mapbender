@@ -4,7 +4,7 @@ from typing import Optional
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
-from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton
+from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton, QLabel
 from qgis._gui import QgsFileWidget
 
 from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os
@@ -27,6 +27,7 @@ class ServerConfigDialog(BASE, WIDGET):
     winPKFileWidget: QgsFileWidget
     credentialsPlainTextRadioButton: QRadioButton
     credentialsAuthDbRadioButton: QRadioButton
+    authLabel: QLabel
 
 
     def __init__(self, server_config_name: Optional[str] = None, mode: Optional[str] = None, parent=None):
@@ -86,6 +87,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.userNameLineEdit.setText(server_config.username)
         self.passwordLineEdit.setText(server_config.password)
         if server_config.authcfg:
+            self.authLabel.setText(f'Authentication saved in database. Configuration: {server_config.authcfg}')
             self.credentialsAuthDbRadioButton.setChecked(True)
             self.userNameLineEdit.setText('')
             self.passwordLineEdit.setText('')

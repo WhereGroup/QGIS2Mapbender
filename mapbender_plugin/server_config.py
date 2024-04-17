@@ -77,9 +77,8 @@ class ServerConfig:
         mb_basis_url = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_basis_url")
         authcfg = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/authcfg")
         windows_pk_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/windows_pk_path")
-        if not username or not password:
+        if authcfg:
             username, password = ServerConfig.get_username_and_password_from_auth_db(authcfg)
-
         return ServerConfig(name, url, port, username, password, projects_path, qgis_server_path, mb_app_path,
                             mb_basis_url, authcfg, windows_pk_path)
 
