@@ -19,11 +19,11 @@ class ServerConfig:
     authcfg: str
     windows_pk_path: str
 
-    def save(self, auth: bool):
+    def save(self, encrypted: bool):
         s = QgsSettings()
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/url", self.url)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/port", self.port)
-        if auth:
+        if encrypted:
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", '')
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/password", '')
             authCfgId = ServerConfig.save_basic_to_auth_db(self.name, self.username, self.password)

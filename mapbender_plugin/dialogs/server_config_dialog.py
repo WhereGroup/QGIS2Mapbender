@@ -47,7 +47,6 @@ class ServerConfigDialog(BASE, WIDGET):
         self.selected_server_config_name = server_config_name
         self.mode = mode
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
-        self.credentialsPlainTextRadioButton.setChecked(True)
         if server_config_name:
             self.getSavedServerConfig(server_config_name, mode)
         if self.mode == 'edit':
@@ -80,14 +79,18 @@ class ServerConfigDialog(BASE, WIDGET):
     def getSavedServerConfig(self, server_config_name: str, mode: str):
         server_config = ServerConfig.getParamsFromSettings(server_config_name)
         self.authcfg = server_config.authcfg
-        if not server_config.username or not server_config.password:
-            self.credentialsAuthDbRadioButton.setChecked(True)
         if mode == 'edit':
             self.serverConfigNameLineEdit.setText(server_config_name)
         self.serverPortLineEdit.setText(server_config.port)
         self.serverAddressLineEdit.setText(server_config.url)
         self.userNameLineEdit.setText(server_config.username)
         self.passwordLineEdit.setText(server_config.password)
+        if server_config.authcfg:
+            self.credentialsAuthDbRadioButton.setChecked(True)
+            self.userNameLineEdit.setText('')
+            self.passwordLineEdit.setText('')
+        else:
+            self.credentialsPlainTextRadioButton.setChecked(True)
         self.qgisProjectPathLineEdit.setText(server_config.projects_path)
         self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
@@ -129,9 +132,9 @@ class ServerConfigDialog(BASE, WIDGET):
         if not self.checkConfigName(serverConfigFromFormular.name):
             return
         if self.credentialsPlainTextRadioButton.isChecked():
-            serverConfigFromFormular.save(False)
+            serverConfigFromFormular.save(encrypted=False)
         else:
-            serverConfigFromFormular.save(True)
+            serverConfigFromFormular.save(encrypted=True)
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
