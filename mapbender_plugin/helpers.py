@@ -16,8 +16,7 @@ def get_os():
         return "Windows"
     elif os == "Linux":
         return "Linux"
-    else:
-        return "Unknown OS"
+    return "Unknown OS"
 def get_plugin_dir() -> str:
     return os.path.dirname(__file__)
 

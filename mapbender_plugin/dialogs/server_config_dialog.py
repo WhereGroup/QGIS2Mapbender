@@ -7,7 +7,7 @@ from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
 from qgis._gui import QgsFileWidget
 
-from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok
+from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os
 from mapbender_plugin.server_config import ServerConfig
 from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
@@ -37,6 +37,8 @@ class ServerConfigDialog(BASE, WIDGET):
             self.mbPathLineEdit,
             self.mbBasisUrlLineEdit
         ]
+        if get_os() == "Linux":
+            self.winPKFileWidget.setEnabled(False)
         self.setupConnections()
         self.authcfg = ''
         self.selected_server_config_name = server_config_name
