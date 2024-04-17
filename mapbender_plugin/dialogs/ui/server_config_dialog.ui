@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>852</width>
-    <height>636</height>
+    <width>867</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,220 +19,205 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>9</y>
-        <width>40</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>../../resources/icons/mapbender_ui_icon.png</pixmap>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-     <widget class="QDialogButtonBox" name="dialogButtonBox">
-      <property name="geometry">
-       <rect>
-        <x>610</x>
-        <y>580</y>
-        <width>210</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="locale">
-       <locale language="English" country="Germany"/>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-      </property>
-     </widget>
-     <widget class="QFrame" name="frame">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>217</y>
-        <width>811</width>
-        <height>131</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="userNameLineEdit"/>
-       </item>
-       <item row="1" column="1">
-        <widget class="QRadioButton" name="credentialsAuthDbRadioButton">
-         <property name="text">
-          <string>Save credentials encrypted in authentication database</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="passwordLabel">
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="userNameLabel">
-         <property name="text">
-          <string>User name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QRadioButton" name="credentialsPlainTextRadioButton">
-         <property name="text">
-          <string>Save credentials as plain text          </string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QgsPasswordLineEdit" name="passwordLineEdit"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLabel" name="authLabel">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>51</y>
-        <width>811</width>
-        <height>141</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="formLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="serviceNameLabel">
-         <property name="text">
-          <string>Server configuration name*                     </string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="serverConfigNameLineEdit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="serverAddressLabel">
-         <property name="text">
-          <string>Server address*</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="serverAddressLineEdit"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="portLabel">
-         <property name="text">
-          <string>Port</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="serverPortLineEdit"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Authentication</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>360</y>
-        <width>811</width>
-        <height>191</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="qgisProjectPathLabel">
-         <property name="text">
-          <string>QGIS-Projects path*</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="qgisProjectPathLineEdit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="qgisServerPathLabel">
-         <property name="text">
-          <string>QGIS-Server path*</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="mbPathLabel">
-         <property name="text">
-          <string>Mapbender application path*</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="mbPathLineEdit"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="mbBasisUrlLabel">
-         <property name="text">
-          <string>Mapbender basis URL*</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="mbBasisUrlLineEdit">
-         <property name="inputMethodHints">
-          <set>Qt::ImhUrlCharactersOnly</set>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="winPKPathLabel">
-         <property name="text">
-          <string>[WINDOWS ONLY] SSH private key path</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QgsFileWidget" name="winPKFileWidget"/>
-       </item>
-      </layout>
-     </widget>
+     <layout class="QFormLayout" name="formLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>../../resources/icons/mapbender_ui_icon.png</pixmap>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0" colspan="2">
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="serviceNameLabel">
+            <property name="text">
+             <string>Server configuration name*                     </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="serverConfigNameLineEdit"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="serverAddressLabel">
+            <property name="text">
+             <string>Server address*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="serverAddressLineEdit"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="portLabel">
+            <property name="text">
+             <string>Port</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="serverPortLineEdit"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Authentication</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="qgisProjectPathLabel">
+            <property name="text">
+             <string>QGIS-Projects path*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="qgisProjectPathLineEdit"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="qgisServerPathLabel">
+            <property name="text">
+             <string>QGIS-Server path*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="mbPathLabel">
+            <property name="text">
+             <string>Mapbender application path*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="mbPathLineEdit"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="mbBasisUrlLabel">
+            <property name="text">
+             <string>Mapbender basis URL*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="mbBasisUrlLineEdit">
+            <property name="inputMethodHints">
+             <set>Qt::ImhUrlCharactersOnly</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="winPKPathLabel">
+            <property name="text">
+             <string>[WINDOWS ONLY] SSH private key path</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QgsFileWidget" name="winPKFileWidget"/>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="userNameLineEdit"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QRadioButton" name="credentialsAuthDbRadioButton">
+             <property name="text">
+              <string>Save credentials encrypted in authentication database</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="passwordLabel">
+             <property name="text">
+              <string>Password</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="userNameLabel">
+             <property name="text">
+              <string>User name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="credentialsPlainTextRadioButton">
+             <property name="text">
+              <string>Save credentials as plain text          </string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QgsPasswordLineEdit" name="passwordLineEdit"/>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLabel" name="authLabel">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="1">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>786</width>
+          <height>5</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDialogButtonBox" name="dialogButtonBox">
+        <property name="locale">
+         <locale language="English" country="Germany"/>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
