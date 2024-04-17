@@ -4,7 +4,7 @@ from typing import Optional
 from PyQt5 import uic
 from PyQt5.QtCore import QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
-from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit
+from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton
 from qgis._gui import QgsFileWidget
 
 from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os
@@ -25,6 +25,9 @@ class ServerConfigDialog(BASE, WIDGET):
     mbPathLineEdit: QLineEdit
     mbBasisUrlLineEdit: QLineEdit
     winPKFileWidget: QgsFileWidget
+    credentialsPlainTextRadioButton: QRadioButton
+    credentialsAuthDbRadioButton: QRadioButton
+
 
     def __init__(self, server_config_name: Optional[str] = None, mode: Optional[str] = None, parent=None):
         super().__init__(parent)
@@ -44,6 +47,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.selected_server_config_name = server_config_name
         self.mode = mode
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
+        self.credentialsPlainTextRadioButton.setChecked(True)
         if server_config_name:
             self.getSavedServerConfig(server_config_name, mode)
         if self.mode == 'edit':
