@@ -126,7 +126,10 @@ class ServerConfigDialog(BASE, WIDGET):
         serverConfigFromFormular = self.getServerConfigFromFormular()
         if not self.checkConfigName(serverConfigFromFormular.name):
             return
-        serverConfigFromFormular.save()
+        if self.credentialsPlainTextRadioButton.isChecked():
+            serverConfigFromFormular.save(False)
+        else:
+            serverConfigFromFormular.save(True)
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
