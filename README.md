@@ -1,4 +1,4 @@
-# QGIS-Plugin_Mapbender
+# QGIS2Mapbender
 
 ## Description
 Prototypical QGIS plugin to populate Mapbender with QGIS-Server WMS from within QGIS.
