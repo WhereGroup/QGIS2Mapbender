@@ -25,7 +25,7 @@ QGIS plugin to populate Mapbender with QGIS-Server WMS from within QGIS.
       - layer set named with any other name (in this case, the name of the layer set should be specified when using the plugin)
 
 ## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+info@wheregroup.com
 
 ## License
-For open source projects, say how it is licensed.
+The plugin is licensed under the attached GNU General Public License.
