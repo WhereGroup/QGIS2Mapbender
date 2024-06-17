@@ -109,7 +109,7 @@ class QgisServerUpload:
                 warn=True)
             if result.ok:
                 QgsMessageLog.logMessage("Files unzipped on server", TAG, level=Qgis.Info)
-                self.connection.run(f'cd ..; cd /data/qgis-projects/; rm {self.source_project_dir_name}.zip;')
+                self.connection.run(f'cd ..; cd {self.server_project_parent_dir_path}/; rm {self.source_project_dir_name}.zip;')
                 return True
             show_fail_box_ok("Failed", f"Could not unzip project directory on server. Reason {result.return_code}")
             return False
