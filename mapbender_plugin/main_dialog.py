@@ -106,6 +106,7 @@ class MainDialog(BASE, WIDGET):
         self.duplicateServerConfigButton.clicked.connect(self.on_duplicate_server_config_clicked)
         self.editServerConfigButton.clicked.connect(self.on_edit_server_config_clicked)
         self.removeServerConfigButton.clicked.connect(self.on_remove_server_config_clicked)
+        self.serverTableWidget.doubleClicked.connect(self.on_edit_server_config_clicked)
 
     def update_server_table(self) -> None:
         server_config_list = list_qgs_settings_child_groups(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection")
