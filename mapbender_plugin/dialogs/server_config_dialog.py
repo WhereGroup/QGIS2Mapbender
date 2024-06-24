@@ -5,7 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import QRegExp, QSettings
 from PyQt5.QtGui import QIntValidator, QRegExpValidator
 from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton, QLabel
-from qgis._gui import QgsFileWidget
+from qgis.gui import QgsFileWidget
 
 from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os
 from mapbender_plugin.server_config import ServerConfig
