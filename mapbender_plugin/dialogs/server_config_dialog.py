@@ -96,8 +96,6 @@ class ServerConfigDialog(BASE, WIDGET):
         if server_config.authcfg:
             self.authLabel.setText(f'Authentication saved in database. Configuration: {server_config.authcfg}')
             self.credentialsAuthDbRadioButton.setChecked(True)
-            self.userNameLineEdit.setText('')
-            self.passwordLineEdit.setText('')
         else:
             self.credentialsPlainTextRadioButton.setChecked(True)
         self.qgisProjectPathLineEdit.setText(server_config.projects_path)
