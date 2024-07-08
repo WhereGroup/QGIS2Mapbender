@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
+    <width>868</width>
     <height>594</height>
    </rect>
   </property>
@@ -78,59 +78,69 @@
         </item>
         <item row="2" column="0" colspan="2">
          <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="qgisProjectPathLabel">
             <property name="text">
              <string>QGIS-Projects path*</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QLineEdit" name="qgisProjectPathLineEdit"/>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="qgisServerPathLabel">
             <property name="text">
-             <string>QGIS-Server path*</string>
+             <string>QGIS-Server URL*</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="mbPathLabel">
             <property name="text">
              <string>Mapbender application path*</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="mbPathLineEdit"/>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="mbBasisUrlLabel">
             <property name="text">
              <string>Mapbender basis URL*</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QLineEdit" name="mbBasisUrlLineEdit">
             <property name="inputMethodHints">
              <set>Qt::ImhUrlCharactersOnly</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="winPKPathLabel">
             <property name="text">
              <string>[WINDOWS ONLY] SSH private key path</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="QgsFileWidget" name="winPKFileWidget"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="binConsoleCommandLabel">
+            <property name="text">
+             <string>Mapbender bin/console command*</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="binConsoleCommandLineEdit"/>
           </item>
          </layout>
         </item>

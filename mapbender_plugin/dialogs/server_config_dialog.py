@@ -28,7 +28,8 @@ class ServerConfigDialog(BASE, WIDGET):
     credentialsPlainTextRadioButton: QRadioButton
     credentialsAuthDbRadioButton: QRadioButton
     authLabel: QLabel
-
+    binConsoleCommandLabel: QLabel
+    binConsoleCommandLineEdit: QLineEdit
 
     def __init__(self, server_config_name: Optional[str] = None, mode: Optional[str] = None, parent=None):
         super().__init__(parent)
@@ -59,6 +60,8 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbPathLineEdit.setToolTip('Example: /data/mapbender/application/')
         self.mbBasisUrlLineEdit.setToolTip('Example: http://mapbender-qgis.wheregroup.lan/mapbender/index_dev.php/')
         self.winPKFileWidget.setToolTip('Example: C:/Users/user/Documents/ED25519-Key_private_key.ppk')
+        self.binConsoleCommandLineEdit.setToolTip('Example: bin/console')
+        # self.binConsoleCommandLineEdit.setPlaceholderText('bin/console')
 
         # QLineEdit validators
         regex = QRegExp("[^\\s;]*")  # regex for blank spaces and semicolon
@@ -103,6 +106,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbPathLineEdit.setText(server_config.mb_app_path)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
         self.winPKFileWidget.lineEdit().setText(server_config.windows_pk_path)
+        self.binConsoleCommandLineEdit.setText(server_config.bin_console_command)
 
     def getServerConfigFromFormular(self) -> ServerConfig:
         return ServerConfig(
@@ -116,7 +120,8 @@ class ServerConfigDialog(BASE, WIDGET):
             mb_app_path=self.mbPathLineEdit.text(),
             mb_basis_url=self.mbBasisUrlLineEdit.text(),
             authcfg=self.authcfg,
-            windows_pk_path=self.winPKFileWidget.lineEdit().text()
+            windows_pk_path=self.winPKFileWidget.lineEdit().text(),
+            bin_console_command=self.binConsoleCommandLineEdit.text()
         )
 
     def validateFields(self) -> None:
