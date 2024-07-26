@@ -36,6 +36,8 @@ services:
     restart: always
     ports:
       - 8080:8080
+    volumes:
+      - ./volumes/mapbender/db:/var/mapbender/application/var/db:rw
   qgis:
     image: qgis/qgis-server:3.36.3-noble
     restart: always
@@ -49,7 +51,7 @@ services:
 
 ### Configuring the connection to the server 
 The figure below shows a typical configuration of the connection to the server and its adaptation to a Docker virtualisation.
-![](C:\prjs\QGIS2Mapbender\QGIS2Mapbender\mapbender_plugin\resources\readme_ex_conf.png)
+![](./mapbender_plugin/resources/config_examples.png)
 
 A few comments on a standard configuration with and without Docker:
 
