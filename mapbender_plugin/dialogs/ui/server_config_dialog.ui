@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>867</width>
-    <height>594</height>
+    <width>868</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,12 +91,9 @@
           <item row="1" column="0">
            <widget class="QLabel" name="qgisServerPathLabel">
             <property name="text">
-             <string>QGIS-Server path*</string>
+             <string>QGIS-Server URL*</string>
             </property>
            </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="mbPathLabel">
@@ -115,13 +112,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="mbBasisUrlLineEdit">
-            <property name="inputMethodHints">
-             <set>Qt::ImhUrlCharactersOnly</set>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="winPKPathLabel">
             <property name="text">
@@ -131,6 +121,90 @@
           </item>
           <item row="4" column="1">
            <widget class="QgsFileWidget" name="winPKFileWidget"/>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="internHLayout">
+            <item>
+             <widget class="QComboBox" name="protocolMapbenderCmbBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>65</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>http://</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>https://</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="serverConfigNameLabel1">
+              <property name="text">
+               <string>                     </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="mbBasisUrlLineEdit">
+              <property name="inputMethodHints">
+               <set>Qt::ImhUrlCharactersOnly</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QComboBox" name="protocolQgisServerCmbBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>65</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>http://</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>https://</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="serverConfigNameLabel2">
+              <property name="text">
+               <string>                     </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -143,20 +217,10 @@
            <enum>QFrame::Raised</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="userNameLineEdit"/>
-           </item>
-           <item row="1" column="1">
-            <widget class="QRadioButton" name="credentialsAuthDbRadioButton">
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="credentialsPlainTextRadioButton">
              <property name="text">
-              <string>Save credentials encrypted in authentication database</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="passwordLabel">
-             <property name="text">
-              <string>Password</string>
+              <string>Save credentials as plain text          </string>
              </property>
             </widget>
            </item>
@@ -167,10 +231,10 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QRadioButton" name="credentialsPlainTextRadioButton">
+           <item row="3" column="0">
+            <widget class="QLabel" name="passwordLabel">
              <property name="text">
-              <string>Save credentials as plain text          </string>
+              <string>Password</string>
              </property>
             </widget>
            </item>
@@ -186,6 +250,16 @@
              </property>
              <property name="text">
               <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="userNameLineEdit"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QRadioButton" name="credentialsAuthDbRadioButton">
+             <property name="text">
+              <string>Save credentials encrypted in authentication database</string>
              </property>
             </widget>
            </item>
@@ -207,15 +281,45 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="1">
-       <widget class="QDialogButtonBox" name="dialogButtonBox">
-        <property name="locale">
-         <locale language="English" country="Germany"/>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-        </property>
-       </widget>
+      <item row="4" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="hLayout3">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="testButton">
+          <property name="text">
+           <string>Test connection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDialogButtonBox" name="dialogButtonBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="locale">
+           <locale language="English" country="Germany"/>
+          </property>
+          <property name="standardButtons">
+           <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -241,9 +345,7 @@
   <tabstop>userNameLineEdit</tabstop>
   <tabstop>passwordLineEdit</tabstop>
   <tabstop>qgisProjectPathLineEdit</tabstop>
-  <tabstop>qgisServerPathLineEdit</tabstop>
   <tabstop>mbPathLineEdit</tabstop>
-  <tabstop>mbBasisUrlLineEdit</tabstop>
   <tabstop>winPKFileWidget</tabstop>
  </tabstops>
  <resources/>
