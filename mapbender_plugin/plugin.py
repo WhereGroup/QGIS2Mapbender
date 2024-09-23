@@ -1,5 +1,7 @@
 
 import os
+from typing import Optional
+
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 
@@ -7,8 +9,10 @@ from mapbender_plugin.main_dialog import MainDialog
 
 
 class MapbenderPlugin:
+    dlg: Optional[MainDialog] = None
     def __init__(self, iface):
         """Constructor of the Mapbender plugin."""
+        self.dlg = None
         self.iface = iface
 
     def initGui(self):
@@ -24,8 +28,12 @@ class MapbenderPlugin:
     def unload(self):
         self.iface.removePluginMenu("&Mapbender plugin", self.action)
         self.iface.removeToolBarIcon(self.action)
+        if self.dlg:
+            self.dlg.close()
+            self.dlg = None
 
     def run(self):
         """Plugin run method : launch the GUI."""
-        dlg = MainDialog()
-        dlg.exec()
+        self.dlg = MainDialog()
+        self.dlg.show()
+        # sys.exit(dlg.exec_())
