@@ -26,7 +26,7 @@ class ServerConfig:
         if encrypted:
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", '')
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/password", '')
-            authCfgId = ServerConfig.save_basic_to_auth_db(self.name, self.username, self.password)
+            authCfgId = ServerConfig.saveBasicToAuthDb(self.name, self.username, self.password, self.authcfg)
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/authcfg", authCfgId)
         else:
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", self.username)
@@ -40,7 +40,7 @@ class ServerConfig:
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/windows_pk_path", self.windows_pk_path)
 
     @staticmethod
-    def save_basic_to_auth_db(server_name, username, password):
+    def saveBasicToAuthDb(server_name, username, password, authCfgId):
         """
         Saves the password securely in the qgis-auth.db file.
 
@@ -48,21 +48,20 @@ class ServerConfig:
             server_name (str): Name of the server or connection.
             username (str): User's username.
             password (str): User's password.
+            authCfgId (str): existing auth config ID saved in settings.
         """
         auth_manager = QgsApplication.authManager()
         conf = QgsAuthMethodConfig()
-        conf.setName(server_name)
+        # if authCfgId already available on the stored keys, it will only be updated. Otherwise, it will be created!
+        auth_manager.loadAuthenticationConfig(authCfgId, conf, True)
         conf.setMethod("Basic")
+        conf.setName(server_name)
         conf.setConfig("username", username)
         conf.setConfig("password", password)
-        # Check if method parameters are correctly set
-        assert conf.isValid()
 
         # Register data in authdb returning the ``authcfg`` of the stored configuration
-        auth_manager.storeAuthenticationConfig(conf)
-        newAuthCfgId = conf.id()
-        assert newAuthCfgId
-        return newAuthCfgId
+        auth_manager.storeAuthenticationConfig(conf, overwrite=True)
+        return conf.id()
 
     @staticmethod
     def getParamsFromSettings(name: str):
