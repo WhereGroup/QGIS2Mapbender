@@ -160,7 +160,6 @@ def ends_with_single_slash(s) -> bool:
     """To check if a string ends with only one '/' using regular expressions (regex)"""
     # Regex pattern to check if string starts with exactly one "/"
     pattern = r"[^/]/$"
-    print('====>', bool(re.search(pattern, s)))
     return bool(re.search(pattern, s))
 
 
