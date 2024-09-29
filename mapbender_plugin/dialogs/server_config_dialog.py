@@ -98,6 +98,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.dialogButtonBox.rejected.connect(self.reject)
         self.serverConfigNameLineEdit.textChanged.connect(self.validateFields)
         self.serverAddressLineEdit.textChanged.connect(self.onChangeServerName)
+        self.credentialsPlainTextRadioButton.toggled.connect(self.onToggleCredential)
         self.qgisProjectPathLineEdit.textChanged.connect(self.validateFields)
         self.qgisServerPathLineEdit.textChanged.connect(self.validateFields)
         self.mbPathLineEdit.textChanged.connect(self.validateFields)
@@ -263,3 +264,7 @@ class ServerConfigDialog(BASE, WIDGET):
         show_succes_box_ok('Success', 'Server configuration successfully saved')
         self.close()
         return
+
+    def onToggleCredential(self, isChecked: bool):
+        """QLabel <authLabel> is visible only if credentials are NOT saved as plain text"""
+        self.authLabel.setVisible(not isChecked)
