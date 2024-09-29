@@ -111,6 +111,12 @@ class ServerConfigDialog(BASE, WIDGET):
             show_fail_box_ok("Failed", errorMsg)
         else:
             self.testButton.setIcon(self.checkedIcon)
+            show_succes_box_ok("Success", """Following tests are carried out:
+            1. SSH connection is successfully established
+            2. Successfully accessed the QGIS project path
+            3. Successfully accessed the Mapbender path
+            4. Mapbender's is validated and its response is 200
+            5. QGIS's URL is valid and its response is 200""")
 
     def execTestsImpl(self) -> Optional[str]:
         """
