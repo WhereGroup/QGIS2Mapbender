@@ -364,7 +364,7 @@ class MainDialog(BASE, WIDGET):
 
         show_succes_box_ok("Success report",
                            "WMS successfully created:\n \n" + wms_url +
-                           "\n \n And added to Mapbender application: \n \n" + "http://" +
+                           "\n \n And added to Mapbender application: \n \n" + server_config.mb_protocol +
                            server_config.url + "/mapbender/application/" + slug)
         self.close()
 

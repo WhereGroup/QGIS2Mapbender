@@ -172,7 +172,7 @@ class ServerConfigDialog(BASE, WIDGET):
             return errorStr
 
         # Test n. 5
-        mapbenderUrl = (f'{self.protocolMapbenderCmbBox.currentText()}{configFromForm.url}'
+        mapbenderUrl = (f'{configFromForm.mb_protocol}{configFromForm.url}'
                         f'{configFromForm.mb_basis_url}')
         errorStr = self.testHttpConn(mapbenderUrl, 'Mapbender', configFromForm.mb_basis_url)
         if errorStr:
@@ -210,10 +210,13 @@ class ServerConfigDialog(BASE, WIDGET):
             self.authLabel.setText(f'Authentication saved in database. Configuration: {server_config.authcfg}')
             self.credentialsAuthDbRadioButton.setChecked(True)
         else:
+            self.authLabel.setText('')
             self.credentialsPlainTextRadioButton.setChecked(True)
         self.qgisProjectPathLineEdit.setText(server_config.projects_path)
+        self.protocolQgisServerCmbBox.setCurrentText(server_config.qgis_server_protocol)
         self.qgisServerPathLineEdit.setText(server_config.qgis_server_path)
         self.mbPathLineEdit.setText(server_config.mb_app_path)
+        self.protocolMapbenderCmbBox.setCurrentText(server_config.mb_protocol)
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
         self.winPKFileWidget.lineEdit().setText(server_config.windows_pk_path)
 
@@ -225,8 +228,10 @@ class ServerConfigDialog(BASE, WIDGET):
             username=self.userNameLineEdit.text(),
             password=self.passwordLineEdit.text(),
             projects_path=self.qgisProjectPathLineEdit.text(),
+            qgis_server_protocol=self.protocolQgisServerCmbBox.currentText(),
             qgis_server_path=self.qgisServerPathLineEdit.text(),
             mb_app_path=self.mbPathLineEdit.text(),
+            mb_protocol=self.protocolMapbenderCmbBox.currentText(),
             mb_basis_url=self.mbBasisUrlLineEdit.text(),
             authcfg=self.authcfg,
             windows_pk_path=self.winPKFileWidget.lineEdit().text()
