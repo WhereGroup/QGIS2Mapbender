@@ -23,19 +23,23 @@ WIDGET, BASE = uic.loadUiType(os.path.join(
 class ServerConfigDialog(BASE, WIDGET):
     serverConfigNameLineEdit: QLineEdit
     serverAddressLineEdit: QLineEdit
-    qgisProjectPathLineEdit: QLineEdit
-    qgisServerPathLineEdit: QLineEdit
-    mbPathLineEdit: QLineEdit
+    serverPortLineEdit: QLineEdit
+
     credentialsPlainTextRadioButton: QRadioButton
     credentialsAuthDbRadioButton: QRadioButton
+    userNameLineEdit: QLineEdit
+    passwordLineEdit: QLineEdit
     authLabel: QLabel
 
     protocolQgisServerCmbBox: QComboBox
     serverConfigNameLabel1: QLabel
+    qgisServerPathLineEdit: QLineEdit     # TODO: better to rename qgisServerUrlLineEdit
+    qgisProjectPathLineEdit: QLineEdit
 
     protocolMapbenderCmbBox: QComboBox
     serverConfigNameLabel2: QLabel
     mbBasisUrlLineEdit: QLineEdit
+    mbPathLineEdit: QLineEdit
 
     winPKFileWidget: QgsFileWidget
 
