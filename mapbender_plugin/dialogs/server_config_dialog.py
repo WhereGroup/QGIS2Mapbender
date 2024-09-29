@@ -138,7 +138,7 @@ class ServerConfigDialog(BASE, WIDGET):
             If found, error message
         """
         configFromForm = self.getServerConfigFromFormular()
-        print(configFromForm)
+        # print(configFromForm)
         connect_kwargs = {"password": configFromForm.password}
 
         if not ends_with_single_slash(configFromForm.projects_path):
