@@ -1,6 +1,8 @@
 import os
 import platform
-
+import re
+from urllib.parse import urlparse
+from fabric2 import Connection
 from PyQt5.QtCore import Qt
 from decorator import contextmanager
 
@@ -135,3 +137,33 @@ def update_mb_slug_in_settings(mb_slug, is_mb_slug) -> None:
 
     elif is_mb_slug:
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/mb_templates", mb_slug)
+
+
+def uri_validator(url: str) -> bool:
+    """Validating a URL in Python.
+    It only checks if the URL is malformed and does not check the response of the http request."""
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except AttributeError:
+        return False
+
+
+def starts_with_single_slash_or_colon(s) -> bool:
+    """To check if a string starts with only one '/' or with a column using regular expressions (regex)"""
+    # Regex pattern to check if string starts with exactly one "/"
+    pattern = r"^(/[^/]|:)"
+    return bool(re.match(pattern, s))
+
+
+def ends_with_single_slash(s) -> bool:
+    """To check if a string ends with only one '/' using regular expressions (regex)"""
+    # Regex pattern to check if string starts with exactly one "/"
+    pattern = r"[^/]/$"
+    return bool(re.search(pattern, s))
+
+
+def check_if_project_folder_exists_on_server(conn: Connection, path: str) -> bool:
+    if conn.run(f'test -d {path}', warn=True).failed:
+       return False
+    return True
