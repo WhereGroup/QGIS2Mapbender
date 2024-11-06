@@ -3,10 +3,11 @@ name=QGIS2Mapbender
 author=Carmen Viesca, Paolo Favero, Peter Gipper, Christoph Welker
 email=info@wheregroup.com
 description=QGIS plugin to populate Mapbender with WMS services from QGIS Server.
-about=QGIS plugin to export your project as a QGIS Server WMS (Web Map Service) and publish it as a Mapbender application (https://mapbender.org). Requires a web server with QGIS Server and Mapbender installed for publishing.
+about=QGIS plugin to export your project as OGC WMS (Web Map Service) and publish it in a Mapbender application (https://mapbender.org). Requires a web server with QGIS Server and Mapbender installed for publishing.
 homepage=https://github.com/WhereGroup/QGIS2Mapbender
 repository=https://github.com/WhereGroup/QGIS2Mapbender
 tracker=https://github.com/WhereGroup/QGIS2Mapbender/issues
+
 tags=mapbender,web,webmap,webmaps,webgis,publish,export,QGIS Server
 
 version=0.8
