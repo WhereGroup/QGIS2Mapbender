@@ -3,7 +3,20 @@ name=QGIS2Mapbender
 author=Carmen Viesca, Paolo Favero, Peter Gipper, Christoph Welker
 email=info@wheregroup.com
 description=QGIS plugin to populate Mapbender with WMS services from QGIS Server.
-about=QGIS plugin to export your project as OGC WMS (Web Map Service) and publish it in a Mapbender application (https://mapbender.org). Requires a web server with QGIS Server and Mapbender installed for publishing.
+about=This QGIS plugin exports your project as a QGIS Server WMS (Web Map Service) and publishes it in a Mapbender application (https://mapbender.org). It requires a web server with QGIS Server and Mapbender installed.
+
+System Requirements:
+
+Local Requirements:
+- The QGIS project must be saved in the same folder as the data.
+- Install `fabric2`, e.g., using the QGIS console, if the library is not already installed.
+
+Server Requirements:
+- QGIS Server must be installed on your server.
+- Mapbender must be installed on your server.
+- Create at least one template application in Mapbender, which will be cloned to publish a new WMS, or an application that will be used to publish a new WMS. These applications should have at least one layer set:
+  - A layer set named "main" (the default layer set for adding a new WMS to the application), OR
+  - A layer set with any other name (in this case, the name of the layer set must be specified when using the plugin).
 homepage=https://github.com/WhereGroup/QGIS2Mapbender
 repository=https://github.com/WhereGroup/QGIS2Mapbender
 tracker=https://github.com/WhereGroup/QGIS2Mapbender/issues
