@@ -27,7 +27,8 @@ class MapbenderUpload:
             """
         with waitCursor():
             result = self.connection.run(
-                f"cd ..; cd {self.server_config.mb_app_path}; bin/console mapbender:{command}", warn=True)
+                f"cd ..; cd {self.server_config.mb_app_path}; {self.server_config.bin_console_command} mapbender:{command}",
+                warn=True)
             exit_status = result.exited
             output = result.stdout
             error_output = result.stderr

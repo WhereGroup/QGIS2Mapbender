@@ -13,11 +13,15 @@ class ServerConfig:
     username: str
     password: str
     projects_path: str
+    qgis_server_protocol: str
     qgis_server_path: str
     mb_app_path: str
+    mb_protocol: str
     mb_basis_url: str
     authcfg: str
     windows_pk_path: str
+    bin_console_command: str
+
 
     def save(self, encrypted: bool):
         s = QgsSettings()
@@ -32,12 +36,18 @@ class ServerConfig:
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/username", self.username)
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/password", self.password)
             s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/authcfg", '')
+
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/projects_path", self.projects_path)
+        s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/qgis_server_protocol",
+                   self.qgis_server_protocol)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/qgis_server_path",
                    self.qgis_server_path)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/mb_app_path", self.mb_app_path)
+        s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/mb_protocol", self.mb_protocol)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/mb_basis_url", self.mb_basis_url)
         s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/windows_pk_path", self.windows_pk_path)
+        s.setValue(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{self.name}/bin_console_command",
+                   self.bin_console_command)
 
     @staticmethod
     def saveBasicToAuthDb(server_name, username, password, authCfgId):
@@ -72,14 +82,18 @@ class ServerConfig:
         username = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/username")
         password = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/password")
         qgis_server_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/qgis_server_path")
+        qgis_server_protocol = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/qgis_server_protocol")
         mb_app_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_app_path")
+        mb_protocol = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_protocol")
         mb_basis_url = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/mb_basis_url")
         authcfg = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/authcfg")
         windows_pk_path = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/windows_pk_path")
+        bin_console_command = s.value(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{name}/bin_console_command")
         if authcfg:
             username, password = ServerConfig.get_username_and_password_from_auth_db(authcfg)
-        return ServerConfig(name, url, port, username, password, projects_path, qgis_server_path, mb_app_path,
-                            mb_basis_url, authcfg, windows_pk_path)
+
+        return ServerConfig(name, url, port, username, password, projects_path, qgis_server_protocol, qgis_server_path,
+                            mb_app_path, mb_protocol, mb_basis_url, authcfg, windows_pk_path, bin_console_command)
 
     @staticmethod
     def get_username_and_password_from_auth_db(authcfg):
