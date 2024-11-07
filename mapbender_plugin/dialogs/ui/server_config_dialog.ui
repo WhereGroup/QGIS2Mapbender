@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Mapbender QGIS-Plugin</string>
+   <string>QGIS2Mapbender</string>
   </property>
   <property name="locale">
    <locale language="English" country="Germany"/>
