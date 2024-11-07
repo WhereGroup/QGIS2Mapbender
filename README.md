@@ -1,7 +1,7 @@
 # QGIS2Mapbender
 
 ## Description
-QGIS plugin to populate Mapbender with QGIS-Server WMS.
+QGIS plugin to transfer your QGIS Server project on your server and publish your QGIS Server WMS in Mapbender.
 
 ## Installation and Requirements
 ### Installing the plugin
@@ -19,9 +19,9 @@ QGIS plugin to populate Mapbender with QGIS-Server WMS.
 ### Requirements on your server
 - QGIS Server is installed on your server.
 - Mapbender is installed on your server.
-- Create at least one template application in Mapbender (that will be cloned and used to publish a new WMS) or an application that will be used to publish a new WMS. These applications should have at least one layer set: 
-  - layer set named "main" (default layer set for adding a new WMS to the application) OR 
-  - layer set named with any other name (in this case, the name of the layer set should be specified when using the plugin)
+- Create at least one template application in Mapbender (that will be cloned and used to publish a new WMS) or an application that will be used to publish a new WMS. These applications should have at least one layerset: 
+  - layerset named "main" (default layerset for adding a new WMS to the application) OR 
+  - layerset named with any other name (in this case, the name of the layerset should be specified when using the plugin)
 
 ### Docker
 - QGIS Server and Mapbender can be run as Docker containers.
