@@ -46,7 +46,7 @@ def qgis_project_is_saved() -> bool:
     #if source_project_dir_path == "./" or source_project_file_path == "":
     if not source_project_file_path:
         show_fail_box_ok('Failed',
-                         "Please use the Mapbender Plugin from a saved QGIS-Project")
+                         "Please use the QGIS2Mapbender from a saved QGIS-Project")
         return False
     return True
 
