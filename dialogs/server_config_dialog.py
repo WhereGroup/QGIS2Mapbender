@@ -9,11 +9,11 @@ from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton, QLabel, Q
 from fabric2 import Connection
 from qgis.gui import QgsFileWidget
 
-from mapbender_plugin.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os, \
+from QGIS2Mapbender.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os, \
     uri_validator, starts_with_single_slash_or_colon, waitCursor, check_if_project_folder_exists_on_server, \
     ends_with_single_slash
-from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+from QGIS2Mapbender.server_config import ServerConfig
+from QGIS2Mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(

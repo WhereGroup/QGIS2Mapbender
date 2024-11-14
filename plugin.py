@@ -5,7 +5,7 @@ from typing import Optional
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 
-from mapbender_plugin.main_dialog import MainDialog
+from QGIS2Mapbender.main_dialog import MainDialog
 
 
 class MapbenderPlugin:

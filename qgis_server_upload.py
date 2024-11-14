@@ -4,9 +4,9 @@ from urllib.parse import urlparse
 
 from qgis.core import QgsMessageLog, Qgis
 
-from mapbender_plugin.helpers import show_fail_box_ok, waitCursor
-from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import TAG
+from QGIS2Mapbender.helpers import show_fail_box_ok, waitCursor
+from QGIS2Mapbender.server_config import ServerConfig
+from QGIS2Mapbender.settings import TAG
 
 class QgisServerUpload:
     def __init__(self, connection, paths):

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from qgis.core import QgsSettings, QgsApplication, QgsAuthMethodConfig, QgsMessageLog, Qgis
 
-from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from QGIS2Mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
 
 
 @dataclass

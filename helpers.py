@@ -8,9 +8,9 @@ from decorator import contextmanager
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
-from qgis.core import QgsApplication, QgsProject, QgsSettings, QgsMessageLog, Qgis
+from qgis.core import QgsApplication, QgsProject, QgsSettings
 
-from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+from QGIS2Mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 def get_os():
     os = platform.system()

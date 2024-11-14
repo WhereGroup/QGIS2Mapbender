@@ -12,16 +12,16 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget,
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 from qgis.utils import iface
 
-from mapbender_plugin.dialogs.server_config_dialog import ServerConfigDialog
-from mapbender_plugin.helpers import qgis_project_is_saved, \
+from QGIS2Mapbender.dialogs.server_config_dialog import ServerConfigDialog
+from QGIS2Mapbender.helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
     list_qgs_settings_child_groups, show_question_box, \
     update_mb_slug_in_settings
-from mapbender_plugin.mapbender_upload import MapbenderUpload
-from mapbender_plugin.paths import Paths
-from mapbender_plugin.server_config import ServerConfig
-from mapbender_plugin.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
-from mapbender_plugin.qgis_server_upload import QgisServerUpload
+from QGIS2Mapbender.mapbender_upload import MapbenderUpload
+from QGIS2Mapbender.paths import Paths
+from QGIS2Mapbender.server_config import ServerConfig
+from QGIS2Mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY, TAG
+from QGIS2Mapbender.qgis_server_upload import QgisServerUpload
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
