@@ -1,10 +1,9 @@
 import json
-import re
 
 from qgis.core import QgsMessageLog, Qgis
 
-from mapbender_plugin.helpers import waitCursor
-from mapbender_plugin.settings import TAG
+from QGIS2Mapbender.helpers import waitCursor
+from QGIS2Mapbender.settings import TAG
 
 
 class MapbenderUpload:

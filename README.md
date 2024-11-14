@@ -51,7 +51,7 @@ services:
 
 ### Configuring the connection to the server 
 The figure below shows a typical configuration of the connection to the server and its adaptation to a Docker virtualisation.
-![](./mapbender_plugin/resources/config_examples.png)
+![](resources/config_examples.png)
 
 A few comments on a standard configuration with and without Docker:
 

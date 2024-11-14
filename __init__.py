@@ -1,6 +1,6 @@
 """
 /***************************************************************************
- Mapbender Plugin
+ QGIS2Mapbender
  A plugin to publish QGIS Projects via a Mapbender server instance.
                              -------------------
         begin                : 2024-02-12
