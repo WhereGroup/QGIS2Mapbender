@@ -27,7 +27,7 @@ QGIS plugin to transfer your QGIS Server project on your server and publish your
 - QGIS Server and Mapbender can be run as Docker containers.
 
 Here is a sample docker-compose.yml file to set up a docker for Mapbender and QGIS Server.
-This configuration requires to have a folder `volumes/qgis/` that contains a QGIS project file called `/worldmap_jt/worldmap_02.qgz`
+This configuration requires to have a folder `volumes/qgis/` that contains a QGIS project file called `/worldmap/worldmap.qgz`
 
 ```yaml
 services:
@@ -44,7 +44,7 @@ services:
     ports:
       - 80:80
     environment:
-      - QGIS_PROJECT_FILE=/qgis/projects/worldmap_jt/worldmap_02.qgz
+      - QGIS_PROJECT_FILE=/qgis/projects/worldmap/worldmap.qgz
     volumes:
       - ./volumes/qgis:/qgis/projects:ro
 ```
