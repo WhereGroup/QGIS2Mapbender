@@ -18,7 +18,7 @@ class MapbenderPlugin:
 
     def initGui(self):
         """Create action that will start plugin configuration"""
-        icon_path = os.path.join(os.path.dirname(__file__), 'resources/icons/mapbender_logo.png')
+        icon_path = os.path.join(os.path.dirname(__file__), 'resources/icons/qgis2mapbender.png')
         self.action = QAction(QIcon(icon_path), 'QGIS2Mapbender', self.iface.mainWindow())
         self.iface.addPluginToMenu("&QGIS2Mapbender", self.action)
         self.iface.addToolBarIcon(self.action)
