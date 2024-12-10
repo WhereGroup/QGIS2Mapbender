@@ -32,12 +32,12 @@ class ServerConfigDialog(BASE, WIDGET):
     authLabel: QLabel
 
     protocolQgisServerCmbBox: QComboBox
-    serverConfigNameLabel1: QLabel
+    # serverConfigNameLabel1: QLabel
     qgisServerPathLineEdit: QLineEdit     # TODO: better to rename qgisServerUrlLineEdit
     qgisProjectPathLineEdit: QLineEdit
 
     protocolMapbenderCmbBox: QComboBox
-    serverConfigNameLabel2: QLabel
+    # serverConfigNameLabel2: QLabel
     mbBasisUrlLineEdit: QLineEdit
     mbPathLineEdit: QLineEdit
 
@@ -66,16 +66,20 @@ class ServerConfigDialog(BASE, WIDGET):
         self.selected_server_config_name = server_config_name
         self.mode = mode
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(False)
+        self.testButton.setEnabled(False)
         if server_config_name:
             self.getSavedServerConfig(server_config_name, mode)
         if self.mode == 'edit':
             self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(True)
+            self.testButton.setEnabled(True)
 
         self.serverConfigNameLineEdit.setToolTip('Custom server configuration name without blank spaces')
         self.qgisProjectPathLineEdit.setToolTip('Example: /data/qgis-projects/')
-        self.qgisServerPathLineEdit.setToolTip('Example: /cgi-bin/qgis_mapserv.fcgi')
+        self.qgisProjectPathLineEdit.setPlaceholderText('/data/qgis-projects/')
+        self.qgisServerPathLineEdit.setToolTip('Example: [SERVER_NAME]/cgi-bin/qgis_mapserv.fcgi')
         self.mbPathLineEdit.setToolTip('Example: /data/mapbender/application/')
-        self.mbBasisUrlLineEdit.setToolTip('Example: /mapbender/index_dev.php/')
+        self.mbPathLineEdit.setPlaceholderText('/mapbender/index_dev.php/')
+        self.mbBasisUrlLineEdit.setToolTip('Example: [SERVER_NAME]/mapbender/index_dev.php/')
         self.winPKFileWidget.setToolTip('Example: C:/Users/user/Documents/ED25519-Key_private_key.ppk')
         self.binConsoleCommandLineEdit.setToolTip('Example: bin/console')
         self.binConsoleCommandLineEdit.setPlaceholderText('bin/console')
@@ -145,10 +149,10 @@ class ServerConfigDialog(BASE, WIDGET):
         connect_kwargs = {"password": configFromForm.password}
 
         if not ends_with_single_slash(configFromForm.projects_path):
-            return f"'{configFromForm.projects_path}' should end with one '/'"
+            return f"QGIS project path '{configFromForm.projects_path}' should end with one '/'"
 
         if not ends_with_single_slash(configFromForm.mb_app_path):
-            return f"'{configFromForm.mb_app_path}' should end with one '/'"
+            return f"Mapbender application path '{configFromForm.mb_app_path}' should end with one '/'"
 
         with Connection(host=configFromForm.url, user=configFromForm.username,
                         port=configFromForm.port, connect_kwargs=connect_kwargs) as connection:
@@ -167,7 +171,7 @@ class ServerConfigDialog(BASE, WIDGET):
 
         # Test n. 4
         wmsServiceRequest = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
-        qgiServerUrl = (f'{self.protocolQgisServerCmbBox.currentText()}{configFromForm.url}'
+        qgiServerUrl = (f'{self.protocolQgisServerCmbBox.currentText()}'
                         f'{configFromForm.qgis_server_path}'
                         f'{wmsServiceRequest}')
         errorStr = self.testHttpConn(qgiServerUrl, 'Qgis Server', configFromForm.qgis_server_path)
@@ -175,7 +179,7 @@ class ServerConfigDialog(BASE, WIDGET):
             return errorStr
 
         # Test n. 5
-        mapbenderUrl = (f'{configFromForm.mb_protocol}{configFromForm.url}'
+        mapbenderUrl = (f'{configFromForm.mb_protocol}'
                         f'{configFromForm.mb_basis_url}')
         errorStr = self.testHttpConn(mapbenderUrl, 'Mapbender', configFromForm.mb_basis_url)
         if errorStr:
@@ -184,8 +188,8 @@ class ServerConfigDialog(BASE, WIDGET):
         return None
 
     def testHttpConn(self, url: str, serverName: str, lastPart: str) -> Optional[str]:
-        if not starts_with_single_slash_or_colon(lastPart):
-            return f"Is the address {url} correct?"
+        # if not starts_with_single_slash_or_colon(lastPart):
+        #     return f"Is the address {url} correct?"
 
         errorStr = f"Unable to connect to the {serverName} {url}. Is the address correct?"
         if not uri_validator(url):
@@ -244,12 +248,15 @@ class ServerConfigDialog(BASE, WIDGET):
 
     def onChangeServerName(self, newValue) -> None:
         # print('newValue', newValue)
-        self.serverConfigNameLabel1.setText(newValue)
-        self.serverConfigNameLabel2.setText(newValue)
+        self.qgisServerPathLineEdit.setPlaceholderText(newValue + '/cgi-bin/qgis_mapserv.fcgi')
+        self.mbBasisUrlLineEdit.setPlaceholderText(newValue + '/mapbender/index.php/')
         self.validateFields()
 
     def validateFields(self) -> None:
         self.dialogButtonBox.button(QDialogButtonBox.Save).setEnabled(
+            all(field.text() for field in self.mandatoryFields))
+
+        self.testButton.setEnabled(
             all(field.text() for field in self.mandatoryFields))
 
     def checkConfigName(self, config_name_from_formular) -> bool:
