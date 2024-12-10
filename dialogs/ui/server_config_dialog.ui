@@ -192,13 +192,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="serverConfigNameLabel2">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QLineEdit" name="qgisServerPathLineEdit"/>
             </item>
            </layout>
@@ -246,13 +239,6 @@
                 <string>https://</string>
                </property>
               </item>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="serverConfigNameLabel1">
-              <property name="text">
-               <string/>
-              </property>
              </widget>
             </item>
             <item>

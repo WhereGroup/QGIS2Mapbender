@@ -332,7 +332,7 @@ class MainDialog(BASE, WIDGET):
             exit_status_wms_add, source_id, error = mapbender_uploader.wms_add()
             if exit_status_wms_add != 0:
                 show_fail_box_ok("Failed",
-                                 f"QGIS-Project is successfuly uploaded to the server but WMS could not be added to "
+                                 f"QGIS-Project is successfully uploaded to the server but WMS could not be added to "
                                  f"Mapbender. Reason: {error}")
                 return
 
@@ -365,7 +365,7 @@ class MainDialog(BASE, WIDGET):
         show_succes_box_ok("Success report",
                            "WMS successfully created:\n \n" + wms_url +
                            "\n \n And added to Mapbender application: \n \n" + server_config.mb_protocol +
-                           server_config.url + "/mapbender/application/" + slug)
+                           server_config.mb_basis_url + "/application/" + slug)
         self.close()
 
     def mb_update(self, connection, server_config, wms_url):
@@ -393,6 +393,6 @@ class MainDialog(BASE, WIDGET):
                              f"Mapbender upload will be interrupted.")
             return
         show_succes_box_ok("Success report",
-                           "WMS succesfully updated:\n \n" + wms_url +
+                           "WMS successfully updated:\n \n" + wms_url +
                            "\n \non Mapbender source(s): " + str(sources_ids))
         self.close()

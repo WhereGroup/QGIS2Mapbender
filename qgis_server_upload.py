@@ -23,7 +23,7 @@ class QgisServerUpload:
 
     def get_wms_url(self, server_config: ServerConfig) -> str:
         wms_service_version_request = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities&map="
-        wms_url = (f'{server_config.mb_protocol}{server_config.url}{server_config.qgis_server_path}'
+        wms_url = (f'{server_config.qgis_server_protocol}{server_config.qgis_server_path}'
                    f'{wms_service_version_request}{server_config.projects_path}{self.source_project_dir_name}/'
                    f'{self.source_project_file_name}')
         return wms_url
