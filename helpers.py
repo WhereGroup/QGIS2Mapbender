@@ -10,7 +10,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import QgsApplication, QgsProject, QgsSettings
 
-from QGIS2Mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+from .settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
 
 def get_os():
     os = platform.system()

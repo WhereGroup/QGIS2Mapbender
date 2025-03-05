@@ -6,10 +6,10 @@ from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QDockWidget
 
-from QGIS2Mapbender.main_dialog import MainDialog
+from .main_dialog import MainDialog
 
 
-class MapbenderPlugin:
+class Qgis2Mapbender:
     dlg: Optional[MainDialog] = None
     def __init__(self, iface):
         """Constructor of the QGIS2Mapbender."""

@@ -2,8 +2,8 @@ import json
 
 from qgis.core import QgsMessageLog, Qgis
 
-from QGIS2Mapbender.helpers import waitCursor
-from QGIS2Mapbender.settings import TAG
+from .helpers import waitCursor
+from .settings import TAG
 
 
 class MapbenderUpload:
