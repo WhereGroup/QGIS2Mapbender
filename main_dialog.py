@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QHeaderView, QWidget,
 from qgis.core import Qgis, QgsSettings, QgsMessageLog
 from qgis.utils import iface
 
+from .qgis_server_api_upload import QgisServerApiUpload
 from .dialogs.server_config_dialog import ServerConfigDialog
 from .helpers import qgis_project_is_saved, \
     show_fail_box_ok, show_fail_box_yes_no, show_succes_box_ok, \
@@ -247,7 +248,11 @@ class MainDialog(BASE, WIDGET):
         # Get server config params and project paths
         server_config = ServerConfig.getParamsFromSettings(self.serverConfigComboBox.currentText())
         paths = Paths.get_paths(server_config.projects_path)
-
+        upload = QgisServerApiUpload(paths)
+        wms_url = upload.get_wms_url(server_config)
+        upload.api_upload(server_config)
+        return
+        # version 2024:
         connect_kwargs = {"password": server_config.password}
         if server_config.windows_pk_path:
             connect_kwargs["key_filename"] = server_config.windows_pk_path

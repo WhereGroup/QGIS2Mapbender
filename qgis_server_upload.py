@@ -1,5 +1,6 @@
 import os
 import shutil
+
 from urllib.parse import urlparse
 
 from qgis.core import QgsMessageLog, Qgis
@@ -48,13 +49,14 @@ class QgisServerUpload:
                                      level=Qgis.Info)
             return True
 
-    def zip_upload_unzip_clean(self) -> bool:
+    def zip_upload_unzip_clean(self, server_config: ServerConfig) -> bool:
         QgsMessageLog.logMessage("Updating QGIS project and data on server ...", TAG, level=Qgis.Info)
         if not self.zip_local_project_dir():
             show_fail_box_ok("Failed",
                              "Local project directory could not be compressed. Upload will be interrupted")
             return False
-        if not self.upload_project_zip_file():
+        if not self.api_upload(server_config):
+        #if not self.upload_project_zip_file():
             show_fail_box_ok("Failed",
                              "Project directory's upload to server failed. WMS could not be created.")
             return False

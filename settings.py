@@ -2,4 +2,4 @@
 
 # General
 PLUGIN_SETTINGS_SERVER_CONFIG_KEY = 'mapbender-plugin'
-TAG = 'Mapbender-Plugin'
+TAG = 'QGIS2Mapbender'

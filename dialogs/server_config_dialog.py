@@ -9,11 +9,13 @@ from PyQt5.QtWidgets import QDialogButtonBox, QLineEdit, QRadioButton, QLabel, Q
 from fabric2 import Connection
 from qgis.gui import QgsFileWidget
 
-from qgis2mapbender.helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os, \
+from ..helpers import show_succes_box_ok, list_qgs_settings_child_groups, show_fail_box_ok, get_os, \
     uri_validator, starts_with_single_slash_or_colon, waitCursor, check_if_project_folder_exists_on_server, \
     ends_with_single_slash
-from qgis2mapbender.server_config import ServerConfig
-from qgis2mapbender.settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+from ..server_config import ServerConfig
+from ..settings import PLUGIN_SETTINGS_SERVER_CONFIG_KEY
+
+from ..api_request import ApiRequest
 
 # Dialog from .ui file
 WIDGET, BASE = uic.loadUiType(os.path.join(
@@ -124,6 +126,12 @@ class ServerConfigDialog(BASE, WIDGET):
         else:
             self.testButton.setIcon(self.checkedIcon)
             show_succes_box_ok("Success", """Following tests are carried out:
+            1. The provided url is valid
+            2. The provided credentials (username and password) are validated
+            3. A token to authenticate API requests is generated
+            4. Successfully accessed the QGIS project path on the server
+            5. Upload rights are granted
+            ---
             1. SSH connection is successfully established
             2. Successfully accessed the QGIS project path
             3. Successfully accessed the Mapbender path
@@ -154,6 +162,37 @@ class ServerConfigDialog(BASE, WIDGET):
         if not ends_with_single_slash(configFromForm.mb_app_path):
             return f"Mapbender application path '{configFromForm.mb_app_path}' should end with one '/'"
 
+
+        # API's URL - delete
+        api_url = "http://" + configFromForm.url + "/mapbender/api"
+
+        api_request = ApiRequest(configFromForm)
+        # Test 1 (url) and 2 (credentials for token)
+        if not api_request.token:
+            if api_request.response_json:
+                error_message = api_request.response_json.get('message', 'Unknown')
+            else:
+                error_message = 'URL is invalid, please check your details. Server address is correct?'
+            return (f"Error: {api_request.status_code_login}: {error_message}. Unable to validate credentials, "
+                    f"please check your details. User and password are correct?")
+
+        # continue implementing new class from here:
+        header = {"Authorization": f"Bearer {api_request.token}"}
+        # Test 3 (upload: tests paths and permissions)
+        test_zip_path = os.path.join(os.path.dirname(__file__),'..','data', 'test_upload.zip')
+        with open(test_zip_path, 'rb') as file:
+            files = {'file': file}
+            response_upload = requests.post(api_url + "/upload/zip" , files=files, headers=header)
+        if not response_upload.status_code == 200:
+            return (f"Error {response_upload.status_code}.\n"
+                    f"{response_upload.json().get('error')}.\n")
+
+        # Further tests (Successfully accessed the Mapbender path):
+        # see WMS
+        #response_view_sources = requests.
+
+
+
         with Connection(host=configFromForm.url, user=configFromForm.username,
                         port=configFromForm.port, connect_kwargs=connect_kwargs) as connection:
             try:  # test SSH connection
@@ -169,7 +208,7 @@ class ServerConfigDialog(BASE, WIDGET):
                 return ("Unable to connect to the server via SSH, please check your details. "
                         f"Login, password are correct? Server address is correct?\n {str(e)}")
 
-        # Test n. 4
+            # Test n. 4
         wmsServiceRequest = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
         qgiServerUrl = (f'{self.protocolQgisServerCmbBox.currentText()}'
                         f'{configFromForm.qgis_server_path}'

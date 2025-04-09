@@ -1,4 +1,5 @@
 import json
+import requests
 
 from qgis.core import QgsMessageLog, Qgis
 
@@ -11,6 +12,30 @@ class MapbenderUpload:
         self.server_config = server_config
         self.wms_url = wms_url
         self.connection = connection
+
+        # API's URL
+        self.api_url = "http://" + self.server_config.url + "/mapbender/api"
+        # credentials
+        self.credentials = {
+            "username": self.server_config.username,
+            "password": self.server_config.password
+        }
+
+        self.exit_status_login, self.token = self.get_token()
+        print(self.token)
+
+    def send_api_request(self, endpoint: str) -> tuple:
+        with waitCursor():
+            response = requests.get(self.api_url + endpoint, json=self.credentials)
+            response_status_code = response.status_code
+            response_json = response.json()
+            return response_status_code, response_json
+
+    def get_token(self):
+        exit_status, response_json = self.send_api_request("/login_check")
+        token = response_json.get("token")
+        return exit_status, token
+
 
     def run_mapbender_command(self, command: str) -> tuple:
         """
