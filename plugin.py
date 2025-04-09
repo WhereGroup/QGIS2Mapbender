@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QDockWidget
 from .main_dialog import MainDialog
 
 
-class Qgis2MapbenderPlugin:
+class Qgis2Mapbender:
     dlg: Optional[MainDialog] = None
     def __init__(self, iface):
         """Constructor of the QGIS2Mapbender."""
