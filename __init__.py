@@ -22,6 +22,6 @@
 
 
 def classFactory(iface):
-    from .plugin import MapbenderPlugin
-    return MapbenderPlugin(iface)
+    from .plugin import Qgis2MapbenderPlugin
+    return Qgis2MapbenderPlugin(iface)
 
