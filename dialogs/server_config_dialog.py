@@ -156,12 +156,11 @@ class ServerConfigDialog(BASE, WIDGET):
         # print(configFromForm)
         connect_kwargs = {"password": configFromForm.password}
 
-        if not ends_with_single_slash(configFromForm.projects_path):
-            return f"QGIS project path '{configFromForm.projects_path}' should end with one '/'"
-
-        if not ends_with_single_slash(configFromForm.mb_app_path):
-            return f"Mapbender application path '{configFromForm.mb_app_path}' should end with one '/'"
-
+        # if not ends_with_single_slash(configFromForm.projects_path):
+        #     return f"QGIS project path '{configFromForm.projects_path}' should end with one '/'"
+        #
+        # if not ends_with_single_slash(configFromForm.mb_app_path):
+        #     return f"Mapbender application path '{configFromForm.mb_app_path}' should end with one '/'"
 
         # API's URL - delete
         api_url = "http://" + configFromForm.url + "/mapbender/api"
@@ -178,14 +177,19 @@ class ServerConfigDialog(BASE, WIDGET):
 
         # continue implementing new class from here:
         header = {"Authorization": f"Bearer {api_request.token}"}
+
+        print('Test 3')
         # Test 3 (upload: tests paths and permissions)
-        test_zip_path = os.path.join(os.path.dirname(__file__),'..','data', 'test_upload.zip')
-        with open(test_zip_path, 'rb') as file:
-            files = {'file': file}
-            response_upload = requests.post(api_url + "/upload/zip" , files=files, headers=header)
+        test_zip_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'test_upload.zip')
+        response_upload = api_request.upload_zip(test_zip_path)
         if not response_upload.status_code == 200:
+            print('go inside')
             return (f"Error {response_upload.status_code}.\n"
                     f"{response_upload.json().get('error')}.\n")
+
+
+        # response_upload = api_request.upload_zip(test_zip_path)
+
 
         # Further tests (Successfully accessed the Mapbender path):
         # see WMS
@@ -193,22 +197,22 @@ class ServerConfigDialog(BASE, WIDGET):
 
 
 
-        with Connection(host=configFromForm.url, user=configFromForm.username,
-                        port=configFromForm.port, connect_kwargs=connect_kwargs) as connection:
-            try:  # test SSH connection
-                connection.open()
-                # connection.run('cd /')
-                #  Tests 2 and 3:
-                if not check_if_project_folder_exists_on_server(connection, configFromForm.projects_path):
-                    return f"Unable to find folder {configFromForm.projects_path} on the server {configFromForm.url}."
-                if not check_if_project_folder_exists_on_server(connection, configFromForm.mb_app_path):
-                    return f"Unable to find folder {configFromForm.mb_app_path} on the server {configFromForm.url}."
+        # with Connection(host=configFromForm.url, user=configFromForm.username,
+        #                 port=configFromForm.port, connect_kwargs=connect_kwargs) as connection:
+        #     try:  # test SSH connection
+        #         connection.open()
+        #         # connection.run('cd /')
+        #         #  Tests 2 and 3:
+        #         if not check_if_project_folder_exists_on_server(connection, configFromForm.projects_path):
+        #             return f"Unable to find folder {configFromForm.projects_path} on the server {configFromForm.url}."
+        #         if not check_if_project_folder_exists_on_server(connection, configFromForm.mb_app_path):
+        #             return f"Unable to find folder {configFromForm.mb_app_path} on the server {configFromForm.url}."
+        #
+        #     except Exception as e:
+        #         return ("Unable to connect to the server via SSH, please check your details. "
+        #                 f"Login, password are correct? Server address is correct?\n {str(e)}")
 
-            except Exception as e:
-                return ("Unable to connect to the server via SSH, please check your details. "
-                        f"Login, password are correct? Server address is correct?\n {str(e)}")
-
-            # Test n. 4
+        # Test n. 4
         wmsServiceRequest = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
         qgiServerUrl = (f'{self.protocolQgisServerCmbBox.currentText()}'
                         f'{configFromForm.qgis_server_path}'
