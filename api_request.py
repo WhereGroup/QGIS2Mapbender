@@ -3,6 +3,7 @@ import requests
 
 from qgis.core import QgsMessageLog, Qgis
 from sympy.codegen.ast import continue_
+# from sympy.codegen.ast import continue_
 
 from .helpers import waitCursor
 from .settings import TAG
