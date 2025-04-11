@@ -33,6 +33,8 @@ class ServerConfigDialog(BASE, WIDGET):
     passwordLineEdit: QLineEdit
     authLabel: QLabel
 
+    apiLineEdit: QLineEdit
+
     protocolQgisServerCmbBox: QComboBox
     # serverConfigNameLabel1: QLabel
     qgisServerPathLineEdit: QLineEdit     # TODO: better to rename qgisServerUrlLineEdit
@@ -99,6 +101,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.qgisServerPathLineEdit.setValidator(regex_validator)
         self.mbPathLineEdit.setValidator(regex_validator)
         self.mbBasisUrlLineEdit.setValidator(regex_validator)
+        self.apiLineEdit.setEnabled(False)
 
         self.checkedIcon = QIcon(":images/themes/default/mIconSuccess.svg")
 
@@ -162,9 +165,6 @@ class ServerConfigDialog(BASE, WIDGET):
         # if not ends_with_single_slash(configFromForm.mb_app_path):
         #     return f"Mapbender application path '{configFromForm.mb_app_path}' should end with one '/'"
 
-        # API's URL - delete
-        api_url = "http://" + configFromForm.url + "/mapbender/api"
-
         api_request = ApiRequest(configFromForm)
         # Test 1 (url) and 2 (credentials for token)
         if not api_request.token:
@@ -183,7 +183,6 @@ class ServerConfigDialog(BASE, WIDGET):
         test_zip_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'test_upload.zip')
         response_upload = api_request.upload_zip(test_zip_path)
         if not response_upload.status_code == 200:
-            print('go inside')
             return (f"Error {response_upload.status_code}.\n"
                     f"{response_upload.json().get('error')}.\n")
 
@@ -270,6 +269,7 @@ class ServerConfigDialog(BASE, WIDGET):
         self.mbBasisUrlLineEdit.setText(server_config.mb_basis_url)
         self.winPKFileWidget.lineEdit().setText(server_config.windows_pk_path)
         self.binConsoleCommandLineEdit.setText(server_config.bin_console_command)
+        self.apiLineEdit.setText("http://" + server_config.url + "/mapbender/api")
 
     def getServerConfigFromFormular(self) -> ServerConfig:
         return ServerConfig(
