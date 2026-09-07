@@ -85,7 +85,7 @@ class MapbenderApiUpload:
             else:
                     return 1, []
         except Exception as e:
-            QgsMessageLog.logMessage(f"Error in mb_upload: {e}", TAG, level=Qgis.MessageLevel.Critical)
+            QgsMessageLog.logMessage(f"Error in Mapbender upload: {e}", TAG, level=Qgis.MessageLevel.Critical)
             return 1, []
 
 

@@ -493,7 +493,7 @@ class MainDialog(BASE, WIDGET):
             mb_upload = MapbenderApiUpload(server_config, api_request, wms_url)
             exit_status_mb_upload, source_ids, is_reloaded = mb_upload.mb_upload()
             if exit_status_mb_upload != 0 or not source_ids:
-                QgsMessageLog.logMessage(f"FAILED mb_upload", TAG, level=Qgis.MessageLevel.Info)
+                QgsMessageLog.logMessage(f"FAILED Mapbender Upload", TAG, level=Qgis.MessageLevel.Info)
                 return
 
             if is_clone_app:
