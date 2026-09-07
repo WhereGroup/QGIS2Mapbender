@@ -4,7 +4,7 @@ author=WhereGroup (Carmen Viesca, Paolo Favero, Peter Gipper, Christoph Welker, 
 email=info@wheregroup.com
 description=QGIS plugin to populate Mapbender with WMS services from QGIS Server using the Mapbender API.
 about=This QGIS plugin exports your project as a QGIS Server WMS (Web Map Service) and publishes it in a Mapbender application (https://mapbender.org).
- Supported project types include local QGIS projects and projects stored in PostgreSQL. Local projects are uploaded together with the data to the configured server upload directory for QGIS Server to serve as WMS; PostgreSQL projects remain in the database. See the requirements below for PostgreSQL project setup.
+ Supported project types include local QGIS projects and projects stored in PostgreSQL. Local projects are uploaded together with the data to the configured server upload directory for QGIS Server to serve as WMS; PostgreSQL projects and data remain in the database. See the requirements below for PostgreSQL project setup.
 
  System Requirements: 
  
@@ -31,7 +31,7 @@ tracker=https://github.com/WhereGroup/QGIS2Mapbender/issues
 
 tags=mapbender, web, webmap, webmaps, webgis, publish, export, qgis server, wms, ogc wms, qgis, services, sdi, geoportal
 
-version=1.1.0
+version=1.2.0
 qgisMinimumVersion=3.2
 qgisMaximumVersion=4.99
 
