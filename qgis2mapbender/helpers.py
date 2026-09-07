@@ -6,13 +6,14 @@ from contextlib import contextmanager
 
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.core import QgsApplication, QgsProject, QgsSettings
+from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsProject, QgsSettings
 
 from .settings import (
     PLUGIN_SETTINGS_SERVER_CONFIG_KEY,
     PROJECT_STORAGE_LOCAL,
     PROJECT_STORAGE_UNSAVED,
     QGIS_SERVER_POSTGRESQL_WRAPPER_PATH,
+    TAG,
 )
 
 from qgis.PyQt.QtWidgets import (
@@ -40,9 +41,10 @@ def check_if_qgis_project_is_dirty_and_save() -> bool:
         Checks if the current QGIS project has unsaved changes and prompts the user to save.
 
         Returns:
-            bool: True if the project is saved or user chose to continue, False if cancelled.
+            bool: True if the project is saved or has no changes, False if cancelled or saving failed.
     """
-    if QgsProject.instance().isDirty():
+    project = QgsProject.instance()
+    if project.isDirty():
         msgBox = QMessageBox()
         msgBox.setWindowTitle("")
         msgBox.setText("There are unsaved changes.")
@@ -53,10 +55,20 @@ def check_if_qgis_project_is_dirty_and_save() -> bool:
         msgBox.setDefaultButton(QMessageBox.StandardButton.Save)
         ret = msgBox.exec()
         if ret == QMessageBox.StandardButton.Save:
-            QgsProject.instance().write()
-            return True
-        elif ret == QMessageBox.StandardButton.Cancel:
-            return False
+            if project.write():
+                return True
+
+            error_message = project.error()
+            QgsMessageLog.logMessage(
+                f"Failed to save QGIS project: {error_message}",
+                TAG,
+                level=Qgis.MessageLevel.Critical,
+            )
+            show_fail_box(
+                "Save failed",
+                f"Could not save the QGIS project.\n\n{error_message}",
+            )
+        return False
     return True
 
 
