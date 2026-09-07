@@ -37,7 +37,6 @@ def get_postgresql_project_wms_url(server_config: ServerConfig) -> str:
     map = f"postgresql://?service={service}&schema={schema}&project={project_name}"
     query = urlencode({
         "map": map,
-        "schema": schema,
         "SERVICE": "WMS",
         "VERSION": "1.3.0",
         "REQUEST": "GetCapabilities",
