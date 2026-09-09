@@ -332,9 +332,6 @@ class ApiRequest:
         Returns:
             Optional[dict]: Parsed JSON, or None if parsing fails.
         """
-        if response is None:
-            return None
-
         try:
             response_json = response.json()
         except ValueError:
