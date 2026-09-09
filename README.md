@@ -1,10 +1,11 @@
 # QGIS2Mapbender
 
 ## Description
-This QGIS plugin exports your project as a QGIS Server WMS (Web Map Service) and publishes it in a Mapbender application (https://mapbender.org). 
-Supported project types include local QGIS projects and projects stored in PostgreSQL.
+QGIS2Mapbender exports QGIS projects as WMS services served by QGIS Server and publishes them in Mapbender applications via the Mapbender API (https://mapbender.org).
 
-You find the QGIS2Mapbender in the QGIS Python Plugins Repository https://plugins.qgis.org/plugins/qgis2mapbender.
+The plugin supports local QGIS projects and projects stored in PostgreSQL. For local projects, the project folder and all files it contains, including local data, are uploaded to the configured server upload directory so that QGIS Server can serve the project as a WMS. Projects stored in PostgreSQL remain in the database, a `pg_service.conf` file must be available to the QGIS instance opening the project and QGIS Server must also be able to access a corresponding server-side configuration.
+
+QGIS2Mapbender is available in the QGIS Python Plugins Repository: https://plugins.qgis.org/plugins/qgis2mapbender.
 
 ![QGIS2Mapbender](qgis2mapbender/resources/img_qgis2mapbender_readme.png)
 
@@ -18,12 +19,12 @@ Alternatively, a release can be downloaded here. The zipped folder can be instal
 
 ### Requirements on your local system
 - For local QGIS projects, the QGIS project must be saved in the same folder as the data. Please note that, along with the QGIS project, all the files in the folder containing the QGIS project will also be uploaded to the server.
-- QGIS projects stored in a PostgreSQL database are also supported.
+- For PostgreSQL projects or data sources, configure a local `pg_service.conf` file for QGIS.
 
 ### Requirements on your server
 - QGIS Server is installed on your server.
 - Mapbender is installed and configured on your server.
-- Use pg_service.conf for PostgreSQL-stored projects. The WMS URL will be built as <your QGIS Server URL>?map=postgresql://?service={service}&schema={schema}&project={project_name} without exposing credentials in the public URL. The service name must be configured in a server-side pg_service.conf file that is readable by QGIS Server.
+- Use pg_service.conf for PostgreSQL-stored projects and/or data sources. The WMS URL for PostgreSQL-stored projects will be built as <your QGIS Server URL>?map=postgresql://?service={service}&schema={schema}&project={project_name} without exposing credentials in the public URL. The service name must be configured in a server-side pg_service.conf file that is readable by QGIS Server and match the service name used in the local pg_service.conf file.
 
 ### Requirements for your Mapbender installation
 
