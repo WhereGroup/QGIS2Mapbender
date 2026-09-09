@@ -14,6 +14,7 @@ from ..helpers import (
     show_success_box,
     list_qgs_settings_child_groups,
     show_fail_box,
+    translate,
     uri_validator,
     waitCursor,
 )
@@ -82,11 +83,15 @@ class ServerConfigDialog(BASE, WIDGET):
         button_save = self.dialogButtonBox.button(QDialogButtonBox.StandardButton.Save)
         button_save.setText(self.tr('Save'))
 
-        self.serverConfigNameLineEdit.setToolTip('Custom server configuration name without blank spaces')
-        self.qgisServerUrlLineEdit.setToolTip(
-            self.tr('Example: [SERVER_NAME]/cgi-bin/qgis_mapserv.fcgi or [SERVER_NAME]/qgis/')
+        self.serverConfigNameLineEdit.setToolTip(
+            translate('Custom server configuration name without blank spaces')
         )
-        self.mbBasisUrlLineEdit.setToolTip('Example: [SERVER_NAME]/mapbender/index_dev.php/')
+        self.qgisServerUrlLineEdit.setToolTip(
+            translate('Example: [SERVER_NAME]/cgi-bin/qgis_mapserv.fcgi or [SERVER_NAME]/qgis/')
+        )
+        self.mbBasisUrlLineEdit.setToolTip(
+            translate('Example: [SERVER_NAME]/mapbender/index_dev.php/')
+        )
 
         # QLineEdit validators
         regex = QRegularExpression("[^\\s;]*")  # regex for blank spaces and semicolon
@@ -180,9 +185,9 @@ class ServerConfigDialog(BASE, WIDGET):
 
         # Test 1: QGIS Server URL
         project_storage_type = get_qgis_project_storage_type()
-        qgis_server_test_name = self.tr('QGIS Server')
+        qgis_server_test_name = translate('QGIS Server')
         if project_storage_type == PROJECT_STORAGE_POSTGRESQL:
-            qgis_server_test_name = self.tr('QGIS Server PostgreSQL wrapper')
+            qgis_server_test_name = translate('QGIS Server PostgreSQL wrapper')
             qgisServerUrl = get_postgresql_project_wms_url(configFromForm)
         else:
             wmsServiceRequest = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
@@ -193,7 +198,7 @@ class ServerConfigDialog(BASE, WIDGET):
             failed_tests.append(errorStr)
         else:
             successful_tests.append(
-                self.tr("Connection to {server_name} was successful.").format(
+                translate("Connection to {server_name} was successful.").format(
                     server_name=qgis_server_test_name
                 )
             )
@@ -220,7 +225,7 @@ class ServerConfigDialog(BASE, WIDGET):
                         failed_tests.append(
                             self.tr("Server upload is not validated (status code {status_code}: {error_zip_upload}).").format(
                             status_code=status_code,
-                                error_zip_upload=error_zip_upload or self.tr(
+                                error_zip_upload=error_zip_upload or translate(
                                     "The server response did not contain an upload directory."
                                 )
                             ))
@@ -287,7 +292,11 @@ class ServerConfigDialog(BASE, WIDGET):
         self.userNameLineEdit.setText(server_config.username)
         self.passwordLineEdit.setText(server_config.password)
         if server_config.authcfg:
-            self.authLabel.setText(f'Authentication saved in database. Configuration: {server_config.authcfg}')
+            self.authLabel.setText(
+                translate(
+                    'Authentication saved in database. Configuration: {authcfg}'
+                ).format(authcfg=server_config.authcfg)
+            )
             self.credentialsAuthDbRadioButton.setChecked(True)
         else:
             self.authLabel.setText('')
@@ -322,7 +331,7 @@ class ServerConfigDialog(BASE, WIDGET):
                 None
         """
         self.qgisServerUrlLineEdit.setPlaceholderText(
-            self.tr(
+            translate(
                 '{server_name}/cgi-bin/qgis_mapserv.fcgi or {server_name}/qgis/'
             ).format(server_name=newValue)
         )
@@ -360,7 +369,10 @@ class ServerConfigDialog(BASE, WIDGET):
             s.remove(f"{PLUGIN_SETTINGS_SERVER_CONFIG_KEY}/connection/{clean_selected}")
             return True
         if clean_form_name in saved_config_names and self.mode != 'edit':
-            show_fail_box('Failed', 'Server configuration name already exists')
+            show_fail_box(
+                translate('Failed'),
+                translate('Server configuration name already exists'),
+            )
             return False
         return True
 
@@ -378,7 +390,10 @@ class ServerConfigDialog(BASE, WIDGET):
             serverConfigFromFormular.save(encrypted=False)
         else:
             serverConfigFromFormular.save(encrypted=True)
-        show_success_box('Success', 'Server configuration successfully saved')
+        show_success_box(
+            translate('Success'),
+            translate('Server configuration successfully saved'),
+        )
         self.close()
         return
 

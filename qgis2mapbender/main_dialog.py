@@ -18,7 +18,7 @@ from .helpers import get_qgis_project_storage_type, qgis_project_is_saved, \
     check_if_qgis_project_is_dirty_and_save, \
     show_fail_box, show_success_box, show_success_link_box, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, is_postgresql_qgis_server_url
+    update_mb_slug_in_settings, is_postgresql_qgis_server_url, translate
 from .paths import Paths
 from .server_config import ServerConfig
 from .settings import (
@@ -132,18 +132,20 @@ class MainDialog(BASE, WIDGET):
         hint_style = ""
 
         if project_storage_type == PROJECT_STORAGE_POSTGRESQL:
-            hint = self.tr(
+            hint = translate(
                 "The QGIS project is stored in a database ({project_storage_type})."
             ).format(project_storage_type=project_storage_type)
         elif project_storage_type == PROJECT_STORAGE_LOCAL:
-            hint = self.tr("The QGIS project is stored locally and will be uploaded to the server. If the QGIS project "
-                           "already exists on the server, it will be overwritten")
+            hint = translate(
+                "The QGIS project is stored locally and will be uploaded to the server. "
+                "If the QGIS project already exists on the server, it will be overwritten"
+            )
         elif project_storage_type == PROJECT_STORAGE_UNSAVED:
-            hint = self.tr(
+            hint = translate(
                 "The QGIS project has not been saved. Please save the project before publishing or updating.")
             hint_style = "color: red;"
         else:
-            hint = self.tr(
+            hint = translate(
                 "The storage type of the current QGIS project ({project_storage_type}) is not supported."
             ).format(project_storage_type=project_storage_type)
             hint_style = "color: red;"
@@ -386,9 +388,9 @@ class MainDialog(BASE, WIDGET):
         """Validates that the current QGIS project storage is supported."""
         if project_storage_type not in PROJECT_STORAGE_LOCAL and project_storage_type not in PROJECT_STORAGE_POSTGRESQL:
             show_fail_box(
-                self.tr("Unsupported QGIS project storage"),
-                self.tr(
-                    "The storage type  of the current QGIS project ({project_storage_type}) is not supported."
+                translate("Unsupported QGIS project storage"),
+                translate(
+                    "The storage type of the current QGIS project ({project_storage_type}) is not supported."
                 ).format(project_storage_type=project_storage_type)
             )
             return False
@@ -563,7 +565,12 @@ class MainDialog(BASE, WIDGET):
                 )
             #self.close()
         except Exception as e:
-            show_fail_box(self.tr("Failed"), f"An error occurred during Mapbender publish: {e}")
+            show_fail_box(
+                self.tr("Failed"),
+                translate("An error occurred during Mapbender publish: {error}").format(
+                    error=e
+                ),
+            )
             QgsMessageLog.logMessage(f"Error in mb_publish: {e}", TAG, level=Qgis.MessageLevel.Critical)
         return
 
@@ -584,7 +591,12 @@ class MainDialog(BASE, WIDGET):
             mb_reload = MapbenderApiUpload(server_config, api_request, wms_url)
             exit_status, source_ids = mb_reload.mb_reload()
             if exit_status != 0 or not source_ids:
-                show_fail_box(self.tr("Failed"), f"No source to update. WMS {wms_url} is not an existing source in Mapbender.")
+                show_fail_box(
+                    self.tr("Failed"),
+                    translate(
+                        "No source to update. WMS {wms_url} is not an existing source in Mapbender."
+                    ).format(wms_url=wms_url),
+                )
                 QgsMessageLog.logMessage(f"FAILED mb_update: No source to update. WMS {wms_url} is not an existing source in Mapbender.", TAG, level=Qgis.MessageLevel.Info)
                 return
             else:
@@ -608,6 +620,11 @@ class MainDialog(BASE, WIDGET):
                 )
 
         except Exception as e:
-            show_fail_box(self.tr("Failed"), f"An error occurred during Mapbender update: {e}")
+            show_fail_box(
+                self.tr("Failed"),
+                translate("An error occurred during Mapbender update: {error}").format(
+                    error=e
+                ),
+            )
             QgsMessageLog.logMessage(f"Error in mb_update: {e}", TAG, level=Qgis.MessageLevel.Critical)
         return

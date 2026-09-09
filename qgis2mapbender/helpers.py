@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QCoreApplication, Qt
 from contextlib import contextmanager
 
 from qgis.PyQt.QtGui import QPixmap
@@ -25,6 +25,9 @@ from qgis.PyQt.QtWidgets import (
 )
 
 
+def translate(text: str) -> str:
+    """Translate text that is shared by dialogs and message boxes."""
+    return QCoreApplication.translate("QGIS2Mapbender", text)
 
 
 def get_project_layer_names() -> list:
@@ -47,11 +50,11 @@ def check_if_qgis_project_is_dirty_and_save() -> bool:
     if project.isDirty():
         msgBox = QMessageBox()
         msgBox.setWindowTitle("")
-        msgBox.setText("There are unsaved changes.")
-        msgBox.setInformativeText("Do you want to save your changes before continuing?")
+        msgBox.setText(translate("There are unsaved changes."))
+        msgBox.setInformativeText(translate("Do you want to save your changes before continuing?"))
         msgBox.setStandardButtons(QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Cancel)
-        msgBox.button(QMessageBox.StandardButton.Save).setText("Save")
-        msgBox.button(QMessageBox.StandardButton.Cancel).setText("Cancel")
+        msgBox.button(QMessageBox.StandardButton.Save).setText(translate("Save"))
+        msgBox.button(QMessageBox.StandardButton.Cancel).setText(translate("Cancel"))
         msgBox.setDefaultButton(QMessageBox.StandardButton.Save)
         ret = msgBox.exec()
         if ret == QMessageBox.StandardButton.Save:
@@ -65,8 +68,10 @@ def check_if_qgis_project_is_dirty_and_save() -> bool:
                 level=Qgis.MessageLevel.Critical,
             )
             show_fail_box(
-                "Save failed",
-                f"Could not save the QGIS project.\n\n{error_message}",
+                translate("Save failed"),
+                translate("Could not save the QGIS project.\n\n{error_message}").format(
+                    error_message=error_message
+                ),
             )
         return False
     return True
@@ -83,7 +88,12 @@ def qgis_project_is_saved() -> bool:
     """
     source_project_file_path = QgsProject.instance().fileName()
     if not source_project_file_path:
-        show_fail_box('Failed', "The QGIS project has not been saved. Please save the project before publishing or updating.")
+        show_fail_box(
+            translate("Failed"),
+            translate(
+                "The QGIS project has not been saved. Please save the project before publishing or updating."
+            ),
+        )
         return False
     return True
 
@@ -167,6 +177,7 @@ def show_fail_box(title: str, text: str) -> int:
     QApplication.restoreOverrideCursor()
     failBox = create_fail_box(title, text)
     failBox.setStandardButtons(QMessageBox.StandardButton.Ok)
+    failBox.button(QMessageBox.StandardButton.Ok).setText(translate("OK"))
     return failBox.exec()
 
 def show_success_box(title: str, text: str) -> int:
@@ -187,6 +198,7 @@ def show_success_box(title: str, text: str) -> int:
     successBox.setWindowTitle(title)
     successBox.setText(text)
     successBox.setStandardButtons(QMessageBox.StandardButton.Ok)
+    successBox.button(QMessageBox.StandardButton.Ok).setText(translate("OK"))
     return successBox.exec()
 
 def show_success_link_box(title: str, text: str) -> int:
@@ -228,6 +240,7 @@ def show_success_link_box(title: str, text: str) -> int:
     layout.addWidget(message_label)
 
     button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+    button_box.button(QDialogButtonBox.StandardButton.Ok).setText(translate("OK"))
     button_box.accepted.connect(dialog.accept)
     layout.addWidget(button_box)
 
@@ -249,8 +262,8 @@ def show_question_box(text: str) -> int:
     questionBox.setIcon(QMessageBox.Icon.Question)
     questionBox.setText(text)
     questionBox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-    questionBox.button(QMessageBox.StandardButton.Yes).setText("Yes")
-    questionBox.button(QMessageBox.StandardButton.No).setText("No")
+    questionBox.button(QMessageBox.StandardButton.Yes).setText(translate("Yes"))
+    questionBox.button(QMessageBox.StandardButton.No).setText(translate("No"))
     return questionBox.exec()
 
 
