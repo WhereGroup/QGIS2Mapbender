@@ -25,6 +25,7 @@ Alternatively, a release can be downloaded here. The zipped folder can be instal
 - QGIS Server is installed on your server.
 - Mapbender is installed and configured on your server.
 - Use pg_service.conf for PostgreSQL-stored projects and/or data sources. The WMS URL for PostgreSQL-stored projects will be built as <your QGIS Server URL>?map=postgresql://?service={service}&schema={schema}&project={project_name} without exposing credentials in the public URL. The service name must be configured in a server-side pg_service.conf file that is readable by QGIS Server and match the service name used in the local pg_service.conf file.
+- For PostgreSQL-stored projects, it is recommended to configure the QGIS Server environment variable `QGIS_SERVER_PROJECT_CACHE_STRATEGY` to `periodic` and set a value for `QGIS_SERVER_PROJECT_CACHE_CHECK_INTERVAL` (see https://docs.qgis.org/3.44/en/docs/server_manual/getting_started.html#httpserver).
 
 ### Requirements for your Mapbender installation
 
