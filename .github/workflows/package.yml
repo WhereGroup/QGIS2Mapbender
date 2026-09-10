@@ -38,6 +38,11 @@ jobs:
           python -m pip install \
             "qgis-plugin-ci==${{ env.QGIS_PLUGIN_CI_VERSION }}"
 
+      - name: Remove generated Python files
+        run: |
+          find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+          find . -type f \( -name "*.pyc" -o -name "*.pyo" \) -delete
+
       - name: Package plugin
         env:
           PLUGIN_VERSION: ${{ env.PLUGIN_VERSION }}
@@ -64,6 +69,11 @@ jobs:
 
           unzip -l "${PACKAGE}" | grep -q "${PLUGIN_DIRECTORY}/metadata.txt"
           unzip -l "${PACKAGE}" | grep -q "${PLUGIN_DIRECTORY}/LICENSE"
+          
+          if unzip -l "${PACKAGE}" | grep -Eq '(^|/)__pycache__/|\.py[co]$'; then
+            echo "The package contains generated Python cache files."
+            exit 1
+          fi
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v7
