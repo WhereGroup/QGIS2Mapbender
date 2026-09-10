@@ -12,6 +12,8 @@ on:
       - main
     paths:
       - ".github/workflows/package.yml"
+      - "CHANGELOG.md"
+      - "pyproject.toml"
       - "qgis2mapbender/**"
 
 permissions:
@@ -21,7 +23,6 @@ env:
   PLUGIN_DIRECTORY: "qgis2mapbender"
   PLUGIN_VERSION: "1.2.0"
   QGIS_PLUGIN_CI_VERSION: "2.9.*"
-
 
 jobs:
   package:
@@ -44,21 +45,21 @@ jobs:
           qgis-plugin-ci package "${PLUGIN_VERSION}" \
             --allow-uncommitted-changes
 
-      - name: Inspect package files
+      - name: Inspect generated files
         run: |
-          find . -maxdepth 2 -type f \
-            \( -name "${{ env.PLUGIN_DIRECTORY }}.*.zip" -o -name "plugins.xml" \) \
+          find . -type f \
+            \( -name "*.zip" -o -name "plugins.xml" \) \
             -print
 
       - name: Validate generated package
         env:
           PLUGIN_DIRECTORY: ${{ env.PLUGIN_DIRECTORY }}
         run: |
-          PACKAGE="$(find . -maxdepth 1 -type f -name "${PLUGIN_DIRECTORY}.*.zip" -print -quit)"
+          PACKAGE="$(find . -type f -name "${PLUGIN_DIRECTORY}.*.zip" -print -quit)"
 
           test -n "${PACKAGE}"
-          test -f "plugins.xml"
 
+          echo "Package found: ${PACKAGE}"
           unzip -l "${PACKAGE}"
 
           unzip -l "${PACKAGE}" | grep -q "${PLUGIN_DIRECTORY}/metadata.txt"
@@ -69,6 +70,5 @@ jobs:
         with:
           name: qgis2mapbender-package
           path: |
-            qgis2mapbender.*.zip
-            plugins.xml
+            **/qgis2mapbender.*.zip
           if-no-files-found: error
