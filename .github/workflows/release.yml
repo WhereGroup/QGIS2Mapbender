@@ -35,7 +35,6 @@ jobs:
             "qgis-plugin-ci==${{ env.QGIS_PLUGIN_CI_VERSION }}"
 
       - name: Publish plugin to QGIS
-        working-directory: ${{ env.PLUGIN_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OSGEO_USER: ${{ secrets.OSGEO_USER }}
