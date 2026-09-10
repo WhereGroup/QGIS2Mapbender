@@ -19,7 +19,9 @@ permissions:
 
 env:
   PLUGIN_DIRECTORY: "qgis2mapbender"
+  PLUGIN_VERSION: "1.2.0"
   QGIS_PLUGIN_CI_VERSION: "2.9.*"
+
 
 jobs:
   package:
@@ -36,8 +38,10 @@ jobs:
             "qgis-plugin-ci==${{ env.QGIS_PLUGIN_CI_VERSION }}"
 
       - name: Package plugin
+        env:
+          PLUGIN_VERSION: ${{ env.PLUGIN_VERSION }}
         run: |
-          qgis-plugin-ci package latest \
+          qgis-plugin-ci package "${PLUGIN_VERSION}" \
             --allow-uncommitted-changes
 
       - name: Inspect package files
