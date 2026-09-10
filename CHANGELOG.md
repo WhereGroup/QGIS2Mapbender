@@ -10,7 +10,7 @@
 * Add Information about how to create translations to CONTRIBUTE.md ([#PR35](...))
 
 ### Bugfixes:
-* Added QGIS4 fixes
+* Added QGIS4 fixes ([#PR36](...))
 
 
 ## v1.1.0
