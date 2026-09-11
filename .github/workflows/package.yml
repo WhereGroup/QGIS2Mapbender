@@ -21,7 +21,6 @@ permissions:
 
 env:
   PLUGIN_DIRECTORY: "qgis2mapbender"
-  PLUGIN_VERSION: "1.2.0"
   QGIS_PLUGIN_CI_VERSION: "2.9.*"
 
 jobs:
@@ -45,16 +44,22 @@ jobs:
 
       - name: Package plugin
         env:
-          PLUGIN_VERSION: ${{ env.PLUGIN_VERSION }}
+          working-directory: ${{ env.PLUGIN_DIRECTORY }}
         run: |
           qgis-plugin-ci package "${PLUGIN_VERSION}" \
             --allow-uncommitted-changes
 
       - name: Inspect generated files
         run: |
-          find . -type f \
-            \( -name "*.zip" -o -name "plugins.xml" \) \
-            -print
+          PLUGIN_VERSION="$(sed -n 's/^version=\(.*\)$/\1/p' \
+            "${PLUGIN_DIRECTORY}/metadata.txt")"
+
+          test -n "${PLUGIN_VERSION}"
+          
+          echo "Packaging version: ${PLUGIN_VERSION}"
+
+          qgis-plugin-ci package "${PLUGIN_VERSION}" \
+            --allow-uncommitted-changes
 
       - name: Validate generated package
         env:
