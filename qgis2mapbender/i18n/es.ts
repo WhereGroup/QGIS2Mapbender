@@ -646,5 +646,25 @@ No se pudieron ejecutar las pruebas de la API (generación de tokens, subida al 
         <source>The JSON response has an unsupported structure.</source>
         <translation>La respuesta JSON tiene una estructura no compatible.</translation>
     </message>
+    <message>
+        <source>The generated WMS URL is invalid.</source>
+        <translation>La URL WMS generada no es válida.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be reached. Please see the QGIS2Mapbender log for more information.</source>
+        <translation>No se pudo acceder a la URL WMS generada. Consulte el registro de QGIS2Mapbender para obtener más información.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL returned HTTP status {status_code}.</source>
+        <translation>La URL WMS generada devolvió el estado HTTP {status_code}.</translation>
+    </message>
+    <message>
+        <source>The server response is not a valid WMS capabilities document.</source>
+        <translation>La respuesta del servidor no es un documento válido de capacidades WMS.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be validated. Please check the server configuration. Is the QGIS Server base URL correct?&#10;&#10;{error}&#10;&#10;The process was interrupted.&#10;&#10;Link to Capabilities:&#10;{wms_url}</source>
+        <translation>No se pudo validar la URL WMS generada. Compruebe la configuración del servidor. ¿Es correcta la URL base del servidor QGIS?&#10;&#10;{error}&#10;&#10;El proceso se interrumpió.&#10;&#10;Enlace a Capabilities:&#10;{wms_url}</translation>
+    </message>
 </context>
 </TS>

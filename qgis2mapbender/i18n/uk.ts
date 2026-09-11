@@ -826,5 +826,25 @@ API-тести (генерація токена, завантаження на �
         <source>The JSON response has an unsupported structure.</source>
         <translation>Відповідь JSON має структуру, що не підтримується.</translation>
     </message>
+    <message>
+        <source>The generated WMS URL is invalid.</source>
+        <translation>Згенерована URL-адреса WMS недійсна.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be reached. Please see the QGIS2Mapbender log for more information.</source>
+        <translation>Не вдалося отримати доступ до згенерованої URL-адреси WMS. Додаткову інформацію див. у журналі QGIS2Mapbender.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL returned HTTP status {status_code}.</source>
+        <translation>Згенерована URL-адреса WMS повернула статус HTTP {status_code}.</translation>
+    </message>
+    <message>
+        <source>The server response is not a valid WMS capabilities document.</source>
+        <translation>Відповідь сервера не є дійсним документом WMS Capabilities.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be validated. Please check the server configuration. Is the QGIS Server base URL correct?&#10;&#10;{error}&#10;&#10;The process was interrupted.&#10;&#10;Link to Capabilities:&#10;{wms_url}</source>
+        <translation>Не вдалося перевірити згенеровану URL-адресу WMS. Перевірте конфігурацію сервера. Чи правильна базова URL-адреса сервера QGIS?&#10;&#10;{error}&#10;&#10;Процес перервано.&#10;&#10;Посилання на Capabilities:&#10;{wms_url}</translation>
+    </message>
 </context>
 </TS>

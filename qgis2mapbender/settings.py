@@ -8,6 +8,11 @@ TAG = 'QGIS2Mapbender'
 REQUEST_TIMEOUT_SIMPLE = 30
 REQUEST_TIMEOUT_API = (10, 300)
 
+# Accepted root elements of a WMS GetCapabilities response
+WMS_CAPABILITIES_ROOT_ELEMENTS = frozenset((
+    "WMS_Capabilities",
+))
+
 # Maximum length of server error details shown in a message box
 MAX_API_ERROR_MESSAGE_LENGTH = 500
 

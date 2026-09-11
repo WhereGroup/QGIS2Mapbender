@@ -18,7 +18,8 @@ from .helpers import get_qgis_project_storage_type, qgis_project_is_saved, \
     check_if_qgis_project_is_dirty_and_save, \
     show_fail_box, show_success_box, show_success_link_box, \
     list_qgs_settings_child_groups, show_question_box, \
-    update_mb_slug_in_settings, is_postgresql_qgis_server_url, translate
+    update_mb_slug_in_settings, translate, \
+    check_wms_url
 from .paths import Paths
 from .server_config import ServerConfig
 from .settings import (
@@ -461,6 +462,24 @@ class MainDialog(BASE, WIDGET):
             else:
                 return
             if not wms_url:
+                return
+
+            wms_validation_error = check_wms_url(wms_url)
+            if wms_validation_error:
+                message = translate(
+                    "The generated WMS URL could not be validated. "
+                    "Please check the server configuration. "
+                    "Is the QGIS Server base URL correct?\n\n"
+                    "{error}\n\n"
+                    "The process was interrupted.\n\n"
+                    "Link to Capabilities:\n{wms_url}"
+                ).format(error=wms_validation_error, wms_url=wms_url)
+                QgsMessageLog.logMessage(
+                    message,
+                    TAG,
+                    level=Qgis.MessageLevel.Critical,
+                )
+                show_fail_box(self.tr("Failed"), message)
                 return
 
             if action == "publish":

@@ -1,4 +1,8 @@
+from typing import Optional
 from urllib.parse import urlparse
+from xml.etree import ElementTree
+
+import requests
 
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtCore import QCoreApplication, Qt
@@ -13,7 +17,9 @@ from .settings import (
     PROJECT_STORAGE_LOCAL,
     PROJECT_STORAGE_UNSAVED,
     QGIS_SERVER_POSTGRESQL_WRAPPER_PATH,
+    REQUEST_TIMEOUT_SIMPLE,
     TAG,
+    WMS_CAPABILITIES_ROOT_ELEMENTS,
 )
 
 from qgis.PyQt.QtWidgets import (
@@ -137,12 +143,6 @@ def append_query_to_url(url: str, query: str) -> str:
     else:
         separator = '?'
     return f'{url}{separator}{query}'
-
-
-def is_postgresql_qgis_server_url(url: str) -> bool:
-    """Returns whether a URL targets the PostgreSQL QGIS Server wrapper."""
-    wrapper_path = QGIS_SERVER_POSTGRESQL_WRAPPER_PATH.rstrip('/')
-    return urlparse(url).path.rstrip('/').endswith(wrapper_path)
 
 
 def create_fail_box(title: str, text: str) -> QMessageBox:
@@ -351,6 +351,45 @@ def uri_validator(url: str) -> bool:
         return all([result.scheme, result.netloc])
     except AttributeError:
         return False
+
+
+def check_wms_url(url: str) -> Optional[str]:
+    """Checks that a generated URL returns a valid WMS capabilities document."""
+    if not uri_validator(url):
+        return translate("The generated WMS URL is invalid.")
+
+    try:
+        response = requests.get(url, timeout=REQUEST_TIMEOUT_SIMPLE)
+    except requests.exceptions.RequestException as error:
+        QgsMessageLog.logMessage(
+            f"Failed to validate WMS URL: {error}",
+            TAG,
+            level=Qgis.MessageLevel.Critical,
+        )
+        return translate(
+            "The generated WMS URL could not be reached. "
+            "Please see the QGIS2Mapbender log for more information."
+        )
+
+    if response.status_code != 200:
+        return translate(
+            "The generated WMS URL returned HTTP status {status_code}."
+        ).format(status_code=response.status_code)
+
+    try:
+        capabilities = ElementTree.fromstring(response.content)
+    except (ElementTree.ParseError, TypeError):
+        return translate(
+            "The server response is not a valid WMS capabilities document."
+        )
+
+    root_name = capabilities.tag.rsplit("}", 1)[-1]
+    if root_name not in WMS_CAPABILITIES_ROOT_ELEMENTS:
+        return translate(
+            "The server response is not a valid WMS capabilities document."
+        )
+
+    return None
 
 
 def get_size_and_unit(bytes_size) -> tuple:

@@ -826,5 +826,25 @@ API-tests (token genereren, uploaden naar server, etc.) konden niet worden uitge
         <source>The JSON response has an unsupported structure.</source>
         <translation>Het JSON-antwoord heeft een niet-ondersteunde structuur.</translation>
     </message>
+    <message>
+        <source>The generated WMS URL is invalid.</source>
+        <translation>De gegenereerde WMS-URL is ongeldig.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be reached. Please see the QGIS2Mapbender log for more information.</source>
+        <translation>De gegenereerde WMS-URL kon niet worden bereikt. Raadpleeg het QGIS2Mapbender-log voor meer informatie.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL returned HTTP status {status_code}.</source>
+        <translation>De gegenereerde WMS-URL retourneerde HTTP-status {status_code}.</translation>
+    </message>
+    <message>
+        <source>The server response is not a valid WMS capabilities document.</source>
+        <translation>Het antwoord van de server is geen geldig WMS-capabilitiesdocument.</translation>
+    </message>
+    <message>
+        <source>The generated WMS URL could not be validated. Please check the server configuration. Is the QGIS Server base URL correct?&#10;&#10;{error}&#10;&#10;The process was interrupted.&#10;&#10;Link to Capabilities:&#10;{wms_url}</source>
+        <translation>De gegenereerde WMS-URL kon niet worden gevalideerd. Controleer de serverconfiguratie. Is de basis-URL van de QGIS-server correct?&#10;&#10;{error}&#10;&#10;Het proces is onderbroken.&#10;&#10;Link naar Capabilities:&#10;{wms_url}</translation>
+    </message>
 </context>
 </TS>

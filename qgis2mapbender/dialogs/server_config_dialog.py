@@ -10,7 +10,6 @@ from qgis.core import QgsMessageLog, Qgis
 
 from ..api_request import ApiRequest
 from ..helpers import (
-    get_qgis_project_storage_type,
     show_success_box,
     list_qgs_settings_child_groups,
     show_fail_box,
@@ -18,11 +17,9 @@ from ..helpers import (
     uri_validator,
     waitCursor,
 )
-from ..qgis_server_postgresql_wms import get_postgresql_project_wms_url
 from ..server_config import ServerConfig
 from ..settings import (
     PLUGIN_SETTINGS_SERVER_CONFIG_KEY,
-    PROJECT_STORAGE_POSTGRESQL,
     TAG,
     REQUEST_TIMEOUT_SIMPLE,
 )
@@ -183,17 +180,12 @@ class ServerConfigDialog(BASE, WIDGET):
         failed_tests = []
         successful_tests = []
 
-        # Test 1: QGIS Server URL
-        project_storage_type = get_qgis_project_storage_type()
+        # Test 1: QGIS Server endpoint
         qgis_server_test_name = translate('QGIS Server')
-        if project_storage_type == PROJECT_STORAGE_POSTGRESQL:
-            qgis_server_test_name = translate('QGIS Server PostgreSQL wrapper')
-            qgisServerUrl = get_postgresql_project_wms_url(configFromForm)
-        else:
-            wmsServiceRequest = "?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
-            qgisServerUrl = f'{configFromForm.qgis_server_path}{wmsServiceRequest}'
-
-        errorStr = self.testHttpConn(qgisServerUrl, qgis_server_test_name)
+        errorStr = self.testHttpConn(
+            configFromForm.qgis_server_path,
+            qgis_server_test_name,
+        )
         if errorStr:
             failed_tests.append(errorStr)
         else:
@@ -261,15 +253,9 @@ class ServerConfigDialog(BASE, WIDGET):
             return errorStr
         try:
             resp = requests.get(url, timeout=REQUEST_TIMEOUT_SIMPLE)
-            if serverName != "Mapbender":
-                if resp.status_code != 200:
-                    content_type = resp.headers.get('Content-Type', '')
-                    if 'text/xml' not in content_type:
-                        return errorStr
-            else:
-                if resp.status_code != 200:
-                    return errorStr
-        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as error:
+            if not resp.ok:
+                return errorStr
+        except requests.exceptions.RequestException as error:
             QgsMessageLog.logMessage(f"Connection error: {error}", TAG, level=Qgis.MessageLevel.Critical)
             return f"{errorStr}"
 
