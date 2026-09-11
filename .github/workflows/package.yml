@@ -44,22 +44,23 @@ jobs:
 
       - name: Package plugin
         env:
-          working-directory: ${{ env.PLUGIN_DIRECTORY }}
+          PLUGIN_DIRECTORY: ${{ env.PLUGIN_DIRECTORY }}
         run: |
+          PLUGIN_VERSION="$(sed -n 's/^version=\(.*\)$/\1/p' \
+            "${PLUGIN_DIRECTORY}/metadata.txt")"
+            
+          test -n "${PLUGIN_VERSION}"
+            
+          echo "Packaging version: ${PLUGIN_VERSION}"
+            
           qgis-plugin-ci package "${PLUGIN_VERSION}" \
             --allow-uncommitted-changes
 
       - name: Inspect generated files
         run: |
-          PLUGIN_VERSION="$(sed -n 's/^version=\(.*\)$/\1/p' \
-            "${PLUGIN_DIRECTORY}/metadata.txt")"
-
-          test -n "${PLUGIN_VERSION}"
-          
-          echo "Packaging version: ${PLUGIN_VERSION}"
-
-          qgis-plugin-ci package "${PLUGIN_VERSION}" \
-            --allow-uncommitted-changes
+          find . -type f \
+            \( -name "*.zip" -o -name "plugins.xml" \) \
+            -print
 
       - name: Validate generated package
         env:
@@ -85,5 +86,5 @@ jobs:
         with:
           name: qgis2mapbender-package
           path: |
-            **/qgis2mapbender.*.zip
+            **/qgis2mapbender.[0-9]*.zip
           if-no-files-found: error
