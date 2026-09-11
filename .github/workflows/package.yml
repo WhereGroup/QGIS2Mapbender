@@ -3,10 +3,6 @@ name: Test QGIS plugin package
 on:
   workflow_dispatch:
 
-  push:
-    branches:
-      - "ci/release-pipeline"
-
   pull_request:
     branches:
       - main
