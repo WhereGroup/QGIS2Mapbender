@@ -1,4 +1,4 @@
-## 1.2.0
+## v1.2.0
 
 ### Features:
 * Added support for QGIS projects stored in PostgreSQL via `pg_service.conf` ([#PR43](https://github.com/WhereGroup/qgis2mapbender/pull/43)) 
@@ -14,7 +14,7 @@
 * Added QGIS4 fixes ([#PR36](...))
 
 
-## 1.1.0
+## v1.1.0
 
 ### Features:
 * Added german, spanish and italian translations ([#PR28](https://github.com/WhereGroup/qgis2mapbender/pull/28))
@@ -23,7 +23,7 @@
 * Server configuration name with "/" in name deletes whole server configuration ([#PR27](https://github.com/WhereGroup/qgis2mapbender/pull/27))
 * Fix import contextmanager and clean imports (PyQt5, _core) ([#PR26](https://github.com/WhereGroup/qgis2mapbender/pull/26))
 
-## 1.0.0
+## v1.0.0
 
 ### Features:
 * Connection to QGIS Server and Mapbender via Mapbender API
@@ -36,7 +36,7 @@
 * Success dialog provides the link to the QGIS Server service and Mapbender application
 
 
-## 0.9.2
+## v0.9.2
 
 ### Features:
 * Add CONTRIBUTE.md, LICENSE, rename resources.
@@ -46,7 +46,7 @@
 ### Fixes:
 * Fix error in Windows that occurs when the Python console is closed.
 
-## 0.9.1
+## v0.9.1
 
 ### Features:
 * QGIS Server and Mapbender can also be run as Docker containers.
